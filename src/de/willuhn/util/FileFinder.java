@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/FileFinder.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/03 19:33:59 $
+ * $Revision: 1.2 $
+ * $Date: 2004/01/05 19:13:37 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -50,6 +50,19 @@ public class FileFinder
 		contains.add(regex);
 	}
 
+  /**
+   * Suchkriterium via OR hinzufuegen.
+   * Die Datei muss die genannte Dateiendung haben.
+   * Wird diese Funktion mehrmals aufgerufen, werden alle
+   * Suchkriterien mit ODER verknuepft.
+   * @param extension Datei-Endung. Bitte ohne Punkt. Also z.Bsp. "jar" statt ".jar".
+   */
+  public void extension(String extension)
+  {
+    if (extension == null || "".equals(extension))
+      return;
+    contains.add(".*?\\."+extension+"$");
+  }
 
 	/**
 	 * Sucht im aktuellen Verzeichnis und liefert das Ergebnis zurueck.
@@ -67,7 +80,7 @@ public class FileFinder
 	 */
   public File[] findRecursive()
 	{
-		find(this.baseDir,false);
+		find(this.baseDir,true);
 		return (File[]) found.toArray(new File[found.size()]);
 	}
 
@@ -137,6 +150,9 @@ public class FileFinder
 
 /**********************************************************************
  * $Log: FileFinder.java,v $
+ * Revision 1.2  2004/01/05 19:13:37  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/01/03 19:33:59  willuhn
  * *** empty log message ***
  *
