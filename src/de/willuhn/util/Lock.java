@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Lock.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/04/21 22:29:07 $
+ * $Revision: 1.5 $
+ * $Date: 2004/04/25 17:35:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -43,7 +43,7 @@ public class Lock {
   }
 
 	/**
-   * Loescht das ggf. vorhandene Lock-File.
+   * Loescht das ggf vorhandene Lock-File.
    */
   public synchronized void delete()
 	{
@@ -73,6 +73,9 @@ public class Lock {
 
 /**********************************************************************
  * $Log: Lock.java,v $
+ * Revision 1.5  2004/04/25 17:35:34  willuhn
+ * @D javadoc
+ *
  * Revision 1.4  2004/04/21 22:29:07  willuhn
  * *** empty log message ***
  *
