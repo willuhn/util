@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Lock.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/03/03 22:27:33 $
+ * $Revision: 1.2 $
+ * $Date: 2004/03/29 19:56:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,8 +15,8 @@ package de.willuhn.util;
 import java.io.File;
 
 /**
- * Kleine Hilfs-Klasse mit der eine Lock-Datei erzeugt werden kann,
- * um sicherzustellen, dass eine Anwendung nicht mehrfach gestartet wird.<br>
+ * Kleine Hilfs-Klasse mit der eine Lock-Datei erzeugt werden kann.
+ * Somit wird sichergestellt, dass eine Anwendung nicht mehrfach gestartet wird.<br>
  * Das Lockfile wird automatisch entfernt, wenn die JVM ordnungsgemaess beendet wird.<br>
  * Das Lock-File wird im aktuellen Verzeichnis erzeugt.
  */
@@ -62,6 +62,9 @@ public class Lock {
 
 /**********************************************************************
  * $Log: Lock.java,v $
+ * Revision 1.2  2004/03/29 19:56:56  willuhn
+ * @D javadoc
+ *
  * Revision 1.1  2004/03/03 22:27:33  willuhn
  * @N added Lock
  *

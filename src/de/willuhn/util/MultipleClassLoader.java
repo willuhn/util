@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.10 $
- * $Date: 2004/03/18 01:24:56 $
+ * $Revision: 1.11 $
+ * $Date: 2004/03/29 19:56:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -146,13 +146,13 @@ public class MultipleClassLoader extends ClassLoader
     throw new ClassNotFoundException("class not found: " + className);
   }
 
-	/**
-	 * Sucht nach einem ggf. vorhandenen Implementor des uebergebenen Interfaces.
+  /**
+	 * Sucht nach einem Implementor des uebergebenen Interfaces.
 	 * Hinweis: Die Funktion liefert generell nur instanziierbare Klassen.
 	 * Es werden also weder abstrakte Klassen, noch Interfaces oder RMI-Stubs geliefert.
 	 * @param interphase das Interface.
-	 * @return ggf. gefundene Klasse oder null.
-		 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
+	 * @return gefundene Klasse.
+	 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
 	 */
 	public Class findImplementor(Class interphase) throws ClassNotFoundException
 	{
@@ -161,10 +161,7 @@ public class MultipleClassLoader extends ClassLoader
 
 	/**
 	 * Klassen-Sucher.
-	 * Diese Teil hier kann man mit Klassen fuettern und danach
-	 * in verschiedener Hinsicht befragen. Man kann z.Bsp. ein
-	 * Interface uebergeben und sich eine ggf. vorhandene Implementierung
-	 * liefern zu lassen.
+	 * Diese Teil hier kann man mit Klassen fuettern und danach in verschiedener Hinsicht befragen.
 	 */
 	private class ClassFinder
 	{
@@ -199,7 +196,7 @@ public class MultipleClassLoader extends ClassLoader
 		 * Hinweis: Die Funktion liefert generell nur instanziierbare Klassen.
 		 * Es werden also weder abstrakte Klassen, noch Interfaces oder RMI-Stubs geliefert.
 		 * @param interphase das Interface.
-		 * @return ggf. gefundene Klasse oder null.
+		 * @return die gefundene Klasse.
 		 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
 		 */
 		private Class findImplementor(Class interphase) throws ClassNotFoundException
@@ -337,6 +334,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.11  2004/03/29 19:56:56  willuhn
+ * @D javadoc
+ *
  * Revision 1.10  2004/03/18 01:24:56  willuhn
  * @C refactoring
  *
