@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.18 $
- * $Date: 2004/07/04 17:07:03 $
+ * $Revision: 1.19 $
+ * $Date: 2004/11/10 17:48:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -94,6 +94,20 @@ public class Logger
 			targets.add(target);
 		}
 	}
+
+  /**
+   * Entfernt ein Target aus der Liste.
+   * @param target zu entfernendes Target.
+   */
+  public static void removeTarget(OutputStream target)
+  {
+    if (target == null)
+      return;
+    synchronized(targets)
+    {
+      targets.remove(target);
+    }
+  }
 
 	/**
 	 * Setzt den Log-Level.
@@ -372,6 +386,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.19  2004/11/10 17:48:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.18  2004/07/04 17:07:03  willuhn
  * *** empty log message ***
  *

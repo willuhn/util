@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/LoggerOutputStream.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/06/30 20:58:52 $
+ * $Revision: 1.3 $
+ * $Date: 2004/11/10 17:48:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,19 +13,13 @@
 package de.willuhn.util;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Ein OutputStream, der alle Ausgaben in den Logger schreibt.
  */
-public class LoggerOutputStream extends OutputStream {
-
-	private final static int BUF_SIZE = 1024;
+public class LoggerOutputStream extends LineOutputStream {
 
 	private int level;
-	private StringBuffer line = new StringBuffer();
-	private char[] buffer = new char[BUF_SIZE];
-	private int bufferCount = 0;
 
   /**
    * ct.
@@ -38,32 +32,11 @@ public class LoggerOutputStream extends OutputStream {
   }
 
   /**
-   * @see java.io.OutputStream#write(int)
+   * @see de.willuhn.util.LineOutputStream#writeLine(java.lang.String)
    */
-  public void write(int b) throws IOException {
-
-		// Wenn ein Linebreak kommt, schreiben wir raus
-		if (b == '\n')
-		{
-			line.append(buffer);
-			Logger.write(level,line.toString().replaceAll("\\r|\\n",""));
-			line = new StringBuffer();
-			bufferCount = 0;
-			buffer = new char[BUF_SIZE];
-			return;
-		}
-
-		// Meistens schreiben wir in den Char-Buffer
-  	if (bufferCount < BUF_SIZE)
-  	{
-  		buffer[bufferCount++] = (char) b;
-  		return;
-  	}
-
-		// Charbuffer ist voll, wir haengens an die Zeile
-		line.append(buffer);
-		bufferCount = 0;
-		buffer = new char[BUF_SIZE];
+  public void writeLine(String s) throws IOException
+  {
+    Logger.write(level,s);
   }
 
 }
@@ -71,6 +44,9 @@ public class LoggerOutputStream extends OutputStream {
 
 /**********************************************************************
  * $Log: LoggerOutputStream.java,v $
+ * Revision 1.3  2004/11/10 17:48:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/06/30 20:58:52  willuhn
  * @C some refactoring
  *
