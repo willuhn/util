@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.22 $
- * $Date: 2004/06/30 20:58:53 $
+ * $Revision: 1.23 $
+ * $Date: 2004/07/25 17:15:33 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -28,7 +28,6 @@ import java.util.Hashtable;
  */
 public class MultipleClassLoader extends ClassLoader
 {
-
   private ArrayList loaders   	= new ArrayList();
   private ArrayList urlList    	= new ArrayList();
   private Hashtable cache     	= new Hashtable();
@@ -38,12 +37,10 @@ public class MultipleClassLoader extends ClassLoader
   private URL[] urls          	= null;
   private URLClassLoader ucl  	= null;
 
-  /**
-   * ct.
-   */
-  public MultipleClassLoader()
-  {
-  }
+	public MultipleClassLoader()
+	{
+		super();
+	}
 
   /**
    * Fuegt einen weiteren ClassLoader hinzu,
@@ -126,6 +123,14 @@ public class MultipleClassLoader extends ClassLoader
       urlsChanged = false;
     }
   }
+
+	/**
+	 * @see java.lang.ClassLoader#findClass(java.lang.String)
+	 */
+	protected Class findClass(String name) throws ClassNotFoundException
+	{
+		return load(name);
+	}
 
   /**
    * @see java.lang.ClassLoader#loadClass(java.lang.String)
@@ -227,6 +232,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.23  2004/07/25 17:15:33  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.22  2004/06/30 20:58:53  willuhn
  * @C some refactoring
  *
