@@ -19,7 +19,7 @@
 		<echo message="VERSION: ${version}"/>
 		<echo message="BUILD  : ${build.number}"/>
 
-        <property name="project.release"	 value="releases/${version}-${build.number}/${define.pluginname}"/>
+        <property name="project.release"	 value="releases/${version}-${build.number}"/>
         <property name="project.src" 		 value="${project.release}/src/classes"/>
         <property name="project.tmp" 		 value="${project.release}/tmp"/>
         <property name="project.javadoc" 	 value="${project.release}/javadoc"/>
