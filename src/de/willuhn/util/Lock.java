@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Lock.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/03/29 19:56:56 $
+ * $Revision: 1.3 $
+ * $Date: 2004/03/29 23:08:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -54,7 +54,7 @@ public class Lock {
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException("Die Anwendung läuft bereits.\n" +				"Sollte eine vorherige Instanz abgestürzt sein, dann löschen " +				"Sie bitte die Lock-Datei \"" + file.getAbsolutePath() + "\".");
+			throw new RuntimeException("Die Anwendung läuft bereits.\n" +				"Sollte eine vorherige Instanz abgestürzt sein, dann löschen\n" +				"Sie bitte die Lock-Datei \"" + file.getAbsolutePath() + "\".");
 		}
 	}
 }
@@ -62,6 +62,9 @@ public class Lock {
 
 /**********************************************************************
  * $Log: Lock.java,v $
+ * Revision 1.3  2004/03/29 23:08:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/03/29 19:56:56  willuhn
  * @D javadoc
  *
