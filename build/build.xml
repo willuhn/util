@@ -82,13 +82,6 @@
 	    <copy file="${build.dir}/COPYING"           tofile="${project.release}/COPYING" />
 	    <copy file="${build.dir}/README"            tofile="${project.release}/README" />
 
-	  	<checksum file="${project.release}/${define.jarfilename}" />
-	  	<echo message="Creating PGP signature" />
-	  	<exec executable="kgpg" failonerror="true" timeout="60000">
-			<arg line="-S ${project.release}/${define.jarfilename}"/>
-	  	</exec>
-	  	<echo message="done" />
-
     </target>
 
 
@@ -116,25 +109,34 @@
 				<exclude name="${build.dir}/BUILD"/>
 			</fileset>
 		</zip>
-		<checksum file="${project.release}/${define.srcfilename}" />
-		<echo message="Creating PGP signature" />
-		<exec executable="kgpg" failonerror="true" timeout="60000">
-			<arg line="-S ${project.release}/${define.srcfilename}"/>
-		</exec>
-		<echo message="done" />
   </target>
 
 
-    <target name="clean" description="cleanup">
-        <delete dir="${project.tmp}"/>
-    </target>
+  <target name="clean" description="cleanup">
+    <delete dir="${project.tmp}"/>
+  </target>
+
+  <target name="sign" description="signs the jar/zip file">
+  	<checksum file="${project.release}/${define.jarfilename}" />
+  	<echo message="Creating PGP signature" />
+  	<exec executable="kgpg" failonerror="true" timeout="60000">
+		<arg line="-S ${project.release}/${define.jarfilename}"/>
+  	</exec>
+  </target>
+
+  <target name="signsrc" description="signs the source zip">
+	<checksum file="${project.release}/${define.srcfilename}" />
+	<echo message="Creating PGP signature" />
+	<exec executable="kgpg" failonerror="true" timeout="60000">
+		<arg line="-S ${project.release}/${define.srcfilename}"/>
+	</exec>
+  </target>
+
+
+  <target depends="init,compile,cvstag,jar,javadoc,src,clean" description="build an official release" name="all" />
 
 
 
-    <target depends="init,compile,cvstag,jar,javadoc,src,clean" description="build an official release" name="all" />
-
-
-
-    <target depends="init,compile,jar,src,clean" description="build inofficial release" name="fast" />
+  <target depends="init,compile,jar,src,clean" description="build inofficial release" name="fast" />
 
 </project>

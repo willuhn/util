@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.5 $
- * $Date: 2004/11/05 01:50:58 $
+ * $Revision: 1.6 $
+ * $Date: 2004/11/05 19:42:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,7 +41,6 @@ public class I18N
 
 	/**
 	 * ct.
-	 * @param resourcePath
 	 */
 	public I18N()
 	{
@@ -203,6 +202,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.6  2004/11/05 19:42:03  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.5  2004/11/05 01:50:58  willuhn
  * *** empty log message ***
  *
