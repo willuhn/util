@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/06/03 00:24:33 $
+ * $Revision: 1.2 $
+ * $Date: 2004/06/03 00:45:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,8 @@ public class BootLoader {
 	public BootLoader(InitParams params)
 	{
 		this.params = params;
+		logger.setLevel(Logger.LEVEL_DEBUG);
+		logger.addTarget(System.out);
 	}
 
 	public final void boot(Class target) throws Exception
@@ -43,15 +45,20 @@ public class BootLoader {
 			return;
 		}
 
-		logger.info("creating new instance of " + target.getName());
 		Service s = (Service) target.newInstance();
 
+		logger.info("checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
 		if (deps != null)
 		{
 			for (int i=0;i<deps.length;++i)
 			{
 				logger.info("booting dependency " + deps[i].getName());
+				if (deps[i].equals(target))
+				{
+					logger.info(deps[i].getName() + " cannot have itself as dependency, skipping");
+					continue;
+				}
 				boot(deps[i]);
 			}
 		}
@@ -60,6 +67,7 @@ public class BootLoader {
 		services.put(target,s);
 	}
 
+
 	public final void setLogger(Logger l)
 	{
 		if (l == null)
@@ -67,11 +75,23 @@ public class BootLoader {
 		this.logger = l;
 	}
 
+  /**
+   * @see java.lang.Object#finalize()
+   */
+  protected void finalize() throws Throwable {
+  	if (logger != null)
+  		logger.close();
+    super.finalize();
+  }
+
 }
 
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.2  2004/06/03 00:45:11  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/06/03 00:24:33  willuhn
  * *** empty log message ***
  *
