@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Level.java,v $
- * $Revision: 1.3 $
- * $Date: 2005/03/09 01:06:20 $
+ * $Revision: 1.4 $
+ * $Date: 2005/03/24 17:28:25 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -33,12 +33,12 @@ public class Level
 	/**
 	 * Vordefinierter Log-Level fuer regulaere Meldungen.
 	 */
-	public final static Level INFO   = new Level("INFO ",100);
+	public final static Level INFO   = new Level("INFO",100);
 
 	/**
 	 * Vordefinierter Log-Level fuer Warnungen.
 	 */
-	public final static Level WARN   = new Level("WARN ",300);
+	public final static Level WARN   = new Level("WARN",300);
 
 	/**
 	 * Vordefinierter Log-Level fuer Fehler.
@@ -113,6 +113,9 @@ public class Level
 
 /**********************************************************************
  * $Log: Level.java,v $
+ * Revision 1.4  2005/03/24 17:28:25  web0
+ * @B bug in Level.findByName
+ *
  * Revision 1.3  2005/03/09 01:06:20  web0
  * @D javadoc fixes
  *
