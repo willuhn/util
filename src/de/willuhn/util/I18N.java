@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/06/10 20:57:34 $
+ * $Revision: 1.5 $
+ * $Date: 2004/11/05 01:50:58 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,7 +13,9 @@
 
 package de.willuhn.util;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -32,31 +34,103 @@ public class I18N
 {
 
   private ResourceBundle bundle;
-  private Properties properties;
+  private Properties fallbackBundle;
+  private Properties properties = new Properties();
 
 	private Locale locale;
 
-  /**
+	/**
+	 * ct.
+	 * @param resourcePath
+	 */
+	public I18N()
+	{
+		this("lang/messages",Locale.getDefault(),null);
+	}
+
+	/**
+	 * ct.
+	 * @param resourcePath
+	 */
+	public I18N(String resourcePath)
+	{
+		this(resourcePath,Locale.getDefault(),null);
+	}
+
+	/**
    * Initialisiert diese Klasse mit dem angegebenen Locale.
    * @param resourcePath
    * @param l das zu verwendende Locale.
    */
   public I18N(String resourcePath, Locale l)
+	{
+		this(resourcePath,l,null);
+	}
+
+  /**
+   * Initialisiert diese Klasse mit dem angegebenen Locale.
+   * @param resourcePath
+   * @param l das zu verwendende Locale.
+   * @param loader der Classloader.
+   */
+  public I18N(String resourcePath, Locale l, ClassLoader loader)
   {
 		if (resourcePath == null || l == null)
 			return;
 
 		locale = l;
-		properties = new Properties();
 
     try {
-      bundle = ResourceBundle.getBundle(resourcePath,l);
+			Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
+    	if (loader != null)
+	      bundle = ResourceBundle.getBundle(resourcePath,l,loader);
+	    else
+				bundle = ResourceBundle.getBundle(resourcePath,l);
+
     }
-    catch (MissingResourceException mre)
+    catch (Exception e)
     {
+    	Logger.warn("unable to load resource bundle " + resourcePath + " for locale " + l.toString());
+			Logger.info("try to read via inputstream");
+			try
+			{
+				load(new FileInputStream(resourcePath + "_" + l.toString() + ".properties"));
+			}
+			catch (Exception e2)
+			{
+				Logger.error("giving up, unable to load resource bundle",e2);
+			}
     }
   }
   
+	/**
+	 * Initialisiert das Bundle basierend auf einem Input-Stream.
+   * @param is Inputstream.
+   */
+  public I18N(InputStream is)
+	{
+		load(is);
+	}
+
+	/**
+	 * Liest das Bundle via InpuStream.
+   * @param is
+   */
+  private void load(InputStream is)
+	{
+		fallbackBundle = new Properties();
+		if (is == null)
+			Logger.error("no inputstream given for I18N");
+		try
+		{
+			fallbackBundle.load(is);
+		}
+		catch (IOException e)
+		{
+			Logger.error("error while reading resource bundle from inputstream",e);
+		}
+	}
+
   /**
    * Uebersetzt den angegebenen String und liefert die uebersetzte
    * Version zurueck. Kann der String nicht uebersetzt werden, wird
@@ -70,8 +144,11 @@ public class I18N
     try {
       if (bundle != null)
         translated = bundle.getString(key);
+      else if (fallbackBundle != null)
+      	translated = fallbackBundle.getProperty(key);
     }
-    catch(MissingResourceException e) {}
+    catch(MissingResourceException e) {
+    }
 
     if (translated != null)
       return translated;
@@ -119,12 +196,16 @@ public class I18N
    */
   public void storeUntranslated(OutputStream os) throws IOException
   {
+		Logger.info("saving unresolved locale strings");
     properties.store(os, "unresolved strings for locale " + locale.toString());
   }
 }
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.5  2004/11/05 01:50:58  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.4  2004/06/10 20:57:34  willuhn
  * @D javadoc comments fixed
  *
