@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/11/12 18:18:19 $
+ * $Revision: 1.2 $
+ * $Date: 2004/12/15 01:18:13 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,6 +41,9 @@ public class Logger
 	private static Level level = Level.DEFAULT;
 
 	private static LoggerThread lt = null;
+	
+	// legt fest, ob der Name der loggenden Klasse ermittelt und mit gedruckt werden soll.
+	private static boolean printClass = true;
 
 	static
 	{
@@ -60,6 +63,15 @@ public class Logger
 		{
 			targets.add(target);
 		}
+	}
+
+	/**
+	 * Legt fest, ob der Name der loggenden Klasse ermittelt und mit gedruckt werden soll.
+   * @param b true, wenn der Klassen-Name mit gedruckt werden soll.
+   */
+  public static void setPrintClass(boolean b)
+	{
+		printClass = b;
 	}
 
   /**
@@ -215,6 +227,14 @@ public class Logger
   	if (level.getValue() < Logger.level.getValue())
   		return;
 
+		if (printClass)
+		{
+			StackTraceElement[] stack = new Throwable().getStackTrace();
+			if (stack.length >= 3)
+			{
+				message = "[" + stack[2].getClassName() + "." + stack[2].getMethodName() + "] " + message;
+			}
+		}
 		lt.write(level,message);
   }
   
@@ -354,6 +374,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.2  2004/12/15 01:18:13  willuhn
+ * @N Logger is now able to log class names to
+ *
  * Revision 1.1  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *
