@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/08 21:38:39 $
+ * $Revision: 1.2 $
+ * $Date: 2004/03/03 22:27:33 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,18 +30,18 @@ import java.util.ResourceBundle;
 public class I18N
 {
 
-  private static ResourceBundle bundle;
-  private static Properties properties;
+  private ResourceBundle bundle;
+  private Properties properties;
 
-	private static String path;
-	private static Locale locale;
+	private String path;
+	private Locale locale;
 
   /**
    * Initialisiert diese Klasse mit dem angegebenen Locale.
    * @param resourcePath
    * @param l das zu verwendende Locale.
    */
-  public static void init(String resourcePath, Locale l)
+  public I18N(String resourcePath, Locale l)
   {
 		if (resourcePath == null || l == null)
 			return;
@@ -65,7 +65,7 @@ public class I18N
    * @param key zu uebersetzender String.
    * @return uebersetzter String.
    */
-  public static String tr(String key)
+  public String tr(String key)
   {
     String translated = null;
     try {
@@ -87,7 +87,7 @@ public class I18N
    * messages_xxx im Temp-Verzeichnis, die waehrend der aktuellen Sitzung
    * nicht uebersetzt werden konnten.
    */
-  public static void flush()
+  public void flush()
   {
     try
     {
@@ -102,6 +102,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.2  2004/03/03 22:27:33  willuhn
+ * @N added Lock
+ *
  * Revision 1.1  2004/01/08 21:38:39  willuhn
  * *** empty log message ***
  *

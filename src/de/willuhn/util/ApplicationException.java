@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ApplicationException.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/08 21:38:39 $
+ * $Revision: 1.2 $
+ * $Date: 2004/03/03 22:27:33 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -63,18 +63,13 @@ public class ApplicationException extends Exception
     super(message, cause);
   }
 
-  /**
-   * @see java.lang.Throwable#getLocalizedMessage()
-   */
-  public String getLocalizedMessage()
-  {
-    return I18N.tr(getMessage());
-  }
-
 }
 
 /*********************************************************************
  * $Log: ApplicationException.java,v $
+ * Revision 1.2  2004/03/03 22:27:33  willuhn
+ * @N added Lock
+ *
  * Revision 1.1  2004/01/08 21:38:39  willuhn
  * *** empty log message ***
  *
