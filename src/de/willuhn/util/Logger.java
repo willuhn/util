@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.17 $
- * $Date: 2004/06/30 20:58:52 $
+ * $Revision: 1.18 $
+ * $Date: 2004/07/04 17:07:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -347,7 +347,7 @@ public class Logger
 				{
 					if (targets.size() == 0)
 					{
-						System.out.println("warn: no logging target defined, logging to console: " + message);
+						System.out.print("warn: no logging target defined, logging to console: " + new String(message));
 						continue;
 					}
 
@@ -360,7 +360,7 @@ public class Logger
 						}
 						catch (IOException e)
 						{
-							System.out.println("alert: error while logging the following message: " + message);
+							System.out.print("alert: error while logging the following message: " + new String(message));
 						}
 					}
 				}
@@ -372,6 +372,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.18  2004/07/04 17:07:03  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.17  2004/06/30 20:58:52  willuhn
  * @C some refactoring
  *
