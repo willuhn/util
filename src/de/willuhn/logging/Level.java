@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Level.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/11/12 18:18:19 $
+ * $Revision: 1.2 $
+ * $Date: 2005/01/14 00:49:04 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -89,11 +89,30 @@ public class Level
 	{
 		return (Level) registry.get(name);
 	}
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj)
+  {
+  	return ((Level)obj).value == this.value;
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  public String toString()
+  {
+    return "Name: " + name + ", Level: " + value;
+  }
+
 }
 
 
 /**********************************************************************
  * $Log: Level.java,v $
+ * Revision 1.2  2005/01/14 00:49:04  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *
