@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/10/08 00:19:25 $
+ * $Revision: 1.3 $
+ * $Date: 2004/11/04 17:48:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -245,11 +245,22 @@ public class ZipExtractor
     public void log(String msg)
     {
     }
+
+    /**
+     * @see de.willuhn.util.ProgressMonitor#percentComplete()
+     */
+    public int percentComplete()
+    {
+      return 0;
+    }
   }
 }
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.3  2004/11/04 17:48:31  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/10/08 00:19:25  willuhn
  * *** empty log message ***
  *

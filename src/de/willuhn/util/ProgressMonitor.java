@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ProgressMonitor.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.2 $
+ * $Date: 2004/11/04 17:48:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,12 @@ public interface ProgressMonitor
    */
   public void percentComplete(int percent);
 
+  /**
+   * Liefert den aktuell angezeigten Fortschritt in Prozent.
+   * @return aktueller Fortschritt.
+   */
+  public int percentComplete();
+  
 	/**
 	 * Teilt dem Monitor den aktuellen Status des Tasks mit.
    * Das koennen selbst definierte Konstanten sein.
@@ -50,6 +56,9 @@ public interface ProgressMonitor
 
 /**********************************************************************
  * $Log: ProgressMonitor.java,v $
+ * Revision 1.2  2004/11/04 17:48:31  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *
