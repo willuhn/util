@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.9 $
- * $Date: 2004/03/06 18:24:47 $
+ * $Revision: 1.10 $
+ * $Date: 2004/03/18 01:24:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -29,23 +29,26 @@ import java.util.Hashtable;
 public class MultipleClassLoader extends ClassLoader
 {
 
-  private static ArrayList loaders = new ArrayList();
-  private static Hashtable cache = new Hashtable();
-	private static Logger logger = new Logger();
+  private ArrayList loaders = new ArrayList();
+  private Hashtable cache = new Hashtable();
+	private Logger logger = new Logger("MultipleClassLoader");
   
-  private static ClassFinder finder = new ClassFinder();
+  private ClassFinder finder = new ClassFinder();
   
-  static {
-    // System-Classloader hinzufuegen
-    addClassloader(getSystemClassLoader());
-  }
+	/**
+   * ct.
+   */
+  public MultipleClassLoader()
+	{
+		addClassloader(getSystemClassLoader());
+	}
 
 	/**
 	 * Optionale Angabe eines Loggers.
 	 * Wird er angegeben, schreibt der ClassLoader seine Infos da rein.
    * @param l zu verwendender ClassLoader.
    */
-  public static void setLogger(Logger l)
+  public void setLogger(Logger l)
 	{
 		if (l == null)
 			return;
@@ -56,7 +59,7 @@ public class MultipleClassLoader extends ClassLoader
    * Fuegt einen weiteren ClassLoader hinzu,
    * @param loader der hinzuzufuegende Classloader.
    */
-  public static void addClassloader(ClassLoader loader)
+  public void addClassloader(ClassLoader loader)
   {
   	if (loader == null)
   		return;
@@ -69,7 +72,7 @@ public class MultipleClassLoader extends ClassLoader
    * @param file das Jar-File oder Verzeichnis.
    * @throws MalformedURLException
    */
-  public static void add(File file) throws MalformedURLException
+  public void add(File file) throws MalformedURLException
   {
   	if (file == null)
   		return;
@@ -83,7 +86,7 @@ public class MultipleClassLoader extends ClassLoader
    * @return eine Liste mit allen Jar-Files, die geladen wurden.
    * @throws MalformedURLException
    */
-  public static File[] addJars(File directory) throws MalformedURLException
+  public File[] addJars(File directory) throws MalformedURLException
 	{
 		// Liste aller Jars aus dem plugin-Verzeichnis holen
 		FileFinder finder = new FileFinder(directory);
@@ -111,7 +114,7 @@ public class MultipleClassLoader extends ClassLoader
    * @return Die Klasse.
    * @throws ClassNotFoundException
    */
-  public static Class load(String className) throws ClassNotFoundException
+  public Class load(String className) throws ClassNotFoundException
   {
 
 		// wir schauen erstmal im Cache nach.
@@ -151,7 +154,7 @@ public class MultipleClassLoader extends ClassLoader
 	 * @return ggf. gefundene Klasse oder null.
 		 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
 	 */
-	public static Class findImplementor(Class interphase) throws ClassNotFoundException
+	public Class findImplementor(Class interphase) throws ClassNotFoundException
 	{
 		return finder.findImplementor(interphase);
 	}
@@ -163,7 +166,7 @@ public class MultipleClassLoader extends ClassLoader
 	 * Interface uebergeben und sich eine ggf. vorhandene Implementierung
 	 * liefern zu lassen.
 	 */
-	private static class ClassFinder
+	private class ClassFinder
 	{
 
 		private Hashtable cache = new Hashtable();
@@ -334,6 +337,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.10  2004/03/18 01:24:56  willuhn
+ * @C refactoring
+ *
  * Revision 1.9  2004/03/06 18:24:47  willuhn
  * @D javadoc
  *

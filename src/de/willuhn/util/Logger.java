@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.10 $
- * $Date: 2004/03/06 18:24:47 $
+ * $Revision: 1.11 $
+ * $Date: 2004/03/18 01:24:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -77,9 +77,9 @@ public class Logger
   /**
    * ct.
    */
-  public Logger()
+  public Logger(String name)
   {
-  	lt = new LoggerThread();
+  	lt = new LoggerThread(name);
   	lt.start();
   }
   
@@ -283,9 +283,9 @@ public class Logger
   	/**
      * ct.
      */
-    public LoggerThread()
+    public LoggerThread(String name)
   	{
-  		super(LoggerThread.class.getName());
+  		super("logger: " + name);
   	}
 
 		/**
@@ -373,6 +373,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.11  2004/03/18 01:24:56  willuhn
+ * @C refactoring
+ *
  * Revision 1.10  2004/03/06 18:24:47  willuhn
  * @D javadoc
  *
