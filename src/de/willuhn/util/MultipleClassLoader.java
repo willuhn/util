@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.5 $
- * $Date: 2004/02/09 13:06:51 $
+ * $Revision: 1.6 $
+ * $Date: 2004/02/25 23:12:07 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,6 +30,7 @@ public class MultipleClassLoader extends ClassLoader
 
   private static ArrayList loaders = new ArrayList();
   private static Hashtable cache = new Hashtable();
+	private static Logger logger = new Logger();
   
   private static ClassFinder finder = new ClassFinder();
   
@@ -38,12 +39,27 @@ public class MultipleClassLoader extends ClassLoader
     addClassloader(getSystemClassLoader());
   }
 
+	/**
+	 * Optionale Angabe eines Loggers.
+	 * Wird er angegeben, schreibt der ClassLoader seine Infos da rein.
+   * @param l zu verwendender ClassLoader.
+   */
+  public static void setLogger(Logger l)
+	{
+		if (l == null)
+			return;
+		logger = l;
+	}
+
   /**
    * Fuegt einen weiteren ClassLoader hinzu,
    * @param loader der hinzuzufuegende Classloader.
    */
   public static void addClassloader(ClassLoader loader)
   {
+  	if (loader == null)
+  		return;
+  	logger.debug("multipleClassLoader: adding class loader " + loader.getClass().getName());
     loaders.add(loader);
   }
   
@@ -56,6 +72,7 @@ public class MultipleClassLoader extends ClassLoader
   {
   	if (file == null)
   		return;
+		logger.debug("multipleClassLoader: adding file " + file.getAbsolutePath());
 		addClassloader(new URLClassLoader(new URL[]{file.toURL()}));
   }
 
@@ -82,6 +99,7 @@ public class MultipleClassLoader extends ClassLoader
 		{
 			File jar = (File) jars[i];
 			urls[i] = jar.toURL();
+			logger.debug("multipleClassLoader: adding file " + jar.getAbsolutePath());
 		}
 		addClassloader(new URLClassLoader(urls));
 		return jars;
@@ -96,7 +114,9 @@ public class MultipleClassLoader extends ClassLoader
 		// wir schauen erstmal im Cache nach.
 		Class c = (Class) cache.get(className);
 		if (c != null)
+		{
 			return c;
+		}
 		
     ClassLoader l = null;
     for (int i=0;i<loaders.size();++i)
@@ -173,15 +193,21 @@ public class MultipleClassLoader extends ClassLoader
 		private Class findImplementor(Class interphase)
 		{
 			if (interphase == null)
+			{
 				return null;
+			}
 
 			if (!interphase.isInterface()) // kein Interface
 				return interphase;
+
+			long start = System.currentTimeMillis();
 		
 			// erstmal im Cache checken
 			Class found = (Class) cache.get(interphase);
 			if (found != null)
+			{
 				return found;
+			}
 			
 			Class test = null;
 			// ueber alle Klassen iterieren 
@@ -196,24 +222,32 @@ public class MultipleClassLoader extends ClassLoader
 				if (check(test,interphase))
 				{
 					cache.put(interphase,test);
+					logger.debug("multipleClassLoader.ClassFinder: found implementor " + test.getName() + " for interface " + interphase.getName());
+					logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
 					return test;
 				}
 
-				// checken, ob weiter unten in der Ableitunghierachie jemand das
+				// checken, ob weiter oben in der Ableitunghierachie jemand das
 				// Interface implementiert. Maximale Iterationstiefe 10
 				Class parent = null;
 				for (int k=0;k<10;++k)
 				{
 					parent = test.getSuperclass();
+					if (parent == null)
+						break; // nichts mehr oben drueber
 					if (check(parent,interphase))
 					{
 						cache.put(interphase,test);
+						logger.debug("multipleClassLoader.ClassFinder: found implementor " + test.getName() + " for interface " + interphase.getName());
+						logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
 						return test; // wir geben "test" zurueck, da es durch die Ableitung von
 												 // "parent" ebenfalls das Interface implementiert.
 					}
+					test = parent;
 				}
 			}
 			// nicht gefunden
+			logger.debug("multipleClassLoader.ClassFinder: ...not found");
 			return null;
 		}
 
@@ -252,6 +286,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.6  2004/02/25 23:12:07  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.5  2004/02/09 13:06:51  willuhn
  * @C misc
  *
