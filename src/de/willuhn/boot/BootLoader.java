@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/06/03 22:11:49 $
+ * $Revision: 1.4 $
+ * $Date: 2004/06/10 20:57:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -54,6 +54,7 @@ public class BootLoader {
    * diesen mit anzugeben, wenn man via <code>failedDependency(Service dependency,SkipServiceException)</code>
    * ueber das Fehlschlagen einer Abhaengigkeit informiert werden moechte.
 	 * @throws Exception
+   * @return der instanziierte Service.
 	 */
 	public final Service boot(Class target,Service caller) throws Exception
 	{
@@ -126,7 +127,6 @@ public class BootLoader {
 			// huh, der Service will noch mehr Zeug starten
 			for (int k=0;k<childs.length;++k)
 			{
-				Service child = null;
 				boot(childs[k],s);
 			}
 		}
@@ -177,6 +177,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.4  2004/06/10 20:57:34  willuhn
+ * @D javadoc comments fixed
+ *
  * Revision 1.3  2004/06/03 22:11:49  willuhn
  * *** empty log message ***
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/JarInfo.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/05/25 23:24:03 $
+ * $Revision: 1.4 $
+ * $Date: 2004/06/10 20:57:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,12 +22,22 @@ import java.util.jar.Manifest;
  */
 public class JarInfo {
 
-	private JarFile jar = null;
 	private Manifest manifest = null;
 
+	/**
+	 * Attribut des Typs Version.
+	 */
 	public final static String ATTRIBUTE_VERSION = "Implementation-Version";
-	public final static String ATTRIBUTE_TITLE   = "Implementation-Title";
-	public final static String ATTRIBUTE_BUILD	 = "Implementation-Buildnumber";
+
+  /**
+	 * Attribut des Typs Title.
+	 */
+  public final static String ATTRIBUTE_TITLE   = "Implementation-Title";
+
+  /**
+   * Attribut des Typs Build.
+   */
+  public final static String ATTRIBUTE_BUILD	 = "Implementation-Buildnumber";
 
   /**
    * ct.
@@ -35,7 +45,6 @@ public class JarInfo {
    * @throws IOException
    */
   public JarInfo(JarFile jar) throws IOException {
-  	this.jar = jar;
   	this.manifest = jar.getManifest();
   }
 
@@ -87,6 +96,9 @@ public class JarInfo {
 
 /**********************************************************************
  * $Log: JarInfo.java,v $
+ * Revision 1.4  2004/06/10 20:57:34  willuhn
+ * @D javadoc comments fixed
+ *
  * Revision 1.3  2004/05/25 23:24:03  willuhn
  * *** empty log message ***
  *

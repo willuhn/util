@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/04/01 22:07:16 $
+ * $Revision: 1.4 $
+ * $Date: 2004/06/10 20:57:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,9 @@
 
 package de.willuhn.util;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -31,7 +34,6 @@ public class I18N
   private ResourceBundle bundle;
   private Properties properties;
 
-	private String path;
 	private Locale locale;
 
   /**
@@ -44,7 +46,6 @@ public class I18N
 		if (resourcePath == null || l == null)
 			return;
 
-		path = resourcePath;
 		locale = l;
 		properties = new Properties();
 
@@ -79,29 +80,54 @@ public class I18N
     return key;
   }
 
+  /**
+   * Uebersetzt den angegebenen String und liefert die uebersetzte
+   * Version zurueck. Kann der String nicht uebersetzt werden, wird
+   * der Original-String zurueckgegeben.
+   * <br><b>Hinweis:</b>. Die Textmarken fuer die Ersetzungen sind mit <code>{n}</code> zu definieren
+   * wobei n von 0 beginnend hochgezaehlt wird und genauso oft vorkommen darf wie das String-Array
+   * Elemente besitzt.<br>
+   * Bsp: i18n.tr("Das ist eine {0} nuetzliche {1}", new String[] {"besonders","Funktion"});
+   * @param key zu uebersetzender String.
+   * @param replacements String-Array mit den einzusetzenden Werten.
+   * @return uebersetzter String.
+   */
+  public String tr(String key, String[] replacements)
+  {
+    return MessageFormat.format(tr(key),replacements);
+  }
+  
+  /**
+   * Uebersetzt den angegeben String und liefert die uebersetzte Version zurueck.
+   * Diese Funktion existiert der Einfachheit halber fuer Strings, welche lediglich
+   * ein Replacement besitzen. Die sonst notwendige Erzeugung eines String-Arrays
+   * mit nur einem Element entfaellt damit.<br>
+   * Bsp: i18n.tr("Das ist eine nuetzliche {0}", "Funktion");
+   * @param key zu uebersetzender String.
+   * @param replacement String mit dem einzusetzenden Wert.
+   * @return uebersetzter String.
+   */
+  public String tr(String key, String replacement)
+  {
+    return MessageFormat.format(tr(key),new String[] {replacement});
+  }
 
   /**
-   * Beendet die aktuelle Sitzung und schreibt alle Strings in eine Datei
-   * messages_xxx im Temp-Verzeichnis, die waehrend der aktuellen Sitzung
-   * nicht uebersetzt werden konnten.
+   * Schreibt alle bis dato nicht uebersetzbaren Strings in den angegebenen OutputStream.
+   * @param os Stream, in den geschrieben werden soll.
+   * @throws IOException
    */
-  public void flush()
+  public void storeUntranslated(OutputStream os) throws IOException
   {
-  	return;
-//    try
-//    {
-////      File file = new File(path + "_" + locale.toString() + ".properties");
-//			File file = new File("/tmp/install/" + locale.toString() + ".properties");
-//      properties.store(new FileOutputStream(file), "unresolved strings for locale " + locale.toString());
-//    }
-//    catch (Exception e)
-//    {
-//    }
+    properties.store(os, "unresolved strings for locale " + locale.toString());
   }
 }
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.4  2004/06/10 20:57:34  willuhn
+ * @D javadoc comments fixed
+ *
  * Revision 1.3  2004/04/01 22:07:16  willuhn
  * *** empty log message ***
  *
