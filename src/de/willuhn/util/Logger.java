@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.8 $
- * $Date: 2004/01/25 18:40:05 $
+ * $Revision: 1.9 $
+ * $Date: 2004/02/12 00:49:12 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -42,7 +42,9 @@ public class Logger
 	public final static int LEVEL_WARN  = 2;
 	public final static int LEVEL_ERROR = 3;
   
-	private int level = LEVEL_DEBUG;
+	public final static int LEVEL_DEFAULT = LEVEL_WARN;
+
+	private int level = LEVEL_DEFAULT;
 
 	private LoggerThread lt = null;
 
@@ -84,11 +86,23 @@ public class Logger
 	{
 		if (level == null || "".equals(level))
 			return;
+		setLevel(getLevelByName(level));
+	}
+	
+	/**
+	 * Liefert den Log-Level basierend auf dem Aliasnamen.
+   * @param name Name des Log-Levels. Siehe auch Logger.LEVEL_TEXT[].
+   * @return int wert des Log-Levels oder Default-Loglevel.
+   *         Siehe auch Logger.LEVEL_*.
+   */
+  public int getLevelByName(String name)
+	{
 		for (int i=0;i<LEVEL_TEXT.length;++i)
 		{
-			if (LEVEL_TEXT[i].equalsIgnoreCase(level))
-				setLevel(i);
+			if (LEVEL_TEXT[i].equalsIgnoreCase(name))
+				return i;
 		}
+		return LEVEL_DEFAULT;
 	}
 
   /**
@@ -333,6 +347,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.9  2004/02/12 00:49:12  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.8  2004/01/25 18:40:05  willuhn
  * *** empty log message ***
  *
