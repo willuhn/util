@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.6 $
- * $Date: 2004/02/25 23:12:07 $
+ * $Revision: 1.7 $
+ * $Date: 2004/02/26 18:47:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -237,10 +237,10 @@ public class MultipleClassLoader extends ClassLoader
 						break; // nichts mehr oben drueber
 					if (check(parent,interphase))
 					{
-						cache.put(interphase,test);
-						logger.debug("multipleClassLoader.ClassFinder: found implementor " + test.getName() + " for interface " + interphase.getName());
+						cache.put(interphase,parent);
+						logger.debug("multipleClassLoader.ClassFinder: found implementor " + parent.getName() + " for interface " + interphase.getName());
 						logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
-						return test; // wir geben "test" zurueck, da es durch die Ableitung von
+						return parent; // wir geben "test" zurueck, da es durch die Ableitung von
 												 // "parent" ebenfalls das Interface implementiert.
 					}
 					test = parent;
@@ -286,6 +286,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.7  2004/02/26 18:47:11  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/02/25 23:12:07  willuhn
  * *** empty log message ***
  *
