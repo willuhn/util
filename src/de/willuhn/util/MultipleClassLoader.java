@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.15 $
- * $Date: 2004/04/01 19:02:02 $
+ * $Revision: 1.16 $
+ * $Date: 2004/05/02 17:04:58 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -344,8 +344,8 @@ public class MultipleClassLoader extends ClassLoader
 			for (int i=ranking.size();i>=0;--i)
 			{
 				current = (Class) ranking.get(i);
-				if (Modifier.isAbstract(current.getModifiers()))
-					continue; //Abstrakte Klassen koennen nicht instanziiert werden
+//				if (Modifier.isAbstract(current.getModifiers()))
+//					continue; //Abstrakte Klassen koennen nicht instanziiert werden
 
 				// dann muesste das hier jetzt die erste passende sein
 				cache.put(interphase,current);
@@ -395,6 +395,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.16  2004/05/02 17:04:58  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.15  2004/04/01 19:02:02  willuhn
  * @N added getResourceAsStream
  *
