@@ -105,10 +105,12 @@
 
 
 
-	<target depends="init" name="src" description="build source package, depends compile target to make sure, the code has no errors">
+	<target depends="compile" name="src" description="build source package, depends compile target to make sure, the code has no errors">
 		<mkdir dir="${project.release}"/>
 		<zip casesensitive="true" zipfile="${project.release}/${define.srcfilename}">
 			<fileset dir="." >
+				<include name=".project"/>
+				<include name=".classpath"/>
 				<include name="${src.dir}/**"/>
 				<include name="${build.dir}/**"/>
 				<exclude name="${build.dir}/BUILD"/>
