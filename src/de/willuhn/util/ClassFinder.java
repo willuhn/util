@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ClassFinder.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/11/12 18:18:19 $
- * $Author: willuhn $
+ * $Revision: 1.5 $
+ * $Date: 2005/02/21 23:16:43 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -164,7 +164,7 @@ public class ClassFinder
 		Class[] interfaces = test.getInterfaces();
 		for (int j=0;j<interfaces.length;++j)
 		{
-			if (interfaces[j].equals(interphase))
+			if (interfaces[j].getName().equals(interphase.getName()))
 			{
 				return true;
 			}
@@ -214,6 +214,9 @@ public class ClassFinder
 
 /**********************************************************************
  * $Log: ClassFinder.java,v $
+ * Revision 1.5  2005/02/21 23:16:43  web0
+ * @B equals() is not implemented in Class
+ *
  * Revision 1.4  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *
