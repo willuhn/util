@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.18 $
- * $Date: 2004/05/04 23:10:24 $
+ * $Revision: 1.19 $
+ * $Date: 2004/05/11 21:07:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -138,9 +138,27 @@ public class MultipleClassLoader extends ClassLoader
 		if (urlsChanged || urls == null || ucl == null)
 		{
 			urls = (URL[]) urlList.toArray(new URL[urlList.size()]);
-			ucl = new URLClassLoader(urls,getParent());
+			ucl = new URLClassLoader(urls,getParent()); // NIEMALS "this" statt "getParent()" verwenden. Das loest eine Rekursion aus.
 			urlsChanged = false;
 		}
+	}
+
+	/**
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+	 */
+	public Class loadClass(String name) throws ClassNotFoundException {
+		return load(name);
+	}
+
+	/**
+	 * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)
+	 */
+	protected synchronized Class loadClass(String name, boolean resolve)
+		throws ClassNotFoundException {
+		Class c = load(name);
+		if (resolve)
+			resolveClass(c);
+		return c;
 	}
 
   /**
@@ -415,6 +433,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.19  2004/05/11 21:07:20  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.18  2004/05/04 23:10:24  willuhn
  * *** empty log message ***
  *
