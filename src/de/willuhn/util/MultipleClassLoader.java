@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/01/29 00:45:50 $
+ * $Revision: 1.5 $
+ * $Date: 2004/02/09 13:06:51 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -48,11 +48,11 @@ public class MultipleClassLoader extends ClassLoader
   }
   
   /**
-   * Fuegt das uebergebene Jar-File zum Class-Loader hinzu.
-   * @param file das Jar-File.
+   * Fuegt das uebergebene Jar-File oder Verzeichnis zum Class-Loader hinzu.
+   * @param file das Jar-File oder Verzeichnis.
    * @throws MalformedURLException
    */
-  public static void addJar(File file) throws MalformedURLException
+  public static void add(File file) throws MalformedURLException
   {
   	if (file == null)
   		return;
@@ -252,6 +252,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.5  2004/02/09 13:06:51  willuhn
+ * @C misc
+ *
  * Revision 1.4  2004/01/29 00:45:50  willuhn
  * *** empty log message ***
  *
