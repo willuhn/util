@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/Attic/Service.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/06/03 22:11:49 $
+ * $Revision: 1.3 $
+ * $Date: 2004/06/30 20:58:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -62,11 +62,20 @@ public interface Service {
    * @return Wert des Parameters.
    */
   public Object getParam(Object key);
+  
+  /**
+   * Wird aufgerufen, wenn die Anwendung beendet wird.
+   * Hier kann der Service Aufraeum-Arbeiten vornehmen.
+   */
+  public void shutdown();
 }
 
 
 /**********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.3  2004/06/30 20:58:52  willuhn
+ * @C some refactoring
+ *
  * Revision 1.2  2004/06/03 22:11:49  willuhn
  * *** empty log message ***
  *

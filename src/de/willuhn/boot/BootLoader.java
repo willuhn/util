@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/06/10 20:57:34 $
+ * $Revision: 1.5 $
+ * $Date: 2004/06/30 20:58:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,11 +23,6 @@ import de.willuhn.util.Logger;
 public class BootLoader {
 
 	/**
-	 * Der Logger.
-	 */
-	private Logger logger = new Logger("BootLoader");
-
-	/**
 	 * Liste der initialisierten Services.
 	 */
 	private HashMap services = new HashMap();
@@ -40,8 +35,8 @@ public class BootLoader {
    */
   public BootLoader()
 	{
-		logger.setLevel(Logger.LEVEL_DEBUG);
-		logger.addTarget(System.out);
+		Logger.setLevel(Logger.LEVEL_DEBUG);
+		Logger.addTarget(System.out);
 	}
 
   /**
@@ -62,29 +57,29 @@ public class BootLoader {
 		// Kein Target definiert
 		if (target == null)
 		{
-			logger.warn("not service given");
+			Logger.warn("not service given");
 			return null;
 		}
 		
 		// Target schon gebootet
 		if (services.get(target) != null)
 		{
-			logger.info(indent() + "service " + target.getName() + " allready booted, skipping");
+			Logger.info(indent() + "service " + target.getName() + " allready booted, skipping");
 			return (Service) services.get(target);
 		}
 
-		logger.info(indent() + "booting service " + target.getName());
+		Logger.info(indent() + "booting service " + target.getName());
 
 		indent++;
 
 		// Instanziieren
 		Service s = (Service) target.newInstance();
 
-		logger.info(indent() + "checking dependencies for " + target.getName());
+		Logger.info(indent() + "checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
 		if (deps == null || deps.length == 0)
 		{
-			logger.info(indent() + "no dependencies found for " + target.getName());
+			Logger.info(indent() + "no dependencies found for " + target.getName());
 			init(caller,s);
 			return s;
 		}
@@ -94,7 +89,7 @@ public class BootLoader {
 		{
 			if (deps[j].equals(target))
 			{
-				logger.info(indent() + deps[j].getName() + " cannot have itself as dependency, skipping");
+				Logger.info(indent() + deps[j].getName() + " cannot have itself as dependency, skipping");
 				indent--;
 				continue;
 			}
@@ -116,7 +111,7 @@ public class BootLoader {
 		catch (SkipServiceException e)
 		{
 			indent--;
-			logger.info(indent() + "init of service " + target.getName() + " failed [message: " + e.getMessage() + "], skipping");
+			Logger.info(indent() + "init of service " + target.getName() + " failed [message: " + e.getMessage() + "], skipping");
 			if (caller != null)
 				caller.failedDependency(s,e);
 			return s;
@@ -133,7 +128,7 @@ public class BootLoader {
 
 		indent--;
 
-		logger.info(indent() + "service " + target.getName() + " booted successfully");
+		Logger.info(indent() + "service " + target.getName() + " booted successfully");
 		services.put(target,s);
 		return s;
 	}
@@ -152,23 +147,11 @@ public class BootLoader {
 		return s;
 	}
 
-	/**
-	 * Definiert einen anderen Logger als den standardmaessig verwendeten.
-   * @param l der zu verwendende Logger.
-   */
-  public final void setLogger(Logger l)
-	{
-		if (l == null)
-			return;
-		this.logger = l;
-	}
-
   /**
    * @see java.lang.Object#finalize()
    */
   protected void finalize() throws Throwable {
-  	if (logger != null)
-  		logger.close();
+ 		Logger.close();
     super.finalize();
   }
 
@@ -177,6 +160,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.5  2004/06/30 20:58:52  willuhn
+ * @C some refactoring
+ *
  * Revision 1.4  2004/06/10 20:57:34  willuhn
  * @D javadoc comments fixed
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.16 $
- * $Date: 2004/06/15 21:11:30 $
+ * $Revision: 1.17 $
+ * $Date: 2004/06/30 20:58:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -26,14 +26,15 @@ import de.willuhn.util.Queue.QueueFullException;
 public class Logger
 {
 
-  private ArrayList targets = new ArrayList();
-
   // maximale Groesse des Log-Puffers (Zeilen-Anzahl)
   private final static int BUFFER_SIZE = 40;
 
+	// Die Liste der Log-Targets
+	private static ArrayList targets = new ArrayList();
+
   // Eine History mit den letzten Log-Eintraegen. Kann ganz nuetzlich sein,
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
-  private History lastLines = new History(BUFFER_SIZE);
+  private static History lastLines = new History(BUFFER_SIZE);
 
 	/**
 	 * Die Bezeichnungen der verschiedenen Log-Level.
@@ -70,46 +71,45 @@ public class Logger
 	 */
 	public final static int LEVEL_DEFAULT = LEVEL_INFO;
 
-	private int level = LEVEL_DEFAULT;
+	private static int level = LEVEL_DEFAULT;
 
-	private LoggerThread lt = null;
+	private static LoggerThread lt = null;
 
-  /**
-   * ct.
-   * @param name Aliasname zur Identifizierung des Logger-Threads.
-   */
-  public Logger(String name)
-  {
-  	lt = new LoggerThread(name);
-  	lt.start();
-  }
+	static
+	{
+		lt = new LoggerThread("Logger-Thread");
+		lt.start();
+	}
   
 	/**
 	 * Fuegt der Liste der Ausgabe-Streams einen weiteren hinzu.
    * @param target AusgabeStream.
    */
-  public void addTarget(OutputStream target)
+  public static void addTarget(OutputStream target)
 	{
 		if (target == null)
 			return;
-		this.targets.add(target);
+		synchronized (targets)
+		{
+			targets.add(target);
+		}
 	}
 
 	/**
 	 * Setzt den Log-Level.
    * @param level Log-Level.
    */
-  public void setLevel(int level)
+  public static void setLevel(int level)
 	{
 		if (level >= 0 && level < LEVEL_TEXT.length)
-			this.level = level;
+			Logger.level = level;
 	}
 
 	/**
 	 * Setzt den Log-Level basierend auf dem uebergebenen String.
    * @param level Name des Log-Levels (DEBUG,INFO,WARN,ERROR).
    */
-  public void setLevel(String level)
+  public static void setLevel(String level)
 	{
 		if (level == null || "".equals(level))
 			return;
@@ -120,9 +120,9 @@ public class Logger
 	 * Liefert den Log-Level basierend auf dem Aliasnamen.
    * @param name Name des Log-Levels. Siehe auch Logger.LEVEL_TEXT[].
    * @return int wert des Log-Levels oder Default-Loglevel.
-   *         Siehe auch Logger.LEVEL_*.
+   * Siehe auch Logger.LEVEL_*.
    */
-  public int getLevelByName(String name)
+  public static int getLevelByName(String name)
 	{
 		for (int i=0;i<LEVEL_TEXT.length;++i)
 		{
@@ -136,7 +136,7 @@ public class Logger
    * Schreibt eine Message vom Typ "debug" ins Log.
    * @param message zu loggende Nachricht.
    */
-  public void debug(String message)
+  public static void debug(String message)
   {
     write(LEVEL_DEBUG,message);
   }
@@ -145,7 +145,7 @@ public class Logger
    * Schreibt eine Message vom Typ "info" ins Log.
    * @param message zu loggende Nachricht.
    */
-  public void info(String message)
+  public static void info(String message)
   {
     write(LEVEL_INFO,message);
   }
@@ -154,7 +154,7 @@ public class Logger
    * Schreibt eine Message vom Typ "warn" ins Log.
    * @param message zu loggende Nachricht.
    */
-  public void warn(String message)
+  public static void warn(String message)
   {
     write(LEVEL_WARN,message);
   }
@@ -163,7 +163,7 @@ public class Logger
    * Schreibt eine Message vom Typ "error" ins Log.
    * @param message zu loggende Nachricht.
    */
-  public void error(String message)
+  public static void error(String message)
   {
     write(LEVEL_ERROR,message);
   }
@@ -173,7 +173,7 @@ public class Logger
 	 * @param message zu loggende Nachricht.
    * @param t Exception oder Error.
    */
-  public void error(String message, Throwable t)
+  public static void error(String message, Throwable t)
 	{
 		write(LEVEL_ERROR,message);
 		ByteArrayOutputStream bos = null;
@@ -194,10 +194,12 @@ public class Logger
   /**
    * Schliesst den Logger und die damit verbundene Log-Datei.
    */
-  public void close()
+  public static void close()
 	{
 		lt.shutdown();
 
+		// Wir muessen noch etwas warten, bis der Thread alle Eintraege
+		// aus der Queue geschrieben hat.
 		try {
 			while (!lt.finished())
 			{
@@ -210,17 +212,21 @@ public class Logger
 			lt.interrupt();
 		}
 
-		OutputStream os = null;
-		for (int i=0;i<this.targets.size();++i)
+		synchronized (targets)
 		{
-			os = (OutputStream) this.targets.get(i);
-			try {
-				os.flush();
-				os.close();
-			}
-			catch (IOException io)
+			OutputStream os = null;
+			for (int i=0;i<targets.size();++i)
 			{
+				os = (OutputStream) targets.get(i);
+				try {
+					os.flush();
+					os.close();
+				}
+				catch (IOException io)
+				{
+				}
 			}
+			targets = new ArrayList();
 		}
 	}
 
@@ -228,7 +234,7 @@ public class Logger
    * Liefert die letzten Zeilen des Logs.
    * @return String-Array mit den letzten Log-Eintraegen (einer pro Index).
    */
-  public String[] getLastLines()
+  public static String[] getLastLines()
   {
     return (String[]) lastLines.toArray(new String[lastLines.size()]);
   }
@@ -238,9 +244,9 @@ public class Logger
    * @param level Log-Levels.
    * @param message zu loggende Nachricht.
    */
-  protected void write(int level, String message)
+  protected static void write(int level, String message)
   {
-  	if (level < this.level)
+  	if (level < Logger.level)
   		return;
 		lt.write(level,message);
   }
@@ -248,7 +254,7 @@ public class Logger
   /**
    * Das eigentliche Schreiben erfolgt in einem extra Thread damit's hoffentlich schneller geht.
    */
-  private class LoggerThread extends Thread
+  private static class LoggerThread extends Thread
   {
   	
   	private final static int maxLines = 100;
@@ -264,7 +270,7 @@ public class Logger
      */
     public LoggerThread(String name)
   	{
-  		super("logger: " + name);
+  		super(name);
   	}
 
 		/**
@@ -318,13 +324,33 @@ public class Logger
 					finished = true;
 					return;
 				}
-				if (messages.size() > 0)
-				{
-					String s = (String) messages.pop();
-					lastLines.push(s);
 
-					OutputStream os = null;
-					message = (s + "\n").getBytes();
+				if (messages.size() == 0)
+				{
+					// nichts zum Schreiben da, dann warten wir etwas
+					try
+					{
+						sleep(100);
+					}
+					catch (InterruptedException e)
+					{
+					}
+					continue;
+				}
+
+				String s = (String) messages.pop();
+				lastLines.push(s);
+
+				OutputStream os = null;
+				message = (s + "\n").getBytes();
+				synchronized (targets)
+				{
+					if (targets.size() == 0)
+					{
+						System.out.println("warn: no logging target defined, logging to console: " + message);
+						continue;
+					}
+
 					for (int i=0;i<targets.size();++i)
 					{
 						os = (OutputStream) targets.get(i);
@@ -334,16 +360,10 @@ public class Logger
 						}
 						catch (IOException e)
 						{
+							System.out.println("alert: error while logging the following message: " + message);
 						}
 					}
 				}
-				try
-        {
-          sleep(100);
-        }
-        catch (InterruptedException e)
-        {
-        }
 			}
     }
 
@@ -352,6 +372,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.17  2004/06/30 20:58:52  willuhn
+ * @C some refactoring
+ *
  * Revision 1.16  2004/06/15 21:11:30  willuhn
  * @N added LoggerOutputStream
  *

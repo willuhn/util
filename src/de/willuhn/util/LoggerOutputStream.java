@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/LoggerOutputStream.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/06/15 21:11:30 $
+ * $Revision: 1.2 $
+ * $Date: 2004/06/30 20:58:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,7 +22,6 @@ public class LoggerOutputStream extends OutputStream {
 
 	private final static int BUF_SIZE = 1024;
 
-	private Logger logger = null;
 	private int level;
 	private StringBuffer line = new StringBuffer();
 	private char[] buffer = new char[BUF_SIZE];
@@ -30,13 +29,11 @@ public class LoggerOutputStream extends OutputStream {
 
   /**
    * ct.
-   * @param logger der Logger, in den geschrieben werden soll.
    * @param logLevel das Log-Level, mit dem der OutputStream schreiben soll.
    */
-  public LoggerOutputStream(Logger logger, int logLevel)
+  public LoggerOutputStream(int logLevel)
   {
     super();
-    this.logger = logger;
     this.level = logLevel;
   }
 
@@ -49,7 +46,7 @@ public class LoggerOutputStream extends OutputStream {
 		if (b == '\n')
 		{
 			line.append(buffer);
-			logger.write(level,line.toString().replaceAll("\\r|\\n",""));
+			Logger.write(level,line.toString().replaceAll("\\r|\\n",""));
 			line = new StringBuffer();
 			bufferCount = 0;
 			buffer = new char[BUF_SIZE];
@@ -74,6 +71,9 @@ public class LoggerOutputStream extends OutputStream {
 
 /**********************************************************************
  * $Log: LoggerOutputStream.java,v $
+ * Revision 1.2  2004/06/30 20:58:52  willuhn
+ * @C some refactoring
+ *
  * Revision 1.1  2004/06/15 21:11:30  willuhn
  * @N added LoggerOutputStream
  *
