@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/SkipServiceException.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/02/27 15:11:42 $
+ * $Revision: 1.3 $
+ * $Date: 2005/03/09 01:06:21 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -35,6 +35,7 @@ public class SkipServiceException extends Exception {
 	 * ct.
 	 * @param bootable Dienst, der die Exception ausgeloest hat.
 	 * @param message Text.
+	 * @param cause
 	 */
 	public SkipServiceException(Bootable bootable,String message, Throwable cause) {
 		super(message,cause);
@@ -55,6 +56,9 @@ public class SkipServiceException extends Exception {
 
 /**********************************************************************
  * $Log: SkipServiceException.java,v $
+ * Revision 1.3  2005/03/09 01:06:21  web0
+ * @D javadoc fixes
+ *
  * Revision 1.2  2005/02/27 15:11:42  web0
  * @C some renaming
  *

@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Base64.java,v $
- * $Revision: 1.1 $
- * $Date: 2005/02/01 17:15:07 $
- * $Author: willuhn $
+ * $Revision: 1.2 $
+ * $Date: 2005/03/09 01:06:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -35,6 +35,7 @@ public class Base64
 	 * Dekodiert Base64 in Text.
    * @param base64 Base64.
    * @return Text.
+	 * @throws IOException
    */
   public final static byte[] decode(String base64) throws IOException
 	{
@@ -42,10 +43,10 @@ public class Base64
 		return decoder.decodeBuffer(base64);
 	}
 
-	/**
-	 * Kodiert Text nach Base64.
+  /**
+   * Kodiert Text nach Base64.
    * @param text
-   * @return
+   * @return Base64-Version.
    */
   public final static String encode(byte[] text)
 	{
@@ -57,6 +58,9 @@ public class Base64
 
 /**********************************************************************
  * $Log: Base64.java,v $
+ * Revision 1.2  2005/03/09 01:06:20  web0
+ * @D javadoc fixes
+ *
  * Revision 1.1  2005/02/01 17:15:07  willuhn
  * *** empty log message ***
  *

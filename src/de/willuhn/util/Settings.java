@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.1 $
- * $Date: 2005/01/13 22:58:05 $
- * $Author: willuhn $
+ * $Revision: 1.2 $
+ * $Date: 2005/03/09 01:06:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -221,7 +221,7 @@ public class Settings
    * Wird das Attribut nicht gefunden oder hat keinen Wert, wird defaultValue zurueckgegeben.
    * Es koennen maximal 256 Werte gelesen oder gespeichert werden.
    * @param name Name des Attributs.
-   * @param defaultValue DefaultWert, wenn das Attribut nicht existiert.
+   * @param defaultValues DefaultWert, wenn das Attribut nicht existiert.
    * @return Werte des Attributs in Form eines String-Arrays.
    */
   public String[] getList(String name, String[] defaultValues)
@@ -349,6 +349,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.2  2005/03/09 01:06:20  web0
+ * @D javadoc fixes
+ *
  * Revision 1.1  2005/01/13 22:58:05  willuhn
  * @N Settings nach willuhn.util verschoben
  *

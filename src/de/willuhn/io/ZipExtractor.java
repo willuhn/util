@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/11/04 22:41:46 $
- * $Author: willuhn $
+ * $Revision: 1.5 $
+ * $Date: 2005/03/09 01:06:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -215,19 +215,43 @@ public class ZipExtractor
     }
   }
 
+  /**
+   * Dummy-Implementierung.
+   */
   private class DummyMonitor implements ProgressMonitor
   {
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setPercentComplete(int)
+     */
     public void setPercentComplete(int percent) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#addPercentComplete(int)
+     */
     public void addPercentComplete(int percent) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
+     */
     public int getPercentComplete() {return 0;}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setStatus(int)
+     */
     public void setStatus(int status) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setStatusText(java.lang.String)
+     */
     public void setStatusText(String text) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#log(java.lang.String)
+     */
     public void log(String msg) {}
   }
 }
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.5  2005/03/09 01:06:20  web0
+ * @D javadoc fixes
+ *
  * Revision 1.4  2004/11/04 22:41:46  willuhn
  * *** empty log message ***
  *

@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/CSVFile.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
- * $Author: willuhn $
+ * $Revision: 1.2 $
+ * $Date: 2005/03/09 01:06:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -34,9 +34,8 @@ public class CSVFile
   /**
    * ct.
    * @param file die CSV-Datei.
-   * @throws IOException
    */
-  public CSVFile(InputStream file) throws IOException
+  public CSVFile(InputStream file)
   {
   	this(file,null);
   }
@@ -45,9 +44,8 @@ public class CSVFile
 	 * ct.
    * @param file die CSV-Datei.
    * @param separator Trennzeichen.
-   * @throws IOException
    */
-  public CSVFile(InputStream file,String separator) throws IOException
+  public CSVFile(InputStream file,String separator)
 	{
 		this.reader = new BufferedReader(new InputStreamReader(file));
 		if (separator != null)
@@ -110,6 +108,9 @@ public class CSVFile
 
 /**********************************************************************
  * $Log: CSVFile.java,v $
+ * Revision 1.2  2005/03/09 01:06:20  web0
+ * @D javadoc fixes
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *

@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/LoggerOutputStream.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/11/12 18:18:19 $
- * $Author: willuhn $
+ * $Revision: 1.2 $
+ * $Date: 2005/03/09 01:06:21 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -12,9 +12,7 @@
  **********************************************************************/
 package de.willuhn.logging;
 
-import java.io.IOException;
-
-import de.willuhn.io.*;
+import de.willuhn.io.LineOutputStream;
 
 /**
  * Ein OutputStream, der alle Ausgaben in den Logger schreibt.
@@ -34,9 +32,9 @@ public class LoggerOutputStream extends LineOutputStream {
   }
 
   /**
-   * @see de.willuhn.util.LineOutputStream#writeLine(java.lang.String)
+   * @see de.willuhn.io.LineOutputStream#writeLine(java.lang.String)
    */
-  public void writeLine(String s) throws IOException
+  public void writeLine(String s)
   {
     Logger.write(level,s);
   }
@@ -46,6 +44,9 @@ public class LoggerOutputStream extends LineOutputStream {
 
 /**********************************************************************
  * $Log: LoggerOutputStream.java,v $
+ * Revision 1.2  2005/03/09 01:06:21  web0
+ * @D javadoc fixes
+ *
  * Revision 1.1  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *

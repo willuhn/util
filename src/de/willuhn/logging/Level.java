@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Level.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/01/14 00:49:04 $
- * $Author: willuhn $
+ * $Revision: 1.3 $
+ * $Date: 2005/03/09 01:06:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -45,6 +45,9 @@ public class Level
 	 */
 	public final static Level ERROR  = new Level("ERROR",500);
 	
+	/**
+	 * Default-Loglevel.
+	 */
 	public final static Level DEFAULT = INFO;
 
   /**
@@ -110,6 +113,9 @@ public class Level
 
 /**********************************************************************
  * $Log: Level.java,v $
+ * Revision 1.3  2005/03/09 01:06:20  web0
+ * @D javadoc fixes
+ *
  * Revision 1.2  2005/01/14 00:49:04  willuhn
  * *** empty log message ***
  *
