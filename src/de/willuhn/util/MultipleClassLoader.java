@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.17 $
- * $Date: 2004/05/04 23:05:01 $
+ * $Revision: 1.18 $
+ * $Date: 2004/05/04 23:10:24 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -253,7 +253,7 @@ public class MultipleClassLoader extends ClassLoader
 		}
 
 		/**
-		 * Sucht nach ggf. vorhandenen Klassen, die das uebergebene Interface implementieren.
+		 * Sucht nach ggf vorhandenen Klassen, die das uebergebene Interface implementieren.
 		 * Hinweis: Die Funktion liefert generell nur instanziierbare Klassen.
 		 * Es werden also weder abstrakte Klassen, noch Interfaces oder RMI-Stubs geliefert.
 		 * @param interphase das Interface.
@@ -415,6 +415,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.18  2004/05/04 23:10:24  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.17  2004/05/04 23:05:01  willuhn
  * *** empty log message ***
  *
