@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.12 $
- * $Date: 2004/03/30 22:07:19 $
+ * $Revision: 1.13 $
+ * $Date: 2004/03/31 22:50:51 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -29,18 +29,23 @@ import java.util.Hashtable;
 public class MultipleClassLoader extends ClassLoader
 {
 
-  private ArrayList loaders = new ArrayList();
-  private Hashtable cache = new Hashtable();
+  private ArrayList loaders 	= new ArrayList();
+	private ArrayList urlList		= new ArrayList();
+  private Hashtable cache 		= new Hashtable();
+	private ClassFinder finder 	= new ClassFinder();
+	
+	boolean urlsChanged 				= false;
+	private URL[] urls					= null;
+	private URLClassLoader ucl	= null;
+	
 	private Logger logger = new Logger("MultipleClassLoader");
   
-  private ClassFinder finder = new ClassFinder();
   
 	/**
    * ct.
    */
   public MultipleClassLoader()
 	{
-		addClassloader(getSystemClassLoader());
 	}
 
 	/**
@@ -76,8 +81,11 @@ public class MultipleClassLoader extends ClassLoader
   {
   	if (file == null)
   		return;
+
 		logger.debug("multipleClassLoader: adding file " + file.getAbsolutePath());
-		addClassloader(new URLClassLoader(new URL[]{file.toURL()}));
+
+		urlList.add(file.toURL());
+		urlsChanged = true;
   }
 
   /**
@@ -98,13 +106,12 @@ public class MultipleClassLoader extends ClassLoader
 			return null;
 		}
 
-		URL[] urls = new URL[jars.length];
 		for(int i=0;i<jars.length;++i)
 		{
-			urls[i] = jars[i].toURL();
+			urlList.add(jars[i].toURL());
 			logger.debug("multipleClassLoader: adding file " + jars[i].getAbsolutePath());
 		}
-		addClassloader(new URLClassLoader(urls));
+		urlsChanged = true;
 		return jars;
 	}
 
@@ -117,27 +124,43 @@ public class MultipleClassLoader extends ClassLoader
   public Class load(String className) throws ClassNotFoundException
   {
 
-		// wir schauen erstmal im Cache nach.
+		// zuerst im Cache schauen.
 		Class c = (Class) cache.get(className);
 		if (c != null)
-		{
 			return c;
+
+		// Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
+		// Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
+		// ist, dass dieser eine alle Plugins und deren Jars kennt.
+		// Wir erzeugen das Array nur, wenn wirklich was geaendert wurde.
+		// Das hundertfache "toArray()" wuerde sonst ewig dauern.
+		if (urlsChanged || urls == null || ucl == null)
+		{
+			urls = (URL[]) urlList.toArray(new URL[urlList.size()]);
+			ucl = new URLClassLoader(urls,getParent());
+			urlsChanged = false;
 		}
-		
+		try {
+			return findVia(ucl,className);
+		}
+		catch (Throwable r) {}
+
+		// Ich weiss, es verstoesst gegen das SUN-Paradigma, dass man zuerst
+		// den Parent-Classloader fragen soll. Wir haben es hier aber mit
+		// Plugins und deren Jars zu tun. Und die kennt der System-Classloader
+		// definitiv nicht.
+		try {
+			return findVia(getParent(),className);
+		}
+		catch (Throwable r) {}
+
+		// ok, wir fragen die anderen ClassLoader
     ClassLoader l = null;
     for (int i=0;i<loaders.size();++i)
     {
       try {
         l = (ClassLoader) loaders.get(i);
-        c = Class.forName(className,true,l);
-        if (c != null)
-        {
-        	// Klasse gefunden. Die tun wir gleich noch in den Cache.
-        	cache.put(className,c);
-        	// und registrieren sie im ClassFinder
-        	finder.addClass(c);
-					return c;
-        }
+				return findVia(l,className);
       }
       catch (Throwable t)
       {
@@ -145,6 +168,23 @@ public class MultipleClassLoader extends ClassLoader
     }
     throw new ClassNotFoundException("class not found: " + className);
   }
+
+	/**
+	 * Sucht die Klasse ueber den angegebenen ClassLoader.
+   * @param loader ClassLoader.
+   * @param className Klasse.
+   * @return die geladene Klasse.
+   * @throws ClassNotFoundException
+   */
+  private Class findVia(ClassLoader loader, String className) throws ClassNotFoundException
+	{
+		Class c = loader.loadClass(className);
+		// Klasse gefunden. Die tun wir gleich noch in den Cache.
+		cache.put(className,c);
+		// und registrieren sie im ClassFinder
+		finder.addClass(c);
+		return c;
+	}
 
   /**
 	 * Sucht nach einem Implementor des uebergebenen Interfaces.
@@ -334,6 +374,10 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.13  2004/03/31 22:50:51  willuhn
+ * @B bugfixes in CLassLoader
+ * @N massive performance speedup! ;)
+ *
  * Revision 1.12  2004/03/30 22:07:19  willuhn
  * *** empty log message ***
  *
