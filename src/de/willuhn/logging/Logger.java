@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/12/31 19:34:22 $
+ * $Revision: 1.4 $
+ * $Date: 2005/01/11 19:01:26 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -335,7 +335,7 @@ public class Logger
 				{
 					if (targets.size() == 0)
 					{
-						System.out.print("warn: no logging target defined, logging to console: " + msg.toString());
+						System.out.println(msg.toString());
 						continue;
 					}
 
@@ -348,7 +348,7 @@ public class Logger
 						}
 						catch (Exception e)
 						{
-							System.out.print("alert: error while logging the following message: " + msg.toString());
+							System.out.println("alert: error while logging the following message: " + msg.toString());
 						}
 					}
 				}
@@ -361,6 +361,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.4  2005/01/11 19:01:26  willuhn
+ * @N added security.Wallet
+ *
  * Revision 1.3  2004/12/31 19:34:22  willuhn
  * @C some logging refactoring
  * @N syslog support for logging
