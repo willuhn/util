@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/01/05 23:08:04 $
+ * $Revision: 1.4 $
+ * $Date: 2004/01/06 18:07:07 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,7 +35,7 @@ public class Logger
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
   private Queue lastLines = new Queue(BUFFER_SIZE);
 
-	private final static String[] text = new String[] {"DEBUG","INFO","WARN","ERROR"};
+	public final static String[] LEVEL_TEXT = new String[] {"DEBUG","INFO","WARN","ERROR"};
 
 	public final static int LEVEL_DEBUG = 0;
 	public final static int LEVEL_INFO  = 1;
@@ -63,7 +63,7 @@ public class Logger
 	{
 		if (target == null)
 			return;
-		this.targets.add(new BufferedOutputStream(target));
+		this.targets.add(target);
 	}
 
 	/**
@@ -72,8 +72,23 @@ public class Logger
    */
   public void setLevel(int level)
 	{
-		if (level >= 0 && level < text.length)
+		if (level >= 0 && level < LEVEL_TEXT.length)
 			this.level = level;
+	}
+
+	/**
+	 * Setzt den Log-Level basierend auf dem uebergebenen String.
+   * @param level Name des Log-Levels (DEBUG,INFO,WARN,ERROR).
+   */
+  public void setLevel(String level)
+	{
+		if (level == null || "".equals(level))
+			return;
+		for (int i=0;i<LEVEL_TEXT.length;++i)
+		{
+			if (LEVEL_TEXT[i].equals(level))
+				setLevel(i);
+		}
 	}
 
   /**
@@ -141,13 +156,13 @@ public class Logger
   public void close()
 	{
 		lt.interrupt();
-		BufferedOutputStream bos = null;
+		OutputStream os = null;
 		for (int i=0;i<this.targets.size();++i)
 		{
-			bos = (BufferedOutputStream) this.targets.get(i);
+			os = (OutputStream) this.targets.get(i);
 			try {
-				bos.flush();
-				bos.close();
+				os.flush();
+				os.close();
 			}
 			catch (IOException io)
 			{
@@ -201,7 +216,7 @@ public class Logger
      */
     public void write(int level, String message)
 		{
-			String s = "["+new Date().toString()+"] ["+text[level]+"] " + message + "\n";
+			String s = "["+new Date().toString()+"] ["+LEVEL_TEXT[level]+"] " + message + "\n";
 			try
       {
         messages.push(s);
@@ -265,6 +280,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.4  2004/01/06 18:07:07  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/01/05 23:08:04  willuhn
  * *** empty log message ***
  *
