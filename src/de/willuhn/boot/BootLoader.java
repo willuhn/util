@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.6 $
- * $Date: 2004/11/12 18:18:19 $
- * $Author: willuhn $
+ * $Revision: 1.7 $
+ * $Date: 2005/02/27 15:11:42 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -37,19 +37,21 @@ public class BootLoader {
 	{
 	}
 
-  /**
+	/**
 	 * Startet den Boot-Prozess.
 	 * @param target das zu bootende Ziel.
 	 * Bevor der Loader die Klasse <code>target</code> via <code>init()</code>
 	 * initialisiert, wird er alle Abhaengigkeiten aufloesen und zuvor alle
 	 * entsprechend <code>depends</code> angegebenen Services starten.
-   * @param caller Der Aufrufer. Kann null sein. Es ist jedoch sinnvoll,
-   * diesen mit anzugeben, wenn man via <code>failedDependency(Service dependency,SkipServiceException)</code>
-   * ueber das Fehlschlagen einer Abhaengigkeit informiert werden moechte.
 	 * @throws Exception
-   * @return der instanziierte Service.
+	 * @return der instanziierte Dienst.
 	 */
-	public final Service boot(Class target,Service caller) throws Exception
+	public final Bootable boot(Class target) throws Exception
+	{
+		return boot(target,null);
+	}
+
+	private final Bootable boot(Class target,Bootable caller) throws Exception
 	{
 
 		// Kein Target definiert
@@ -63,7 +65,7 @@ public class BootLoader {
 		if (services.get(target) != null)
 		{
 			Logger.info(indent() + "service " + target.getName() + " allready booted, skipping");
-			return (Service) services.get(target);
+			return (Bootable) services.get(target);
 		}
 
 		Logger.info(indent() + "booting service " + target.getName());
@@ -71,7 +73,7 @@ public class BootLoader {
 		indent++;
 
 		// Instanziieren
-		Service s = (Service) target.newInstance();
+		Bootable s = (Bootable) target.newInstance();
 
 		Logger.info(indent() + "checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
@@ -98,7 +100,7 @@ public class BootLoader {
 		return init(caller,s);
 	}
 
-	private Service init(Service caller,Service s) throws Exception
+	private Bootable init(Bootable caller,Bootable s) throws Exception
 	{
 		Class target = s.getClass();
 
@@ -111,7 +113,7 @@ public class BootLoader {
 			indent--;
 			Logger.info(indent() + "init of service " + target.getName() + " failed [message: " + e.getMessage() + "], skipping");
 			if (caller != null)
-				caller.failedDependency(s,e);
+				caller.failedDependency(e);
 			return s;
 		}
 
@@ -158,6 +160,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.7  2005/02/27 15:11:42  web0
+ * @C some renaming
+ *
  * Revision 1.6  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *

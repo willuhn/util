@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/SkipServiceException.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/06/03 22:11:49 $
- * $Author: willuhn $
+ * $Revision: 1.2 $
+ * $Date: 2005/02/27 15:11:42 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -19,44 +19,45 @@ package de.willuhn.boot;
  */
 public class SkipServiceException extends Exception {
 
+	private Bootable bootable = null;
 
   /**
    * ct.
+   * @param bootable Dienst, der die Exception ausgeloest hat.
+   * @param message Text.
    */
-  public SkipServiceException() {
-    super();
+  public SkipServiceException(Bootable bootable,String message) {
+		super(message);
+		this.bootable = bootable;
   }
 
-  /**
-   * ct.
-   * @param message
-   */
-  public SkipServiceException(String message) {
-    super(message);
-  }
+	/**
+	 * ct.
+	 * @param bootable Dienst, der die Exception ausgeloest hat.
+	 * @param message Text.
+	 */
+	public SkipServiceException(Bootable bootable,String message, Throwable cause) {
+		super(message,cause);
+		this.bootable = bootable;
+	}
 
-  /**
-   * ct.
-   * @param cause
+	/**
+	 * Liefert den Dienst, der den Fehler augeloest hat.
+   * @return Dienst.
    */
-  public SkipServiceException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * ct.
-   * @param message
-   * @param cause
-   */
-  public SkipServiceException(String message, Throwable cause) {
-    super(message, cause);
-  }
+  public Bootable getBootable()
+	{
+		return bootable;
+	}
 
 }
 
 
 /**********************************************************************
  * $Log: SkipServiceException.java,v $
+ * Revision 1.2  2005/02/27 15:11:42  web0
+ * @C some renaming
+ *
  * Revision 1.1  2004/06/03 22:11:49  willuhn
  * *** empty log message ***
  *
