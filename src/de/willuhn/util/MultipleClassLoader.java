@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.25 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.26 $
+ * $Date: 2004/11/12 18:18:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import de.willuhn.io.*;
+import de.willuhn.logging.*;
 
 /**
  * ClassLoader der sich beliebiger anderer ClassLoader bedient.
@@ -237,6 +238,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.26  2004/11/12 18:18:19  willuhn
+ * @C Logging refactoring
+ *
  * Revision 1.25  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *

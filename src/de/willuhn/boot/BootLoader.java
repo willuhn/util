@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.5 $
- * $Date: 2004/06/30 20:58:52 $
+ * $Revision: 1.6 $
+ * $Date: 2004/11/12 18:18:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,7 +14,7 @@ package de.willuhn.boot;
 
 import java.util.HashMap;
 
-import de.willuhn.util.Logger;
+import de.willuhn.logging.Logger;
 
 /**
  * Der BootLoader.
@@ -35,8 +35,6 @@ public class BootLoader {
    */
   public BootLoader()
 	{
-		Logger.setLevel(Logger.LEVEL_DEBUG);
-		Logger.addTarget(System.out);
 	}
 
   /**
@@ -160,6 +158,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.6  2004/11/12 18:18:19  willuhn
+ * @C Logging refactoring
+ *
  * Revision 1.5  2004/06/30 20:58:52  willuhn
  * @C some refactoring
  *

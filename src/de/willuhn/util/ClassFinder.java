@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ClassFinder.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/06/30 20:58:53 $
+ * $Revision: 1.4 $
+ * $Date: 2004/11/12 18:18:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,8 @@ package de.willuhn.util;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import de.willuhn.logging.*;
 
 /**
  */
@@ -212,6 +214,9 @@ public class ClassFinder
 
 /**********************************************************************
  * $Log: ClassFinder.java,v $
+ * Revision 1.4  2004/11/12 18:18:19  willuhn
+ * @C Logging refactoring
+ *
  * Revision 1.3  2004/06/30 20:58:53  willuhn
  * @C some refactoring
  *

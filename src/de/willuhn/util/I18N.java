@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.7 $
- * $Date: 2004/11/12 16:19:33 $
+ * $Revision: 1.8 $
+ * $Date: 2004/11/12 18:18:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
+
+import de.willuhn.logging.*;
 
 /**
  * Diese Klasse behandelt die Internationalisierung.
@@ -194,6 +196,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.8  2004/11/12 18:18:19  willuhn
+ * @C Logging refactoring
+ *
  * Revision 1.7  2004/11/12 16:19:33  willuhn
  * *** empty log message ***
  *
