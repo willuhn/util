@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.6 $
- * $Date: 2004/11/05 19:42:03 $
+ * $Revision: 1.7 $
+ * $Date: 2004/11/12 16:19:33 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,7 +13,6 @@
 
 package de.willuhn.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,25 +34,38 @@ public class I18N
 
   private ResourceBundle bundle;
   private Properties fallbackBundle;
-  private Properties properties = new Properties();
+  private Properties unresolved = new Properties();
 
 	private Locale locale;
 
-	/**
-	 * ct.
-	 */
-	public I18N()
-	{
-		this("lang/messages",Locale.getDefault(),null);
-	}
+  private final static String DEFAULTPATH = "lang/messages";
 
 	/**
 	 * ct.
+   * Verwendet das Default-Locale und "lang/messages" als Resource-Path.
+	 */
+	public I18N()
+	{
+		this(null,null,null);
+	}
+
+  /**
+   * ct.
+   * Verwendet das uebergebene Locale und "lang/messages" als Resource-Path.
+   * @param l Locale.
+   */
+  public I18N(Locale l)
+  {
+    this(null,l,null);
+  }
+	/**
+	 * ct.
+   * Verwendet den uebergebenen Resource-Path und das Default-Locale.
 	 * @param resourcePath
 	 */
 	public I18N(String resourcePath)
 	{
-		this(resourcePath,Locale.getDefault(),null);
+		this(resourcePath,null,null);
 	}
 
 	/**
@@ -74,61 +86,41 @@ public class I18N
    */
   public I18N(String resourcePath, Locale l, ClassLoader loader)
   {
-		if (resourcePath == null || l == null)
-			return;
+		if (resourcePath == null)
+      resourcePath = DEFAULTPATH;
 
-		locale = l;
+    if (l == null)
+      this.locale = Locale.getDefault();
+    else
+      this.locale = l;
 
-    try {
-			Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
-    	if (loader != null)
-	      bundle = ResourceBundle.getBundle(resourcePath,l,loader);
-	    else
-				bundle = ResourceBundle.getBundle(resourcePath,l);
 
-    }
-    catch (Exception e)
-    {
-    	Logger.warn("unable to load resource bundle " + resourcePath + " for locale " + l.toString());
-			Logger.info("try to read via inputstream");
-			try
-			{
-				load(new FileInputStream(resourcePath + "_" + l.toString() + ".properties"));
-			}
-			catch (Exception e2)
-			{
-				Logger.error("giving up, unable to load resource bundle",e2);
-			}
-    }
+		Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
+  	if (loader != null)
+      bundle = ResourceBundle.getBundle(resourcePath,l,loader);
+    else
+			bundle = ResourceBundle.getBundle(resourcePath,l);
   }
   
-	/**
-	 * Initialisiert das Bundle basierend auf einem Input-Stream.
-   * @param is Inputstream.
-   */
-  public I18N(InputStream is)
-	{
-		load(is);
-	}
-
-	/**
-	 * Liest das Bundle via InpuStream.
+  /**
+   * ct.
+   * Verwendet den Inputstream zu Lesen der Resourcen.
    * @param is
    */
-  private void load(InputStream is)
-	{
-		fallbackBundle = new Properties();
-		if (is == null)
-			Logger.error("no inputstream given for I18N");
-		try
-		{
-			fallbackBundle.load(is);
-		}
-		catch (IOException e)
-		{
-			Logger.error("error while reading resource bundle from inputstream",e);
-		}
-	}
+  public I18N(InputStream is)
+  {
+    fallbackBundle = new Properties();
+    if (is == null)
+      Logger.error("no inputstream given for I18N");
+    try
+    {
+      fallbackBundle.load(is);
+    }
+    catch (IOException e)
+    {
+      Logger.error("error while reading resource bundle from inputstream",e);
+    }
+  }
 
   /**
    * Uebersetzt den angegebenen String und liefert die uebersetzte
@@ -152,7 +144,7 @@ public class I18N
     if (translated != null)
       return translated;
     
-    properties.put(key,key);
+    unresolved.put(key,key);
     return key;
   }
 
@@ -196,12 +188,15 @@ public class I18N
   public void storeUntranslated(OutputStream os) throws IOException
   {
 		Logger.info("saving unresolved locale strings");
-    properties.store(os, "unresolved strings for locale " + locale.toString());
+    unresolved.store(os, "unresolved strings for locale " + locale.toString());
   }
 }
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.7  2004/11/12 16:19:33  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/11/05 19:42:03  willuhn
  * *** empty log message ***
  *
