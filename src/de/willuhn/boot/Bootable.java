@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/Bootable.java,v $
- * $Revision: 1.1 $
- * $Date: 2005/02/27 15:11:42 $
+ * $Revision: 1.2 $
+ * $Date: 2005/02/27 15:25:32 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -11,6 +11,8 @@
  *
  **********************************************************************/
 package de.willuhn.boot;
+
+import de.willuhn.util.ProgressMonitor;
 
 /**
  * Interface eines ueber den BootLoader startfaehigen Dienst.
@@ -25,6 +27,7 @@ public interface Bootable {
 	 * Wird vom BootLoader aufgerufen, wenn der Dienst initialisiert werden soll.
    * @param caller der Dienst, welcher das init ausgeloest hat und somit
    * von diesem Dienst abhaengig ist.
+   * @param monitor Monitor, ueber den der Dienst Log-Ausgaben zum Bootprozess ausgeben kann.
    * @return Liste von weiteren Klassen, die <b>nach</b> der erfolgreichen
    * Initialisierung zusaetzlich gestartet werden sollen.
    * @throws SkipServiceException wenn der Service uebersprungen werden soll. 
@@ -34,7 +37,7 @@ public interface Bootable {
    * Stattdessen wird lediglich dieser Service uebersprungen. Um den gesamten
    * Boot-Prozess abzubrechen, muss folglich eine RuntimeException geworfen werden.
    */
-  public Class[] init(Bootable caller) throws SkipServiceException;
+  public Class[] init(Bootable caller, ProgressMonitor monitor) throws SkipServiceException;
 	
 	/**
 	 * Liste von Abhaengigkeiten in Form von Class-Objekten.
@@ -72,6 +75,9 @@ public interface Bootable {
 
 /**********************************************************************
  * $Log: Bootable.java,v $
+ * Revision 1.2  2005/02/27 15:25:32  web0
+ * *** empty log message ***
+ *
  * Revision 1.1  2005/02/27 15:11:42  web0
  * @C some renaming
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.7 $
- * $Date: 2005/02/27 15:11:42 $
+ * $Revision: 1.8 $
+ * $Date: 2005/02/27 15:25:32 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.boot;
 import java.util.HashMap;
 
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ProgressMonitor;
 
 /**
  * Der BootLoader.
@@ -29,12 +30,16 @@ public class BootLoader {
 
 	private int indent = 0;
 
-	/**
+	private ProgressMonitor monitor = null;
+
+  /**
    * ct.
    * Erzeugt einen neuen BootLoader. 
+   * @param monitor Monitor, ueber den die Dienste ihre Informationen ueber den Boot-Vorgang ausgeben koennen.
    */
-  public BootLoader()
+  public BootLoader(ProgressMonitor monitor)
 	{
+		this.monitor = monitor;
 	}
 
 	/**
@@ -106,7 +111,7 @@ public class BootLoader {
 
 		Class[] childs;
 		try {
-			childs = s.init(s);
+			childs = s.init(s,this.monitor);
 		}
 		catch (SkipServiceException e)
 		{
@@ -160,6 +165,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.8  2005/02/27 15:25:32  web0
+ * *** empty log message ***
+ *
  * Revision 1.7  2005/02/27 15:11:42  web0
  * @C some renaming
  *
