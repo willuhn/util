@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.4 $
- * $Date: 2004/01/06 18:07:07 $
+ * $Revision: 1.5 $
+ * $Date: 2004/01/06 19:58:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -86,7 +86,7 @@ public class Logger
 			return;
 		for (int i=0;i<LEVEL_TEXT.length;++i)
 		{
-			if (LEVEL_TEXT[i].equals(level))
+			if (LEVEL_TEXT[i].equalsIgnoreCase(level))
 				setLevel(i);
 		}
 	}
@@ -216,14 +216,14 @@ public class Logger
      */
     public void write(int level, String message)
 		{
-			String s = "["+new Date().toString()+"] ["+LEVEL_TEXT[level]+"] " + message + "\n";
+			String s = "["+new Date().toString()+"] ["+LEVEL_TEXT[level]+"] " + message;
 			try
       {
         messages.push(s);
       }
       catch (QueueFullException e)
       {
-        System.out.print(s);
+        System.out.println(s);
       }
 		}
 
@@ -251,14 +251,14 @@ public class Logger
 						}	catch (QueueFullException e1)	{}
 					}
 
-					BufferedOutputStream bos = null;
-					message = s.getBytes();
+					OutputStream os = null;
+					message = (s + "\n").getBytes();
 					for (int i=0;i<targets.size();++i)
 					{
-						bos = (BufferedOutputStream) targets.get(i);
+						os = (OutputStream) targets.get(i);
 						try
 						{
-							bos.write(message);
+							os.write(message);
 						}
 						catch (IOException e)
 						{
@@ -280,6 +280,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.5  2004/01/06 19:58:29  willuhn
+ * @N ArrayEnumeration
+ *
  * Revision 1.4  2004/01/06 18:07:07  willuhn
  * *** empty log message ***
  *

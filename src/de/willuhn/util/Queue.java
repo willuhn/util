@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Queue.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/01/05 23:08:04 $
+ * $Revision: 1.3 $
+ * $Date: 2004/01/06 19:58:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 
 package de.willuhn.util;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -59,6 +60,16 @@ public class Queue
   public int size()
 	{
 		return v.size();
+	}
+
+	/**
+	 * Liefert eine Enumeration ueber alle Elemente der Queue.
+	 * Es wird nur eine Kopie ausgegeben.
+   * @return Enumeration ueber alle Elemente.
+   */
+  public synchronized Enumeration elements()
+	{
+		return new ArrayEnumeration(v.toArray());
 	}
 
   /**
@@ -115,6 +126,9 @@ public class Queue
 
 /**********************************************************************
  * $Log: Queue.java,v $
+ * Revision 1.3  2004/01/06 19:58:29  willuhn
+ * @N ArrayEnumeration
+ *
  * Revision 1.2  2004/01/05 23:08:04  willuhn
  * *** empty log message ***
  *
