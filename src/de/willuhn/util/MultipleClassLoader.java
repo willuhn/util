@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.13 $
- * $Date: 2004/03/31 22:50:51 $
+ * $Revision: 1.14 $
+ * $Date: 2004/04/01 00:23:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -310,7 +310,6 @@ public class MultipleClassLoader extends ClassLoader
 
 			// OK, direkt implementiert hat's scheinbar niemand.
 			// Dann checken wir das Ranking.
-			// Wir sind oben angekommen, jetzt werten wir das Ranking aus.
 			if (ranking.size() == 0)
 			{
 				// Mift, nix gefunden
@@ -326,7 +325,7 @@ public class MultipleClassLoader extends ClassLoader
 				if (Modifier.isAbstract(current.getModifiers()))
 					continue; //Abstrakte Klassen koennen nicht instanziiert werden
 
-				// dann muesset das hier jetzt die erste passende sein
+				// dann muesste das hier jetzt die erste passende sein
 				cache.put(interphase,current);
 				logger.debug("multipleClassLoader.ClassFinder: found implementor " + current.getName() + " for interface " + interphase.getName());
 				logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
@@ -374,6 +373,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.14  2004/04/01 00:23:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.13  2004/03/31 22:50:51  willuhn
  * @B bugfixes in CLassLoader
  * @N massive performance speedup! ;)
