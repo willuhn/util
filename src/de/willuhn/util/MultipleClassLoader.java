@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.19 $
- * $Date: 2004/05/11 21:07:20 $
+ * $Revision: 1.20 $
+ * $Date: 2004/05/25 23:24:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -83,7 +83,7 @@ public class MultipleClassLoader extends ClassLoader
   	if (file == null)
   		return;
 
-		logger.debug("multipleClassLoader: adding file " + file.getAbsolutePath());
+		logger.info("multipleClassLoader: adding file " + file.getAbsolutePath());
 
 		urlList.add(file.toURL());
 		urlsChanged = true;
@@ -433,6 +433,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.20  2004/05/25 23:24:03  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.19  2004/05/11 21:07:20  willuhn
  * *** empty log message ***
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.12 $
- * $Date: 2004/05/11 21:19:23 $
+ * $Revision: 1.13 $
+ * $Date: 2004/05/25 23:24:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -68,7 +68,7 @@ public class Logger
 	/**
 	 * Standard-Loglevel.
 	 */
-	public final static int LEVEL_DEFAULT = LEVEL_WARN;
+	public final static int LEVEL_DEFAULT = LEVEL_INFO;
 
 	private int level = LEVEL_DEFAULT;
 
@@ -349,6 +349,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.13  2004/05/25 23:24:03  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.12  2004/05/11 21:19:23  willuhn
  * *** empty log message ***
  *

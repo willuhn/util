@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/JarInfo.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/04/14 21:56:39 $
+ * $Revision: 1.3 $
+ * $Date: 2004/05/25 23:24:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -50,17 +50,15 @@ public class JarInfo {
 	}
 
 	/**
-	 * Liefert die Versionsnummer des JARs, die im Manifest als Attribut ""Implementation-Version" hinterlegt ist.
-	 * Wenn der String das Format "V_&lt;Major-Number&gt;_&lt;Minor-Number&gt; hat, wird es funktionieren.
+	 * Liefert die Versionsnummer des JARs, die im Manifest als Attribut &quot;Implementation-Version&quot; hinterlegt ist.
+	 * Wenn der String das Format &lt;Major-Number&gt;.&lt;Minor-Number&gt; hat, wird die Version als Double zurueckgeliefert.
 	 * Existiert das Attribut nicht oder kann es nicht geparst werden, wird 1.0 zurueckgeliefert.
 	 * @return Version des Plugins.
 	 */
 	public double getVersion()
 	{
 		try {
-			String version = getAttribute(ATTRIBUTE_VERSION);
-			version = version.substring(2).replace('_','.');
-			return Double.parseDouble(version);
+			return Double.parseDouble(getAttribute(ATTRIBUTE_VERSION));
 		}
 		catch (Exception e)
 		{
@@ -89,6 +87,9 @@ public class JarInfo {
 
 /**********************************************************************
  * $Log: JarInfo.java,v $
+ * Revision 1.3  2004/05/25 23:24:03  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/04/14 21:56:39  willuhn
  * *** empty log message ***
  *
