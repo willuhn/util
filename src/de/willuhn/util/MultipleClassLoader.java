@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.11 $
- * $Date: 2004/03/29 19:56:56 $
+ * $Revision: 1.12 $
+ * $Date: 2004/03/30 22:07:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -139,7 +139,7 @@ public class MultipleClassLoader extends ClassLoader
 					return c;
         }
       }
-      catch (Exception e)
+      catch (Throwable t)
       {
       }
     }
@@ -334,6 +334,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.12  2004/03/30 22:07:19  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.11  2004/03/29 19:56:56  willuhn
  * @D javadoc
  *
