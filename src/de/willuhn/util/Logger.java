@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/03 19:33:59 $
+ * $Revision: 1.2 $
+ * $Date: 2004/01/05 21:46:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,12 +13,11 @@
 
 package de.willuhn.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+
+import de.willuhn.util.Queue.QueueFullException;
 
 /**
  * Kleiner System-Logger.
@@ -27,32 +26,40 @@ import java.util.Vector;
 public class Logger
 {
 
-  private OutputStream target;
+  private ArrayList targets = new ArrayList();
 
   // maximale Groesse des Log-Puffers (Zeilen-Anzahl)
-  private final static int FIFO_SIZE = 40;
+  private final static int BUFFER_SIZE = 40;
 
-  // Ein FIFO mit den letzten Log-Eintraegen. Kann ganz nuetzlich sein,
+  // Eine Queue mit den letzten Log-Eintraegen. Kann ganz nuetzlich sein,
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
-  private Vector lastLines = new Vector(FIFO_SIZE);
+  private Queue lastLines = new Queue(BUFFER_SIZE);
 
   private final static String DEBUG  = "DEBUG";
   private final static String INFO   = "INFO";
   private final static String WARN   = "WARN";
   private final static String ERROR  = "ERROR";
   
+	private LoggerThread lt = null;
   /**
    * ct.
-   * @param target Outputstream, in den die Log-Ausgaben geschrieben werden sollen.
    */
-  public Logger(OutputStream target)
+  public Logger()
   {
-    if (target == null)
-      this.target = System.out;
-    else 
-      this.target = target;
+  	lt = new LoggerThread();
+  	lt.start();
   }
   
+	/**
+	 * Fuegt der Liste der Ausgabe-Streams einen weiteren hinzu.
+   * @param target AusgabeStream.
+   */
+  public void addTarget(OutputStream target)
+	{
+		if (target == null)
+			return;
+		this.targets.add(new BufferedOutputStream(target));
+	}
   /**
    * Schreibt eine Message vom Typ "debug" ins Log.
    * @param message zu loggende Nachricht.
@@ -117,12 +124,18 @@ public class Logger
    */
   public void close()
 	{
-		try {
-			target.flush();
-			target.close();
-		}
-		catch (IOException io)
+		lt.interrupt();
+		BufferedOutputStream bos = null;
+		for (int i=0;i<this.targets.size();++i)
 		{
+			bos = (BufferedOutputStream) this.targets.get(i);
+			try {
+				bos.flush();
+				bos.close();
+			}
+			catch (IOException io)
+			{
+			}
 		}
 	}
 
@@ -142,23 +155,87 @@ public class Logger
    */
   private void write(String level, String message)
   {
-    String s = "["+new Date().toString()+"] ["+level+"] " + message + "\n";
-    try
-    {
-      synchronized(lastLines) { // wir wollen ja nicht, dass die FIFO aus'm Tritt kommt ;)
-        lastLines.addElement(s);
-        if (lastLines.size() >= FIFO_SIZE)
-          lastLines.removeElementAt(0); // maximale Groesse erreicht, wir schneiden unten ab
+		lt.write(level,message);
+  }
+  
+  /**
+   * Das eigentliche Schreiben erfolgt in einem extra Thread damit's hoffentlich schneller geht.
+   */
+  private class LoggerThread extends Thread
+  {
+  	
+  	private final static int maxLines = 100;
+  	private Queue messages = new Queue(maxLines);
+
+  	/**
+     * ct.
+     */
+    public LoggerThread()
+  	{
+  		super(LoggerThread.class.getName());
+  	}
+
+		/**
+		 * Loggt eine Zeile in's Logfile.
+     * @param level Log-Level.
+     * @param message Die eigentliche Nachricht.
+     */
+    public void write(String level, String message)
+		{
+			String s = "["+new Date().toString()+"] ["+level+"] " + message + "\n";
+			try
+      {
+        messages.add(s);
       }
+      catch (QueueFullException e)
+      {
+        System.out.print(s);
+      }
+		}
 
-      target.write(s.getBytes());
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    public void run()
+    {
+    	byte[] message;
+			while(true)
+			{
+				if (messages.size() > 0)
+				{
+					BufferedOutputStream bos = null;
+					message = ((String)messages.get()).getBytes();
+					for (int i=0;i<targets.size();++i)
+					{
+						bos = (BufferedOutputStream) targets.get(i);
+						try
+						{
+							bos.write(message);
+						}
+						catch (IOException e)
+						{
+						}
+					}
+				}
+				try
+        {
+          sleep(100);
+        }
+        catch (InterruptedException e)
+        {
+        }
+			}
+    }
 
-    } catch (IOException e) {}
   }
 }
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.2  2004/01/05 21:46:29  willuhn
+ * @N added queue
+ * @N logger writes now in separate thread
+ *
  * Revision 1.1  2004/01/03 19:33:59  willuhn
  * *** empty log message ***
  *
