@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/ArrayEnumeration.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/06 19:58:29 $
+ * $Revision: 1.2 $
+ * $Date: 2004/01/08 21:38:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 
 package de.willuhn.util;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 /**
@@ -33,6 +34,14 @@ public class ArrayEnumeration implements Enumeration
   	this.array = array;
   }
 
+	/**
+   * Erzeugt eine neue Enumeration.
+   * @param array
+   */
+  public ArrayEnumeration(ArrayList array)
+	{
+		this.array = array.toArray();
+	}
   /**
    * @see java.util.Enumeration#hasMoreElements()
    */
@@ -54,6 +63,9 @@ public class ArrayEnumeration implements Enumeration
 
 /**********************************************************************
  * $Log: ArrayEnumeration.java,v $
+ * Revision 1.2  2004/01/08 21:38:39  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/01/06 19:58:29  willuhn
  * @N ArrayEnumeration
  *

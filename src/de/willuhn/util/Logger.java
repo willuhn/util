@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.5 $
- * $Date: 2004/01/06 19:58:29 $
+ * $Revision: 1.6 $
+ * $Date: 2004/01/08 21:38:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -31,9 +31,9 @@ public class Logger
   // maximale Groesse des Log-Puffers (Zeilen-Anzahl)
   private final static int BUFFER_SIZE = 40;
 
-  // Eine Queue mit den letzten Log-Eintraegen. Kann ganz nuetzlich sein,
+  // Eine History mit den letzten Log-Eintraegen. Kann ganz nuetzlich sein,
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
-  private Queue lastLines = new Queue(BUFFER_SIZE);
+  private History lastLines = new History(BUFFER_SIZE);
 
 	public final static String[] LEVEL_TEXT = new String[] {"DEBUG","INFO","WARN","ERROR"};
 
@@ -238,18 +238,7 @@ public class Logger
 				if (messages.size() > 0)
 				{
 					String s = (String) messages.pop();
-
-					synchronized (lastLines)
-					{
-						try
-						{
-							{
-								if (lastLines.full())
-									lastLines.pop();
-								lastLines.push(s);
-							}
-						}	catch (QueueFullException e1)	{}
-					}
+					lastLines.push(s);
 
 					OutputStream os = null;
 					message = (s + "\n").getBytes();
@@ -280,6 +269,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.6  2004/01/08 21:38:39  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.5  2004/01/06 19:58:29  willuhn
  * @N ArrayEnumeration
  *
