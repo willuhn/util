@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.13 $
- * $Date: 2004/05/25 23:24:03 $
+ * $Revision: 1.14 $
+ * $Date: 2004/06/03 22:11:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -76,6 +76,7 @@ public class Logger
 
   /**
    * ct.
+   * @param name Aliasname zur Identifizierung des Logger-Threads.
    */
   public Logger(String name)
   {
@@ -349,6 +350,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.14  2004/06/03 22:11:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.13  2004/05/25 23:24:03  willuhn
  * *** empty log message ***
  *

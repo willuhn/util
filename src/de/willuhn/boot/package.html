@@ -1,0 +1,58 @@
+<html>
+
+  <head></head>
+
+  <body>
+    <p>
+      de.willuhn.boot ist ein kleines Framework zum Starten
+      von Diensten/Services angelehnt an das SysV-Bootkonzept
+      (bekannt aus Unix-Systemen).
+    </p>
+
+    <p>
+      <b>Einsatzzweck:</b> komplexere Java-Anwendungen, die beim
+      Starten eine Reihe von Java-Klassen initialisieren müssen.
+      <br/>Typisches Beispiel - ein JSP-Server:<br/>
+      <ul>
+      	<li>Starten des Server-Loops
+      		<ul>
+      			<li>Abhängigkeit: Starten des TCP-Managers
+					<ul>
+      					<li>Abhängigkeit: Starten eines Pools von TCP-Listenern</li>
+      					<li>Abhängigkeit: Starten eines Pools von TCP-Listenern mit SSL-Support</li>
+      				</ul>
+      			</li>
+      			<li>Abhängigkeit: Starten des Webapp-Managers
+      				<ul>
+      					<li>Abhängigkeit: Context für jedes gefundene WAR-Archiv starten</li>
+      				</ul>
+      			</li>
+      			<li>Abhängigkeit: Initialisieren des Handler
+      				<ul>
+      					<li>Abhängigkeit: JSP-Handler (matcht auf *.jsp und *.jsf)</li>
+      					<li>Abhängigkeit: File-Handler (matcht auf *.*)</li>
+		      		</ul>
+      			</li>
+		      	<li>Abhängigkeit: Starten des JSP-Compilers</li>
+			</ul>
+		</li>
+   	</ul>
+  	Es sind also eine Reihe von Services zu initialisieren, die voneinander
+	abhängig sind.
+    </p>
+    <p>
+      <b>Ziele:</b>
+      <ul>
+      	<li>
+      		Beim Starten eines Services muss der Bootloader selbständig alle
+      		abhängigen und somit vorher zu startenden Dienste auflösen.
+		</li>
+		<li>
+      		Jeder Service muss hierbei nur seine direkten Abhängigkeiten
+      		kennen. Alle daraus resultierenden weiteren Abhängigkeiten
+      		muss der Bottloader selbst erkennen.
+      	</li>
+      </ul>
+    </p>
+  </body>
+</html>
