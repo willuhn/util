@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.23 $
- * $Date: 2004/07/25 17:15:33 $
+ * $Revision: 1.24 $
+ * $Date: 2004/08/18 23:14:28 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -37,6 +37,9 @@ public class MultipleClassLoader extends ClassLoader
   private URL[] urls          	= null;
   private URLClassLoader ucl  	= null;
 
+	/**
+	 * Erzeugt eine neue Instanz des Classloaders.
+	 */
 	public MultipleClassLoader()
 	{
 		super();
@@ -232,6 +235,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.24  2004/08/18 23:14:28  willuhn
+ * @D Javadoc
+ *
  * Revision 1.23  2004/07/25 17:15:33  willuhn
  * *** empty log message ***
  *
