@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/11/04 17:48:31 $
+ * $Revision: 1.4 $
+ * $Date: 2004/11/04 22:41:46 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -103,7 +103,7 @@ public class ZipExtractor
         monitor.log("  processing " + currentName);
 
         // Fortschritt neu berechnen
-        monitor.percentComplete(i * 100 / size);
+        monitor.setPercentComplete(i * 100 / size);
         i++;
 
         currentFile = new File(targetDirectory,currentName);
@@ -190,7 +190,7 @@ public class ZipExtractor
         if (backup != null && backup.exists())
           backup.delete();
       }
-      monitor.percentComplete(100);
+      monitor.setPercentComplete(100);
       monitor.setStatusText("zip file " + zip.getName() + " uncompressed successfully");
     }
     catch (IOException e)
@@ -217,47 +217,20 @@ public class ZipExtractor
 
   private class DummyMonitor implements ProgressMonitor
   {
-
-    /**
-     * @see de.willuhn.util.ProgressMonitor#percentComplete(int)
-     */
-    public void percentComplete(int percent)
-    {
-    }
-
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatus(int)
-     */
-    public void setStatus(int status)
-    {
-    }
-
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatusText(java.lang.String)
-     */
-    public void setStatusText(String text)
-    {
-    }
-
-    /**
-     * @see de.willuhn.util.ProgressMonitor#log(java.lang.String)
-     */
-    public void log(String msg)
-    {
-    }
-
-    /**
-     * @see de.willuhn.util.ProgressMonitor#percentComplete()
-     */
-    public int percentComplete()
-    {
-      return 0;
-    }
+    public void setPercentComplete(int percent) {}
+    public void addPercentComplete(int percent) {}
+    public int getPercentComplete() {return 0;}
+    public void setStatus(int status) {}
+    public void setStatusText(String text) {}
+    public void log(String msg) {}
   }
 }
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.4  2004/11/04 22:41:46  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/11/04 17:48:31  willuhn
  * *** empty log message ***
  *

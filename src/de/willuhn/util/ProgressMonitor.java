@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ProgressMonitor.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/11/04 17:48:31 $
+ * $Revision: 1.3 $
+ * $Date: 2004/11/04 22:41:46 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,18 +23,28 @@ public interface ProgressMonitor
 {
 	/**
 	 * Teilt dem Monitor mit, wieviel Prozent der Aufgabe bereits abgearbeitet sind.
+	 * Bitte einen absoluten Wert angeben. Der Fortschritt wird dann unabhaengig
+	 * vom vorherigen Wert auf den hier uebergebenen gesetzt. 
    * @param percent prozentualer Fortschritt (muss zwischen 0 und 100 liegen).
    */
-  public void percentComplete(int percent);
+  public void setPercentComplete(int percent);
+
+	/**
+	 * Teilt dem Monitor mit, wieviel Prozent der Aufgabe gerade erledigt wurde.
+	 * Bitte hier einen relativen positiven Wert angeben, um den der aktuelle
+	 * Wert erhoeht werden soll.
+   * @param percent Anzahl der Prozent-Punkte, um die der Fortschritt erhoeht werden soll.
+   */
+  public void addPercentComplete(int percent);
 
   /**
    * Liefert den aktuell angezeigten Fortschritt in Prozent.
    * @return aktueller Fortschritt.
    */
-  public int percentComplete();
+  public int getPercentComplete();
   
 	/**
-	 * Teilt dem Monitor den aktuellen Status des Tasks mit.
+	 * Teilt dem Monitor den aktuellen Status mit.
    * Das koennen selbst definierte Konstanten sein.
    * @param status der aktuelle Status.
    */
@@ -56,6 +66,9 @@ public interface ProgressMonitor
 
 /**********************************************************************
  * $Log: ProgressMonitor.java,v $
+ * Revision 1.3  2004/11/04 22:41:46  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/11/04 17:48:31  willuhn
  * *** empty log message ***
  *
