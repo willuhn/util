@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/FileFinder.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/06/03 00:24:38 $
+ * $Revision: 1.4 $
+ * $Date: 2004/06/08 22:26:03 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,9 +41,9 @@ public class FileFinder
 	 * Die Datei muss den genannten String im Detainamen enthalten.
 	 * Wird diese Funktion mehrmals aufgerufen, werden alle
 	 * Suchkriterien mit ODER verknuepft.
-   * @param regex Regulaerer Ausdruck.
-   */
-  public void contains(String regex)
+	 * @param regex Regulaerer Ausdruck.
+	 */
+	public void matches(String regex)
 	{
 		if (regex == null || "".equals(regex))
 			return;
@@ -153,6 +153,9 @@ public class FileFinder
 
 /**********************************************************************
  * $Log: FileFinder.java,v $
+ * Revision 1.4  2004/06/08 22:26:03  willuhn
+ * @C renamed FileFinder#contains() into FileFinder#matches()
+ *
  * Revision 1.3  2004/06/03 00:24:38  willuhn
  * *** empty log message ***
  *
