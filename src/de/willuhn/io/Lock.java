@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/Attic/Lock.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.2 $
+ * $Date: 2005/01/21 02:31:15 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -38,7 +38,7 @@ public class Lock {
    */
   public Lock(String name) throws RuntimeException
   {
-		file = new File(name + ".lock");
+		file = new File(name);
   	init();
   }
 
@@ -73,6 +73,9 @@ public class Lock {
 
 /**********************************************************************
  * $Log: Lock.java,v $
+ * Revision 1.2  2005/01/21 02:31:15  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *
