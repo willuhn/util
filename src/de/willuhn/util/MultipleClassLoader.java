@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.16 $
- * $Date: 2004/05/02 17:04:58 $
+ * $Revision: 1.17 $
+ * $Date: 2004/05/04 23:05:01 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -202,30 +202,29 @@ public class MultipleClassLoader extends ClassLoader
 	{
 		Class c = loader.loadClass(className);
 		// Klasse gefunden. Die tun wir gleich noch in den Cache.
-		cache.put(className,c);
-		// und registrieren sie im ClassFinder
-		finder.addClass(c);
+		if (cache.put(className,c) == null)
+		{
+			// und registrieren sie im ClassFinder. Aber nur, wenn
+			// sie im Cache noch nicht existierte.
+			finder.addClass(c);
+		}
 		return c;
 	}
 
-  /**
-	 * Sucht nach einem Implementor des uebergebenen Interfaces.
-	 * Hinweis: Die Funktion liefert generell nur instanziierbare Klassen.
-	 * Es werden also weder abstrakte Klassen, noch Interfaces oder RMI-Stubs geliefert.
-	 * @param interphase das Interface.
-	 * @return gefundene Klasse.
-	 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
-	 */
-	public Class findImplementor(Class interphase) throws ClassNotFoundException
+	/**
+	 * Liefert einen ClassFinder, mit dem man nach Klassen im Classpath suchen kann.
+   * @return ClassFinder.
+   */
+  public ClassFinder getClassFinder()
 	{
-		return finder.findImplementor(interphase);
+		return finder;
 	}
 
 	/**
 	 * Klassen-Sucher.
 	 * Diese Teil hier kann man mit Klassen fuettern und danach in verschiedener Hinsicht befragen.
 	 */
-	private class ClassFinder
+	public class ClassFinder
 	{
 
 		private Hashtable cache = new Hashtable();
@@ -254,26 +253,28 @@ public class MultipleClassLoader extends ClassLoader
 		}
 
 		/**
-		 * Sucht nach einem ggf. vorhandenen Implementor des uebergebenen Interfaces.
+		 * Sucht nach ggf. vorhandenen Klassen, die das uebergebene Interface implementieren.
 		 * Hinweis: Die Funktion liefert generell nur instanziierbare Klassen.
 		 * Es werden also weder abstrakte Klassen, noch Interfaces oder RMI-Stubs geliefert.
 		 * @param interphase das Interface.
-		 * @return die gefundene Klasse.
-		 * @throws ClassNotFoundException wenn der Implementor nicht gefunden wurde.
+		 * Handelt es sich hierbei nicht um ein Interface sondern eine instanziierbare
+		 * nicht abstrakte Klasse, wir diese direkt und ohne Suche wieder zurueckgegeben.
+		 * @return die gefundenen Klassen.
+		 * @throws ClassNotFoundException wenn der Implementor nichts gefunden hat.
 		 */
-		private Class findImplementor(Class interphase) throws ClassNotFoundException
+		public Class[] findImplementors(Class interphase) throws ClassNotFoundException
 		{
 
 			if (!interphase.isInterface() &&
 					!Modifier.isAbstract(interphase.getModifiers()) &&
 					!isStub(interphase)) // kein Interface, nicht abstract, kein Stub
-				return interphase; //dann geben wir das Ding so zurueck, wie es ist
+				return new Class[] {interphase}; //dann geben wir das Ding so zurueck, wie es ist
 
 			long start = System.currentTimeMillis();
 		
 			// erstmal im Cache checken
-			Class found = (Class) cache.get(interphase);
-			if (found != null)
+			Class[] found = (Class[]) cache.get(interphase);
+			if (found != null && found.length > 0)
 			{
 				return found;
 			}
@@ -283,80 +284,60 @@ public class MultipleClassLoader extends ClassLoader
 			// So, jetzt geht die Suche los
 			// Ggf. muessen wir die Ableitungshierachie hochwandern.
 			// Wenn mehrere Klassen das Interface implementieren, sammeln
-			// wir diese in einer Ranking-Liste und nehmen am Ende die Klasse,
-			// welche das Interface direkt oder am naehesten implementiert.
+			// wir diese in einer Ranking-Liste.
 			ArrayList ranking = new ArrayList();
+
+			// Hier speichern wir alle direkten Treffer um bei der
+			// Suche in der Ableitungs-Hierachie keine Duplikate
+			// zu finden.
+			Hashtable duplicates = new Hashtable();
 
 			// ueber alle Klassen iterieren 
 			for (int i=0;i<classes.size();++i)
 			{
 				test = (Class) classes.get(i);
 
+				// hey, die haben wir doch schon.
+				if (duplicates.get(test) != null)
+					continue;
+
 				// ist ein Stub - koennen wir ganz vergessen
 				if (isStub(test))
 					continue;
 
-				// checken, ob die Klasse das Interface direkt
-				// implementiert und nicht abstrakt ist.
-				if (directImplementor(test,interphase) &&
+				// checken, ob die Klasse das Interface
+				// irgendwie implementiert und nicht abstrakt ist.
+				if (implementor(test,interphase) &&
 					  !Modifier.isAbstract(test.getModifiers())
 				)
 				{
-					// ok, dann koennen wir die gleich nehmen
-					cache.put(interphase,test);
-					logger.debug("multipleClassLoader.ClassFinder: found implementor " + test.getName() + " for interface " + interphase.getName());
-					logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
-					return test;
-				}
-
-
-				// und jetzt die Rekursion
-				Class parent = null;
-				while (true)
-				{
-					parent = test.getSuperclass();
-					if (parent == null)
-						break; // oben angekommen. Naechste Test-Klasse bitte ;)
-
-					if (!parent.isInterface() &&
-					    !Modifier.isAbstract(parent.getModifiers()) &&
-							directImplementor(parent,interphase))
-					{
-						// Mhh, ist auf jeden Fall schonmal eine brauchbarer Kandidat.
-						ranking.add(parent);
-					}
-					test = parent; // naechste Iteration
+					// hier, wir haben einen direkten Implementor.
+					// Wenn das der Fall ist, schenken wir uns
+					// die Suche in der Ableitungshierachie dieser
+					// Klasse (macht ja auch keinen Sinn, weil die
+					// Parent-Klassen dann meist abstrakt sind)
+					// und springen gleich zur naechsten.
+					ranking.add(test);
+					duplicates.put(test,test);
+					continue;
 				}
 			}
 
 
-			// OK, direkt implementiert hat's scheinbar niemand.
-			// Dann checken wir das Ranking.
+			// Jetzt checken wir noch das Ranking.
 			if (ranking.size() == 0)
 			{
-				// Mift, nix gefunden
+				// Mift, ueberhaupt nix gefunden
 				logger.debug("multipleClassLoader.ClassFinder: ...no implementor found for " + interphase.getName());
 				throw new ClassNotFoundException("no implementor found for " + interphase.getName());
 			}
 
-			// dabei fangen wir hinten an, weil die dem Interface naeher sind
-			Class current = null;
-			for (int i=ranking.size();i>=0;--i)
-			{
-				current = (Class) ranking.get(i);
-//				if (Modifier.isAbstract(current.getModifiers()))
-//					continue; //Abstrakte Klassen koennen nicht instanziiert werden
+			// ok, wir haben was. Das tun wir in den Cache als Array von Class-Objekten
+			Class[] classes = (Class[]) ranking.toArray(new Class[ranking.size()]);
+			cache.put(interphase,classes);
+			logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
+			return classes;
 
-				// dann muesste das hier jetzt die erste passende sein
-				cache.put(interphase,current);
-				logger.debug("multipleClassLoader.ClassFinder: found implementor " + current.getName() + " for interface " + interphase.getName());
-				logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
-				return current;
-			}
-
-			// Mift, nix gefunden
-			logger.debug("multipleClassLoader.ClassFinder: ...no implementor found for " + interphase.getName());
-			throw new ClassNotFoundException("no implementor found for " + interphase.getName());
 		}
 
 		/**
@@ -374,10 +355,12 @@ public class MultipleClassLoader extends ClassLoader
 		 * Checkt, ob die Klasse das Interface implementiert.
 		 * @param test Test-Klasse.
 		 * @param interphase zu pruefendes Interface.
-		 * @return true, wenn sie es implementiert.
+		 * @return true, wenn sie es <b>direkt</b> implementiert.
 		 */
 		private boolean directImplementor(Class test, Class interphase)
 		{
+			// Im ersten Schritt pruefen wir, ob die Klasse das Interface
+			// direkt implementiert
 			Class[] interfaces = test.getInterfaces();
 			for (int j=0;j<interfaces.length;++j)
 			{
@@ -385,16 +368,56 @@ public class MultipleClassLoader extends ClassLoader
 				{
 					return true;
 				}
+				// Bevor wir die naechste Iteration durchlaufen muessen wir nun
+				// aber noch pruefen, ob das aktuell getestete Interface vielleicht
+				// vom gewuenschten Interface abgeleitet ist. Also z.Bsp:
+				// interface a;
+				// interface b extends a;
+				// class c implements b;
+				if (implementor(interfaces[j],interphase))
+					return true;
 			}
 			return false;
 		}
-	
+
+		/**
+		 * Checkt rekursiv in der Ableitungshierachie, ob die Klasse das
+		 * Interface irgendwie implementiert.
+     * @param test Test-Klasse.
+     * @param interphase zu pruefendes Interface.
+     * @return true, wenn sie es implementiert.
+     */
+    private boolean implementor(Class test, Class interphase)
+		{	
+			if (directImplementor(test,interphase))
+				return true;
+
+			// jetzt die Iteration
+			Class current = test;
+			Class parent = null;
+			while (true)
+			{
+				parent = current.getSuperclass();
+				if (parent == null)
+					return false;
+
+				if (!parent.isInterface() &&
+						directImplementor(parent,interphase))
+				{
+					return true;
+				}
+				current = parent; // naechste Iteration
+			}
+		}
 	}
 }
 
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.17  2004/05/04 23:05:01  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.16  2004/05/02 17:04:58  willuhn
  * *** empty log message ***
  *
