@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.15 $
- * $Date: 2004/06/10 20:57:34 $
+ * $Revision: 1.16 $
+ * $Date: 2004/06/15 21:11:30 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -238,7 +238,7 @@ public class Logger
    * @param level Log-Levels.
    * @param message zu loggende Nachricht.
    */
-  private void write(int level, String message)
+  protected void write(int level, String message)
   {
   	if (level < this.level)
   		return;
@@ -352,6 +352,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.16  2004/06/15 21:11:30  willuhn
+ * @N added LoggerOutputStream
+ *
  * Revision 1.15  2004/06/10 20:57:34  willuhn
  * @D javadoc comments fixed
  *
