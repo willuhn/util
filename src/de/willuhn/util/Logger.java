@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.6 $
- * $Date: 2004/01/08 21:38:39 $
+ * $Revision: 1.7 $
+ * $Date: 2004/01/24 17:40:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -155,7 +155,19 @@ public class Logger
    */
   public void close()
 	{
-		lt.interrupt();
+		lt.shutdown();
+
+		try {
+			while (!lt.finished())
+			{
+				Thread.sleep(50);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 		OutputStream os = null;
 		for (int i=0;i<this.targets.size();++i)
 		{
@@ -200,6 +212,9 @@ public class Logger
   	
   	private final static int maxLines = 100;
   	private Queue messages = new Queue(maxLines);
+  	
+  	private boolean quit = false;
+  	private boolean finished = false;
 
   	/**
      * ct.
@@ -216,6 +231,9 @@ public class Logger
      */
     public void write(int level, String message)
 		{
+			if (quit)
+				return; // wir nehmen keine Log-Meldungen mehr entgegen.
+
 			String s = "["+new Date().toString()+"] ["+LEVEL_TEXT[level]+"] " + message;
 			try
       {
@@ -227,6 +245,23 @@ public class Logger
       }
 		}
 
+		/**
+     * Beendet den Logger-Thread.
+     */
+    public void shutdown()
+		{
+			this.quit = true;
+		}
+
+		/**
+		 * Liefert true, wenn der Thread die letzten Meldungen rausgeschrieben hat.
+     * @return true, wenn alles rausgeschrieben ist.
+     */
+    public boolean finished()
+		{
+			return finished;
+		}
+
     /**
      * @see java.lang.Runnable#run()
      */
@@ -235,6 +270,11 @@ public class Logger
     	byte[] message;
 			while(true)
 			{
+				if (messages.size() == 0 && quit)
+				{
+					finished = true;
+					return;
+				}
 				if (messages.size() > 0)
 				{
 					String s = (String) messages.pop();
@@ -269,6 +309,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.7  2004/01/24 17:40:52  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/01/08 21:38:39  willuhn
  * *** empty log message ***
  *
