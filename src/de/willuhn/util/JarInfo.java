@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/JarInfo.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/04/14 21:48:34 $
+ * $Revision: 1.2 $
+ * $Date: 2004/04/14 21:56:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,7 @@ public class JarInfo {
 
 	public final static String ATTRIBUTE_VERSION = "Implementation-Version";
 	public final static String ATTRIBUTE_TITLE   = "Implementation-Title";
+	public final static String ATTRIBUTE_BUILD	 = "Implementation-Buildnumber";
 
   /**
    * ct.
@@ -51,7 +52,7 @@ public class JarInfo {
 	/**
 	 * Liefert die Versionsnummer des JARs, die im Manifest als Attribut ""Implementation-Version" hinterlegt ist.
 	 * Wenn der String das Format "V_&lt;Major-Number&gt;_&lt;Minor-Number&gt; hat, wird es funktionieren.
-	 * Andernfalls liefert die Funktion "1.0".
+	 * Existiert das Attribut nicht oder kann es nicht geparst werden, wird 1.0 zurueckgeliefert.
 	 * @return Version des Plugins.
 	 */
 	public double getVersion()
@@ -67,11 +68,30 @@ public class JarInfo {
 		}
 	}
 
+	/**
+	 * Liefert die Build-Nummer des JARs, die im Manifest als Attribut ""Implementation-Buildnumber" hinterlegt ist.
+	 * Existiert das Attribut nicht oder kann es nicht geparst werden, wird 1 zurueckgeliefert.
+	 * @return Buildnumber des Plugins.
+	 */
+	public int getBuildnumber()
+	{
+		try {
+			return Integer.parseInt(getAttribute(ATTRIBUTE_BUILD));
+		}
+		catch (Exception e)
+		{
+			return 1;
+		}
+	}
+
 }
 
 
 /**********************************************************************
  * $Log: JarInfo.java,v $
+ * Revision 1.2  2004/04/14 21:56:39  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/14 21:48:34  willuhn
  * *** empty log message ***
  *
