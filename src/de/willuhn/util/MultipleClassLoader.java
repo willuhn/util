@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.14 $
- * $Date: 2004/04/01 00:23:49 $
+ * $Revision: 1.15 $
+ * $Date: 2004/04/01 19:02:02 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,6 +14,7 @@
 package de.willuhn.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -115,6 +116,33 @@ public class MultipleClassLoader extends ClassLoader
 		return jars;
 	}
 
+	/**
+	 * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+	 */
+	public InputStream getResourceAsStream(String name) {
+		checkUCL();
+		InputStream is = ucl.getResourceAsStream(name);
+		if (is != null)
+			return is;
+		return super.getResourceAsStream(name);
+	}
+
+	/**
+   * Checkt, ob die Liste der URLs geaendert wurde und passt den
+   * URL-Classloader entsprechend an.
+   */
+  private void checkUCL()
+	{
+		// Wir erzeugen das Array nur, wenn wirklich was geaendert wurde.
+		// Das hundertfache "toArray()" wuerde sonst ewig dauern.
+		if (urlsChanged || urls == null || ucl == null)
+		{
+			urls = (URL[]) urlList.toArray(new URL[urlList.size()]);
+			ucl = new URLClassLoader(urls,getParent());
+			urlsChanged = false;
+		}
+	}
+
   /**
    * Laedt die angegebene Klasse und initialisiert sie.
    * @param className Name der Klasse.
@@ -129,18 +157,12 @@ public class MultipleClassLoader extends ClassLoader
 		if (c != null)
 			return c;
 
-		// Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
-		// Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
-		// ist, dass dieser eine alle Plugins und deren Jars kennt.
-		// Wir erzeugen das Array nur, wenn wirklich was geaendert wurde.
-		// Das hundertfache "toArray()" wuerde sonst ewig dauern.
-		if (urlsChanged || urls == null || ucl == null)
-		{
-			urls = (URL[]) urlList.toArray(new URL[urlList.size()]);
-			ucl = new URLClassLoader(urls,getParent());
-			urlsChanged = false;
-		}
+		checkUCL();
 		try {
+			// Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
+			// Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
+			// ist, dass dieser eine alle Plugins und deren Jars kennt.
+			// URLClassLoader checken
 			return findVia(ucl,className);
 		}
 		catch (Throwable r) {}
@@ -373,6 +395,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.15  2004/04/01 19:02:02  willuhn
+ * @N added getResourceAsStream
+ *
  * Revision 1.14  2004/04/01 00:23:49  willuhn
  * *** empty log message ***
  *
