@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.11 $
- * $Date: 2004/03/18 01:24:56 $
+ * $Revision: 1.12 $
+ * $Date: 2004/05/11 21:19:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -164,18 +164,6 @@ public class Logger
    */
   public void error(String message)
   {
-		Exception e = new Exception();
-		StackTraceElement[] lines = e.getStackTrace();
-		message = "[" + 
-							lines[1].getClassName() + 
-						  "." + 
-						  lines[1].getMethodName() +
-						  "(" +
-						  lines[1].getFileName() +
-						  ":" +
-						  lines[1].getLineNumber() + 
-						  ")] " + 
-						  message;
     write(LEVEL_ERROR,message);
   }
 
@@ -186,18 +174,6 @@ public class Logger
    */
   public void error(String message, Throwable t)
 	{
-		Exception e = new Exception();
-		StackTraceElement[] lines = e.getStackTrace();
-		message = "[" + 
-							lines[1].getClassName() + 
-							"." + 
-							lines[1].getMethodName() +
-							"(" +
-							lines[1].getFileName() +
-							":" +
-							lines[1].getLineNumber() + 
-							")] " + 
-							message;
 		write(LEVEL_ERROR,message);
 		ByteArrayOutputStream bos = null;
 		try {
@@ -373,6 +349,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.12  2004/05/11 21:19:23  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.11  2004/03/18 01:24:56  willuhn
  * @C refactoring
  *
