@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/03/03 22:27:33 $
+ * $Revision: 1.3 $
+ * $Date: 2004/04/01 22:07:16 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,8 +13,6 @@
 
 package de.willuhn.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -89,19 +87,24 @@ public class I18N
    */
   public void flush()
   {
-    try
-    {
-      File file = new File(path + "_" + locale.toString() + ".properties");
-      properties.store(new FileOutputStream(file), "unresolved strings for locale " + locale.toString());
-    }
-    catch (Exception e)
-    {
-    }
+  	return;
+//    try
+//    {
+////      File file = new File(path + "_" + locale.toString() + ".properties");
+//			File file = new File("/tmp/install/" + locale.toString() + ".properties");
+//      properties.store(new FileOutputStream(file), "unresolved strings for locale " + locale.toString());
+//    }
+//    catch (Exception e)
+//    {
+//    }
   }
 }
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.3  2004/04/01 22:07:16  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/03/03 22:27:33  willuhn
  * @N added Lock
  *
