@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/12/15 01:18:13 $
+ * $Revision: 1.3 $
+ * $Date: 2004/12/31 19:34:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 
+import de.willuhn.logging.targets.Target;
 import de.willuhn.util.History;
 import de.willuhn.util.Queue;
 import de.willuhn.util.Queue.QueueFullException;
@@ -42,9 +43,6 @@ public class Logger
 
 	private static LoggerThread lt = null;
 	
-	// legt fest, ob der Name der loggenden Klasse ermittelt und mit gedruckt werden soll.
-	private static boolean printClass = true;
-
 	static
 	{
 		lt = new LoggerThread("Logger-Thread");
@@ -52,10 +50,10 @@ public class Logger
 	}
   
 	/**
-	 * Fuegt der Liste der Ausgabe-Streams einen weiteren hinzu.
-   * @param target AusgabeStream.
+	 * Fuegt der Liste der Ausgabe-Targets ein weiteres hinzu.
+   * @param target Ausgabe-Target.
    */
-  public static void addTarget(OutputStream target)
+  public static void addTarget(Target target)
 	{
 		if (target == null)
 			return;
@@ -65,20 +63,11 @@ public class Logger
 		}
 	}
 
-	/**
-	 * Legt fest, ob der Name der loggenden Klasse ermittelt und mit gedruckt werden soll.
-   * @param b true, wenn der Klassen-Name mit gedruckt werden soll.
-   */
-  public static void setPrintClass(boolean b)
-	{
-		printClass = b;
-	}
-
   /**
    * Entfernt ein Target aus der Liste.
    * @param target zu entfernendes Target.
    */
-  public static void removeTarget(OutputStream target)
+  public static void removeTarget(Target target)
   {
     if (target == null)
       return;
@@ -190,15 +179,14 @@ public class Logger
 
 		synchronized (targets)
 		{
-			OutputStream os = null;
+			Target target = null;
 			for (int i=0;i<targets.size();++i)
 			{
-				os = (OutputStream) targets.get(i);
+				target = (Target) targets.get(i);
 				try {
-					os.flush();
-					os.close();
+					target.close();
 				}
-				catch (IOException io)
+				catch (Exception io)
 				{
 				}
 			}
@@ -208,11 +196,11 @@ public class Logger
 
   /**
    * Liefert die letzten Zeilen des Logs.
-   * @return String-Array mit den letzten Log-Eintraegen (einer pro Index).
+   * @return Array mit den letzten Log-Eintraegen (einer pro Index).
    */
-  public static String[] getLastLines()
+  public static Message[] getLastLines()
   {
-    return (String[]) lastLines.toArray(new String[lastLines.size()]);
+    return (Message[]) lastLines.toArray(new Message[lastLines.size()]);
   }
 
   /**
@@ -227,15 +215,18 @@ public class Logger
   	if (level.getValue() < Logger.level.getValue())
   		return;
 
-		if (printClass)
+		String clazz = null;
+		String method = null;
+		StackTraceElement[] stack = new Throwable().getStackTrace();
+		if (stack.length >= 3)
 		{
-			StackTraceElement[] stack = new Throwable().getStackTrace();
-			if (stack.length >= 3)
-			{
-				message = "[" + stack[2].getClassName() + "." + stack[2].getMethodName() + "] " + message;
-			}
+			clazz = stack[2].getClassName();
+			method = stack[2].getMethodName();
 		}
-		lt.write(level,message);
+		
+		Message msg = new Message(new Date(),level,clazz,method,message);
+		lastLines.push(msg);
+		lt.write(msg);
   }
   
   /**
@@ -259,18 +250,15 @@ public class Logger
   		super(name);
   	}
 
-		/**
+    /**
 		 * Loggt eine Zeile in's Logfile.
-     * @param level Log-Level.
-     * @param message Die eigentliche Nachricht.
+     * @param msg die zu loggende Nachricht.
      */
-    private void write(Level level, String message)
+    private void write(Message msg)
 		{
 			if (quit)
 				return; // wir nehmen keine Log-Meldungen mehr entgegen.
 
-			String s = "["+new Date().toString()+"] ["+level.getName()+"] " + message;
-			
 			// Das machen wir in einer Schleife solange, bis Hinzufuegen
 			// zur Queue erfolgreich war. OK, wir haben eine Maximal-Zahl von Versuchen ;)
 			int retryCount = 1000;
@@ -280,13 +268,13 @@ public class Logger
 				if (count++ >= retryCount)
 				{
 					System.out.println("***** [WARN] Logger queue full, writing to STDOUT *****");
-					System.out.println(s);
+					System.out.println(msg.toString());
 					return;
 				}
 
 				try
 				{
-					messages.push(s);
+					messages.push(msg);
 					return;
 				}
 				catch (QueueFullException e)
@@ -318,7 +306,7 @@ public class Logger
      */
     public void run()
     {
-    	byte[] message;
+    	Message msg = null;
 			while(true)
 			{
 				if (messages.size() == 0 && quit)
@@ -340,29 +328,27 @@ public class Logger
 					continue;
 				}
 
-				String s = (String) messages.pop();
-				lastLines.push(s);
+				msg = (Message) messages.pop();
 
-				OutputStream os = null;
-				message = (s + "\n").getBytes();
+				Target target = null;
 				synchronized (targets)
 				{
 					if (targets.size() == 0)
 					{
-						System.out.print("warn: no logging target defined, logging to console: " + new String(message));
+						System.out.print("warn: no logging target defined, logging to console: " + msg.toString());
 						continue;
 					}
 
 					for (int i=0;i<targets.size();++i)
 					{
-						os = (OutputStream) targets.get(i);
+						target = (Target) targets.get(i);
 						try
 						{
-							os.write(message);
+							target.write(msg);
 						}
-						catch (IOException e)
+						catch (Exception e)
 						{
-							System.out.print("alert: error while logging the following message: " + new String(message));
+							System.out.print("alert: error while logging the following message: " + msg.toString());
 						}
 					}
 				}
@@ -370,10 +356,15 @@ public class Logger
     }
 
   }
+
 }
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.3  2004/12/31 19:34:22  willuhn
+ * @C some logging refactoring
+ * @N syslog support for logging
+ *
  * Revision 1.2  2004/12/15 01:18:13  willuhn
  * @N Logger is now able to log class names to
  *
