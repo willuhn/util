@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Queue.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/01/05 21:46:29 $
+ * $Revision: 1.2 $
+ * $Date: 2004/01/05 23:08:04 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -42,10 +42,10 @@ public class Queue
   }
 
 	/**
-	 * Nimmt das naechste zu bearbeitende Objekt aus der Queue und liefert es zurueck. 
+	 * Entfernt das naechste zu bearbeitende Objekt aus der Queue und liefert es zurueck. 
    * @return naechstes zu bearbeitendes Objekt.
    */
-  public synchronized Object get()
+  public synchronized Object pop()
 	{
 		Object o = v.get(0);
 		v.removeElementAt(0);
@@ -71,15 +71,24 @@ public class Queue
 		return v.toArray(type);
 	}
 
+	/**
+	 * Prueft, ob die Queue voll ist.
+   * @return true, wenn sie voll ist.
+   */
+  public boolean full()
+	{
+		return (v.size() >= capacity);
+	}
+
   /**
 	 * Fuegt der Queue ein weiteres Objekt hinzu. Ist die Queue voll, wird eine
 	 * Exception geworfen
    * @param o das hinzuzufuegende Objekt.
    * @throws QueueFullException Wenn die Queue voll ist.
    */
-  public synchronized void add(Object o) throws QueueFullException
+  public synchronized void push(Object o) throws QueueFullException
 	{
-		if (v.size() > capacity)
+		if (full())
 			throw new QueueFullException("maximum queue size reached");
 		v.addElement(o);
 	}
@@ -106,6 +115,9 @@ public class Queue
 
 /**********************************************************************
  * $Log: Queue.java,v $
+ * Revision 1.2  2004/01/05 23:08:04  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/01/05 21:46:29  willuhn
  * @N added queue
  * @N logger writes now in separate thread

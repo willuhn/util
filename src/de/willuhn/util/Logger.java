@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.2 $
- * $Date: 2004/01/05 21:46:29 $
+ * $Revision: 1.3 $
+ * $Date: 2004/01/05 23:08:04 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,12 +35,17 @@ public class Logger
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
   private Queue lastLines = new Queue(BUFFER_SIZE);
 
-  private final static String DEBUG  = "DEBUG";
-  private final static String INFO   = "INFO";
-  private final static String WARN   = "WARN";
-  private final static String ERROR  = "ERROR";
+	private final static String[] text = new String[] {"DEBUG","INFO","WARN","ERROR"};
+
+	public final static int LEVEL_DEBUG = 0;
+	public final static int LEVEL_INFO  = 1;
+	public final static int LEVEL_WARN  = 2;
+	public final static int LEVEL_ERROR = 3;
   
+	private int level = LEVEL_DEBUG;
+
 	private LoggerThread lt = null;
+
   /**
    * ct.
    */
@@ -60,13 +65,24 @@ public class Logger
 			return;
 		this.targets.add(new BufferedOutputStream(target));
 	}
+
+	/**
+	 * Setzt den Log-Level.
+   * @param level Log-Level.
+   */
+  public void setLevel(int level)
+	{
+		if (level >= 0 && level < text.length)
+			this.level = level;
+	}
+
   /**
    * Schreibt eine Message vom Typ "debug" ins Log.
    * @param message zu loggende Nachricht.
    */
   public void debug(String message)
   {
-    write(DEBUG,message);
+    write(LEVEL_DEBUG,message);
   }
 
   /**
@@ -75,7 +91,7 @@ public class Logger
    */
   public void info(String message)
   {
-    write(INFO,message);
+    write(LEVEL_INFO,message);
   }
 
   /**
@@ -84,7 +100,7 @@ public class Logger
    */
   public void warn(String message)
   {
-    write(WARN,message);
+    write(LEVEL_WARN,message);
   }
 
   /**
@@ -93,7 +109,7 @@ public class Logger
    */
   public void error(String message)
   {
-    write(ERROR,message);
+    write(LEVEL_ERROR,message);
   }
 
 	/**
@@ -103,12 +119,12 @@ public class Logger
    */
   public void error(String message, Throwable t)
 	{
-		write(ERROR,message);
+		write(LEVEL_ERROR,message);
 		ByteArrayOutputStream bos = null;
 		try {
 			bos = new ByteArrayOutputStream();
 			t.printStackTrace(new PrintStream(bos));
-			write(ERROR,bos.toString());
+			write(LEVEL_ERROR,bos.toString());
 		}
 		finally {
 			try {
@@ -150,11 +166,14 @@ public class Logger
 
   /**
    * Interne Methode zum Formatieren und Schreiben der Meldungen.
-   * @param level Name des Log-Levels.
+   * @param level Log-Levels.
    * @param message zu loggende Nachricht.
    */
-  private void write(String level, String message)
+  private void write(int level, String message)
   {
+  	if (level < this.level)
+  		return;
+
 		lt.write(level,message);
   }
   
@@ -180,12 +199,12 @@ public class Logger
      * @param level Log-Level.
      * @param message Die eigentliche Nachricht.
      */
-    public void write(String level, String message)
+    public void write(int level, String message)
 		{
-			String s = "["+new Date().toString()+"] ["+level+"] " + message + "\n";
+			String s = "["+new Date().toString()+"] ["+text[level]+"] " + message + "\n";
 			try
       {
-        messages.add(s);
+        messages.push(s);
       }
       catch (QueueFullException e)
       {
@@ -203,8 +222,22 @@ public class Logger
 			{
 				if (messages.size() > 0)
 				{
+					String s = (String) messages.pop();
+
+					synchronized (lastLines)
+					{
+						try
+						{
+							{
+								if (lastLines.full())
+									lastLines.pop();
+								lastLines.push(s);
+							}
+						}	catch (QueueFullException e1)	{}
+					}
+
 					BufferedOutputStream bos = null;
-					message = ((String)messages.get()).getBytes();
+					message = s.getBytes();
 					for (int i=0;i<targets.size();++i)
 					{
 						bos = (BufferedOutputStream) targets.get(i);
@@ -232,6 +265,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.3  2004/01/05 23:08:04  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/01/05 21:46:29  willuhn
  * @N added queue
  * @N logger writes now in separate thread
