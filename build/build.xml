@@ -35,8 +35,8 @@
     	<echo message="CVS-Tag: ${tag}"/>
 	    <echo message="BUILD  : ${build.number}"/>
 
-	    <property name="define.jarfilename"  value="de_willuhn_util-${version}-${build.number}.jar"/>
-    	<property name="define.srcfilename"  value="de_willuhn_util-${version}-${build.number}.src.zip"/>
+	    <property name="define.jarfilename"  value="de_willuhn_util.jar"/>
+    	<property name="define.srcfilename"  value="de_willuhn_util.src.zip"/>
 	    <property name="define.package"      value="de.willuhn.util"/>
 
         <property name="project.release"	 value="releases/${version}-${build.number}"/>
