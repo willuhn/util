@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.8 $
- * $Date: 2004/02/27 01:09:42 $
+ * $Revision: 1.9 $
+ * $Date: 2004/03/06 18:24:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,16 +98,18 @@ public class MultipleClassLoader extends ClassLoader
 		URL[] urls = new URL[jars.length];
 		for(int i=0;i<jars.length;++i)
 		{
-			File jar = (File) jars[i];
-			urls[i] = jar.toURL();
-			logger.debug("multipleClassLoader: adding file " + jar.getAbsolutePath());
+			urls[i] = jars[i].toURL();
+			logger.debug("multipleClassLoader: adding file " + jars[i].getAbsolutePath());
 		}
 		addClassloader(new URLClassLoader(urls));
 		return jars;
 	}
 
   /**
-   * @see java.lang.ClassLoader#loadClass(java.lang.String)
+   * Laedt die angegebene Klasse und initialisiert sie.
+   * @param className Name der Klasse.
+   * @return Die Klasse.
+   * @throws ClassNotFoundException
    */
   public static Class load(String className) throws ClassNotFoundException
   {
@@ -332,6 +334,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.9  2004/03/06 18:24:47  willuhn
+ * @D javadoc
+ *
  * Revision 1.8  2004/02/27 01:09:42  willuhn
  * *** empty log message ***
  *

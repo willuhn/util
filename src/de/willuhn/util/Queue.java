@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Queue.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/01/06 19:58:29 $
+ * $Revision: 1.4 $
+ * $Date: 2004/03/06 18:24:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -28,7 +28,14 @@ public class Queue
 	private int capacity = 10;
 	private Vector v = null;
 
+	/**
+	 * Die Minimal-Kapazitaet der Queue.
+	 */
 	public static int CAPACITY_MIN = 2;
+
+	/**
+	 * Die Maximal-Kapazitaet der Queue.
+	 */
 	public static int CAPACITY_MAX = 1000;
 
   /**
@@ -126,6 +133,9 @@ public class Queue
 
 /**********************************************************************
  * $Log: Queue.java,v $
+ * Revision 1.4  2004/03/06 18:24:47  willuhn
+ * @D javadoc
+ *
  * Revision 1.3  2004/01/06 19:58:29  willuhn
  * @N ArrayEnumeration
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Attic/Logger.java,v $
- * $Revision: 1.9 $
- * $Date: 2004/02/12 00:49:12 $
+ * $Revision: 1.10 $
+ * $Date: 2004/03/06 18:24:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,13 +35,39 @@ public class Logger
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
   private History lastLines = new History(BUFFER_SIZE);
 
+	/**
+	 * Die Bezeichnungen der verschiedenen Log-Level.
+	 */
 	public final static String[] LEVEL_TEXT = new String[] {"DEBUG","INFO","WARN","ERROR"};
 
+	/**
+	 * Log-Level DEBUG.
+	 * Hoechster Log-Level.
+	 */
 	public final static int LEVEL_DEBUG = 0;
+
+	/**
+	 * Log-Level INFO.
+	 * Es werden keine DEBUG-Meldungen angezeigt.
+	 */
 	public final static int LEVEL_INFO  = 1;
+
+	/**
+	 * Log-Level WARN.
+	 * Es werden nur Warnungen und Fehler angezeigt.
+	 */
 	public final static int LEVEL_WARN  = 2;
+
+	/**
+	 * Log-Level ERROR.
+	 * Es werden nur Fehler angezeigt.
+	 */
 	public final static int LEVEL_ERROR = 3;
+	
   
+	/**
+	 * Standard-Loglevel.
+	 */
 	public final static int LEVEL_DEFAULT = LEVEL_WARN;
 
 	private int level = LEVEL_DEFAULT;
@@ -347,6 +373,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.10  2004/03/06 18:24:47  willuhn
+ * @D javadoc
+ *
  * Revision 1.9  2004/02/12 00:49:12  willuhn
  * *** empty log message ***
  *
