@@ -1,16 +1,15 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.2 $
+ * $Date: 2004/10/08 00:19:25 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
- * Copyright (c) by  bbv AG
+ * Copyright (c) by willuhn.webdesign
  * All rights reserved
  *
  **********************************************************************/
-
 package de.willuhn.io;
 
 import java.io.File;
@@ -251,6 +250,9 @@ public class ZipExtractor
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.2  2004/10/08 00:19:25  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *
