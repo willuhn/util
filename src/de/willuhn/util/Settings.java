@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/03/09 01:06:20 $
+ * $Revision: 1.3 $
+ * $Date: 2005/04/21 23:33:37 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -14,10 +14,9 @@ package de.willuhn.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -37,8 +36,11 @@ import de.willuhn.logging.Logger;
 public class Settings
 {
 
-	private String path;
-  private String className;
+  private static Thread watcher        = null;
+  private static Hashtable files       = new Hashtable();
+
+  private File file;
+  private Class clazz;
   private Properties properties;
 
 	private boolean storeWhenRead = true;
@@ -59,24 +61,25 @@ public class Settings
    */
   public Settings(String path, Class clazz)
   {
-    this.className = clazz.getName();
-    this.path = path;
+    this.clazz = clazz;
+
     properties = new Properties();
     
     // Filenamen ermitteln
-    try {
-      // wir testen mal, ob wir die Datei lesen koennen.
-      FileInputStream fis = new FileInputStream(getFile());
-      properties.load(fis);
-    }
-    catch (FileNotFoundException e)
-    {
-      // ne, koemmer nicht, also erstellen wir ein neues.
+    this.file = new File(path + File.separator + clazz.getName() + ".properties");
+
+    // wir testen mal, ob wir die Datei lesen koennen.
+    if (!this.file.exists() || !this.file.canRead())
       store();
-    }
-    catch (IOException ioe)
+
+    load();
+    
+    files.put(this, new Long(this.file.lastModified()));
+    
+    if (watcher == null)
     {
-    	Logger.error("error while loading " + getFile().getAbsolutePath(),ioe);
+      watcher = new Watcher();
+      watcher.start();
     }
   }
 
@@ -100,15 +103,6 @@ public class Settings
 		this.storeWhenRead = b;
 	}
 
-  /**
-   * Liefert das File, in dem die Settings gespeichert werden.
-   * @return File in dem die Settings der Klasse gespeichert werden.
-   */
-  private File getFile()
-  {
-    return new File(this.path+"/"+className+ ".properties");
-  }
-  
 	/**
 	 * Liefert eine Liste aller Attribut-Namen, die in dieser Settings-Instanz gespeichert wurden.
    * @return Liste der Attribut-Namen.
@@ -332,23 +326,100 @@ public class Settings
    * Hinweis: Die Funktion wirft keine IOException, wenn die Datei nicht
    * gespeichert werden kann. Stattdessen wird der Fehler lediglich geloggt.
    */
-  private void store()
+  private synchronized void store()
   {
     try
     {
-      properties.store(new FileOutputStream(getFile()),"Settings for class " + className);
+      properties.store(new FileOutputStream(this.file),"Settings for class " + this.clazz.getName());
+      // Wenn wir selbst geaendert haben, aktualisieren wir den Zeitstempel damit
+      // deswegen nicht die Datei neu geladen wird
+      files.put(this,new Long(this.file.lastModified()));
     }
     catch (Exception e1)
     {
       Logger.error("unable to create settings. Do you " +
-        "have write permissions in " + getFile().getAbsolutePath() + " ?",e1);
+        "have write permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
 
+  }
+
+  /**
+   * Liest die Properties aus der Datei.
+   */
+  private synchronized void load()
+  {
+    try
+    {
+      this.properties.load(new FileInputStream(this.file));
+    }
+    catch (Exception e1)
+    {
+      Logger.error("unable to load settings. Do you " +
+        "have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
+    }
+
+  }
+
+  /**
+   * Watcher-Thread, der die Zeitstempel der Properties-Files ueberwacht und
+   * bei Datei-Aenderungen automatisch neu laedt.
+   */
+  private static class Watcher extends Thread
+  {
+    /**
+     * ct.
+     */
+    public Watcher()
+    {
+      super("configfile modification watcher");
+    }
+
+   /**
+    * @see java.lang.Runnable#run()
+    */
+    public void run()
+    {
+      Iterator i        = null;
+      Settings s        = null;
+      Long last         = null;
+      Long current      = null;
+      while (true)
+      {
+        try
+        {
+          i = files.keySet().iterator();
+          while (i.hasNext())
+          {
+            s = (Settings) i.next();
+            last = (Long) files.get(s);
+            if (last == null || s == null)
+              continue;
+            current = new Long(s.file.lastModified());
+            if (last.longValue() < current.longValue())
+            {
+              Logger.info("file " + s.file.getAbsolutePath() + " has changed, reloading");
+              s.load();
+              files.put(s,current);
+            }
+            
+          }
+          sleep(10000l);
+        }
+        catch (InterruptedException e)
+        {
+          Logger.error("configfile watcher interrupted, modifications will no longer be deteced automatically",e);
+          return;
+        }
+      }
+    }
   }
 }
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.3  2005/04/21 23:33:37  web0
+ * @N auto reloading of config files after changing
+ *
  * Revision 1.2  2005/03/09 01:06:20  web0
  * @D javadoc fixes
  *
