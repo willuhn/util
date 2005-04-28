@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/04/04 17:51:09 $
+ * $Revision: 1.3 $
+ * $Date: 2005/04/28 15:43:33 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -32,10 +32,11 @@ public class Session extends Observable
 
   /**
    * ct.
-   * @param timeout Anzahl der Sekunden (Nicht Millisekunden!), nach deren Ablauf ein Element wieder entfernt werden soll.
+   * @param timeout Anzahl der Millisekunden, nach deren Ablauf ein Element wieder entfernt werden soll.
    */
   public Session(long timeout)
   {
+    Logger.debug("creating new session. default timeout: " + timeout + " millis");
     this.timeout = timeout;
     this.worker = new Worker();
     this.worker.start();
@@ -48,21 +49,18 @@ public class Session extends Observable
    */
   public void put(Object key, Object value)
   {
-    synchronized(data)
-    {
-      data.put(key,new SessionObject(value));
-    }
+    put(key,value,this.timeout);
   }
 
   /**
    * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit einem separaten Timeoout.
    * @param key Name des Schluessels.
    * @param value Wert des Schluessels.
-   * @param timeout Timeout in Sekunden.
+   * @param timeout Timeout in Millisekunden.
    */
   public void put(Object key, Object value, long timeout)
   {
-    put(key,value,new Date(System.currentTimeMillis() + (timeout * 1000l)));
+    put(key,value,new Date(System.currentTimeMillis() + timeout));
   }
 
   /**
@@ -75,7 +73,8 @@ public class Session extends Observable
   {
     synchronized(data)
     {
-      data.put(key,new SessionObject(value, timeout));
+      data.put(key,new SessionObject(value, timeout.getTime()));
+      Logger.debug("added object to session, object: " + key.toString() + ", timeout: " + timeout.toString());
     }
   }
 
@@ -133,31 +132,32 @@ public class Session extends Observable
   private class SessionObject
   {
     private Object value;
-    private Date timeout = null;
+    private long timeout;
 
-    private SessionObject(Object value, Date timeout)
+    private SessionObject(Object value, long timeout)
     {
       this.value = value;
       this.timeout = timeout;
-    }
-
-    private SessionObject(Object value)
-    {
-      this(value,new Date(System.currentTimeMillis() + (Session.this.timeout + 1000l)));
     }
   }
 
   private class Worker extends Thread
   {
-    
+    public Worker()
+    {
+      super("Worker Thread for Session " + Session.this.hashCode());
+      Logger.debug("Created Worker Thread for Session " + Session.this.hashCode());
+    }
+
     /**
      * @see java.lang.Runnable#run()
      */
     public void run()
     {
+      Logger.debug("starting worker thread");
       while (true)
       {
-        Date current = new Date();
+        long current = System.currentTimeMillis();
         try
         {
           synchronized(data)
@@ -167,7 +167,7 @@ public class Session extends Observable
             {
               Object key          = i.next();
               SessionObject value = (SessionObject) data.get(key);
-              if (current.after(value.timeout))
+              if (current > value.timeout)
               {
                 Logger.debug("removing object " + key + " from session");
                 data.remove(key);
@@ -190,6 +190,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.3  2005/04/28 15:43:33  web0
+ * *** empty log message ***
+ *
  * Revision 1.2  2005/04/04 17:51:09  web0
  * @N new Session
  *
