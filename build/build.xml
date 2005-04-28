@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 
 <project basedir=".." default="all" name="All">
 
@@ -34,6 +34,7 @@
       <echo message="VERSION: ${version}"/>
       <echo message="CVS-Tag: ${tag}"/>
       <echo message="BUILD  : ${build.number}"/>
+      <echo message="JVM    : ${java.version} ${java.vendor}" />
 
       <property name="define.jarfilename"  value="de_willuhn_util.jar"/>
       <property name="define.srcfilename"  value="de_willuhn_util.src.zip"/>
