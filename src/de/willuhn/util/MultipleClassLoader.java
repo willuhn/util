@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.26 $
- * $Date: 2004/11/12 18:18:19 $
- * $Author: willuhn $
+ * $Revision: 1.27 $
+ * $Date: 2005/05/02 11:23:20 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -79,14 +79,19 @@ public class MultipleClassLoader extends ClassLoader
   /**
    * Fuegt rekursiv alle Jar-Files zum Class-Loader hinzu, die sich im uebergebenen Verzeichnis befinden.
    * @param directory Verzeichnis mit Jar-Files.
+   * @param extensions Liste von Datei-Endungen, die beruecksichtigt werden sollen.
+   * Also z.Bsp. ".jar,.zip".
    * @return eine Liste mit allen Jar-Files, die geladen wurden.
    * @throws MalformedURLException
    */
-  public File[] addJars(File directory) throws MalformedURLException
+  public File[] addJars(File directory, String[] extensions) throws MalformedURLException
   {
     // Liste aller Jars aus dem plugin-Verzeichnis holen
     FileFinder finder = new FileFinder(directory);
-    finder.extension("jar");
+    for (int i=0;i<extensions.length;++i)
+    {
+      finder.extension(extensions[i]);
+    }
     File[] jars = finder.findRecursive();
 
     if (jars == null || jars.length < 1)
@@ -101,6 +106,18 @@ public class MultipleClassLoader extends ClassLoader
     }
     urlsChanged = true;
     return jars;
+  }
+
+  /**
+   * Fuegt rekursiv alle Jar-Files zum Class-Loader hinzu, die sich im uebergebenen Verzeichnis befinden.
+   * Diese Funktion beschraenkt sich bei der Suche auf die Standard-Archivendungen ".jar" und ".zip".
+   * @param directory Verzeichnis mit Jar-Files.
+   * @return eine Liste mit allen Jar-Files, die geladen wurden.
+   * @throws MalformedURLException
+   */
+  public File[] addJars(File directory) throws MalformedURLException
+  {
+    return addJars(directory, new String[] {"jar","zip"});
   }
 
   /**
@@ -238,6 +255,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.27  2005/05/02 11:23:20  web0
+ * *** empty log message ***
+ *
  * Revision 1.26  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *
