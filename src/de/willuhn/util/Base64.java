@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Base64.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/03/09 01:06:20 $
+ * $Revision: 1.3 $
+ * $Date: 2005/05/03 22:04:32 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,9 @@ import sun.misc.BASE64Encoder;
 public class Base64
 {
 
+  private final static BASE64Decoder decoder = new BASE64Decoder();
+  private final static BASE64Encoder encoder = new BASE64Encoder();
+
   private Base64()
   {
   }
@@ -39,7 +42,6 @@ public class Base64
    */
   public final static byte[] decode(String base64) throws IOException
 	{
-		BASE64Decoder decoder = new BASE64Decoder();
 		return decoder.decodeBuffer(base64);
 	}
 
@@ -50,7 +52,6 @@ public class Base64
    */
   public final static String encode(byte[] text)
 	{
-		BASE64Encoder encoder = new BASE64Encoder();
 		return encoder.encode(text);
 	}
 }
@@ -58,6 +59,9 @@ public class Base64
 
 /**********************************************************************
  * $Log: Base64.java,v $
+ * Revision 1.3  2005/05/03 22:04:32  web0
+ * *** empty log message ***
+ *
  * Revision 1.2  2005/03/09 01:06:20  web0
  * @D javadoc fixes
  *
