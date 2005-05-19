@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.27 $
- * $Date: 2005/05/02 11:23:20 $
+ * $Revision: 1.28 $
+ * $Date: 2005/05/19 17:43:58 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -21,8 +21,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import de.willuhn.io.*;
-import de.willuhn.logging.*;
+import de.willuhn.io.FileFinder;
+import de.willuhn.logging.Logger;
 
 /**
  * ClassLoader der sich beliebiger anderer ClassLoader bedient.
@@ -32,13 +32,10 @@ import de.willuhn.logging.*;
 public class MultipleClassLoader extends ClassLoader
 {
   private ArrayList loaders   	= new ArrayList();
-  private ArrayList urlList    	= new ArrayList();
   private Hashtable cache     	= new Hashtable();
   private ClassFinder finder   	= new ClassFinder();
 
-  boolean urlsChanged         	= false;
-  private URL[] urls          	= null;
-  private URLClassLoader ucl  	= null;
+  private URLLoader ucl       	= null;
 
 	/**
 	 * Erzeugt eine neue Instanz des Classloaders.
@@ -46,6 +43,7 @@ public class MultipleClassLoader extends ClassLoader
 	public MultipleClassLoader()
 	{
 		super();
+    this.ucl = new URLLoader();
 	}
 
   /**
@@ -71,9 +69,7 @@ public class MultipleClassLoader extends ClassLoader
       return;
 
     Logger.info("multipleClassLoader: adding file " + file.getAbsolutePath());
-
-    urlList.add(file.toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
-    urlsChanged = true;
+    this.ucl.addURL(file.toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
   }
 
   /**
@@ -101,10 +97,9 @@ public class MultipleClassLoader extends ClassLoader
 
     for(int i=0;i<jars.length;++i)
     {
-      urlList.add(jars[i].toURI().toURL());  // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
 			Logger.debug("multipleClassLoader: adding file " + jars[i].getAbsolutePath());
+      this.ucl.addURL(jars[i].toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
     }
-    urlsChanged = true;
     return jars;
   }
 
@@ -124,27 +119,10 @@ public class MultipleClassLoader extends ClassLoader
    * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
    */
   public InputStream getResourceAsStream(String name) {
-    checkUCL();
     InputStream is = ucl.getResourceAsStream(name);
     if (is != null)
       return is;
     return super.getResourceAsStream(name);
-  }
-
-  /**
-   * Checkt, ob die Liste der URLs geaendert wurde und passt den
-   * URL-Classloader entsprechend an.
-   */
-  private void checkUCL()
-  {
-    // Wir erzeugen das Array nur, wenn wirklich was geaendert wurde.
-    // Das hundertfache "toArray()" wuerde sonst ewig dauern.
-    if (urlsChanged || urls == null || ucl == null)
-    {
-      urls = (URL[]) urlList.toArray(new URL[urlList.size()]);
-      ucl = new URLClassLoader(urls,getParent()); // NIEMALS "this" statt "getParent()" verwenden. Das loest eine Rekursion aus.
-      urlsChanged = false;
-    }
   }
 
 	/**
@@ -187,7 +165,6 @@ public class MultipleClassLoader extends ClassLoader
     if (c != null)
       return c;
 
-    checkUCL();
     try {
       // Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
       // Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
@@ -250,11 +227,36 @@ public class MultipleClassLoader extends ClassLoader
     return finder;
   }
 
+  /**
+   * Wir ueberschreiben den URLClassLoader um an die Funktion "addURL" ranzukommen.
+   */
+  private class URLLoader extends URLClassLoader
+  {
+
+    public URLLoader()
+    {
+      // Niemals den MultipleClassLoader selbst uebergeben, das wuerde eine
+      // Rekursion ausloesen
+      super(new URL[]{},MultipleClassLoader.this.getParent());
+    }
+
+    /**
+     * @see java.net.URLClassLoader#addURL(java.net.URL)
+     */
+    protected void addURL(URL url)
+    {
+      super.addURL(url);
+    }
+
+  }
 }
 
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.28  2005/05/19 17:43:58  web0
+ * @B Uralt-Fehler im URLClassloader gefixt
+ *
  * Revision 1.27  2005/05/02 11:23:20  web0
  * *** empty log message ***
  *
