@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.4 $
- * $Date: 2005/05/19 18:13:35 $
+ * $Revision: 1.5 $
+ * $Date: 2005/05/19 21:40:09 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -16,9 +16,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Random;
 
 import de.willuhn.logging.Logger;
 
@@ -379,20 +382,21 @@ public class Settings
     */
     public void run()
     {
-      Iterator i        = null;
+      Enumeration e     = null;
       Settings s        = null;
       Long last         = null;
       Long current      = null;
+      Random r = new Random();
       while (true)
       {
         try
         {
-          synchronized(files)
+          try
           {
-            i = files.keySet().iterator();
-            while (i.hasNext())
+            e = files.keys();
+            while (e.hasMoreElements())
             {
-              s = (Settings) i.next();
+              s = (Settings) e.nextElement();
               last = (Long) files.get(s);
               if (last == null || s == null)
                 continue;
@@ -405,11 +409,15 @@ public class Settings
               }
             }
           }
-          sleep(10000l);
+          catch (ConcurrentModificationException ce)
+          {
+            // nicht weiter schlimm, dann beim naechsten mal
+          }
+          sleep(10000l + r.nextInt(100));
         }
-        catch (InterruptedException e)
+        catch (InterruptedException ie)
         {
-          Logger.error("configfile watcher interrupted, modifications will no longer be deteced automatically",e);
+          Logger.error("configfile watcher interrupted, modifications will no longer be deteced automatically",ie);
           return;
         }
       }
@@ -419,6 +427,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.5  2005/05/19 21:40:09  web0
+ * *** empty log message ***
+ *
  * Revision 1.4  2005/05/19 18:13:35  web0
  * *** empty log message ***
  *
