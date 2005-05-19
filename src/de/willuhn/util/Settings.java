@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.3 $
- * $Date: 2005/04/21 23:33:37 $
+ * $Revision: 1.4 $
+ * $Date: 2005/05/19 18:13:35 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -387,21 +387,23 @@ public class Settings
       {
         try
         {
-          i = files.keySet().iterator();
-          while (i.hasNext())
+          synchronized(files)
           {
-            s = (Settings) i.next();
-            last = (Long) files.get(s);
-            if (last == null || s == null)
-              continue;
-            current = new Long(s.file.lastModified());
-            if (last.longValue() < current.longValue())
+            i = files.keySet().iterator();
+            while (i.hasNext())
             {
-              Logger.info("file " + s.file.getAbsolutePath() + " has changed, reloading");
-              s.load();
-              files.put(s,current);
+              s = (Settings) i.next();
+              last = (Long) files.get(s);
+              if (last == null || s == null)
+                continue;
+              current = new Long(s.file.lastModified());
+              if (last.longValue() < current.longValue())
+              {
+                Logger.info("file " + s.file.getAbsolutePath() + " has changed, reloading");
+                s.load();
+                files.put(s,current);
+              }
             }
-            
           }
           sleep(10000l);
         }
@@ -417,6 +419,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.4  2005/05/19 18:13:35  web0
+ * *** empty log message ***
+ *
  * Revision 1.3  2005/04/21 23:33:37  web0
  * @N auto reloading of config files after changing
  *
