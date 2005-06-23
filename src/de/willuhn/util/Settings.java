@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.5 $
- * $Date: 2005/05/19 21:40:09 $
+ * $Revision: 1.6 $
+ * $Date: 2005/06/23 20:50:30 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -403,7 +403,7 @@ public class Settings
               current = new Long(s.file.lastModified());
               if (last.longValue() < current.longValue())
               {
-                Logger.info("file " + s.file.getAbsolutePath() + " has changed, reloading");
+                Logger.debug("file " + s.file.getAbsolutePath() + " has changed, reloading");
                 s.load();
                 files.put(s,current);
               }
@@ -427,6 +427,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.6  2005/06/23 20:50:30  web0
+ * *** empty log message ***
+ *
  * Revision 1.5  2005/05/19 21:40:09  web0
  * *** empty log message ***
  *
