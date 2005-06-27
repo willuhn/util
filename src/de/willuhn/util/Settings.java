@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/06/23 20:50:30 $
+ * $Revision: 1.7 $
+ * $Date: 2005/06/27 11:52:14 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -193,6 +193,12 @@ public class Settings
 		return d;
 	}
 
+  /**
+   * Liefert den Wert des Attributes.
+   * @param name
+   * @param defaultValue
+   * @return der Wert des Attributes.
+   */
   private String getProperty(String name, String defaultValue)
 	{
 		return properties.getProperty(name,defaultValue);
@@ -364,6 +370,23 @@ public class Settings
   }
 
   /**
+   * @see java.lang.Object#finalize()
+   */
+  protected void finalize() throws Throwable
+  {
+    Logger.debug("removing " + this.file.getAbsolutePath() + " from watcher");
+    try
+    {
+      files.remove(this);
+    }
+    catch (Exception e)
+    {
+      Logger.info("unable to remove " + this.file.getAbsolutePath() + " from watcher");
+    }
+    super.finalize();
+  }
+
+  /**
    * Watcher-Thread, der die Zeitstempel der Properties-Files ueberwacht und
    * bei Datei-Aenderungen automatisch neu laedt.
    */
@@ -427,6 +450,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.7  2005/06/27 11:52:14  web0
+ * *** empty log message ***
+ *
  * Revision 1.6  2005/06/23 20:50:30  web0
  * *** empty log message ***
  *
