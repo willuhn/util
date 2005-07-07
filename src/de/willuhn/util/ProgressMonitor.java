@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ProgressMonitor.java,v $
- * $Revision: 1.3 $
- * $Date: 2004/11/04 22:41:46 $
- * $Author: willuhn $
+ * $Revision: 1.4 $
+ * $Date: 2005/07/07 22:15:40 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -21,6 +21,31 @@ package de.willuhn.util;
  */
 public interface ProgressMonitor
 {
+  /**
+   * Konstante fuer Status "noch kein Status gesetzt".
+   */
+  public final static int STATUS_NONE     = 1;
+
+  /**
+   * Konstante fuer Status "Laeuft gerade".
+   */
+  public final static int STATUS_RUNNING  = 2;
+
+  /**
+   * Konstante fuer Status "Mit Fehlern beendet".
+   */
+  public final static int STATUS_ERROR    = 3;
+
+  /**
+   * Konstante fuer Status "Erfolgreich beendet".
+   */
+  public final static int STATUS_DONE     = 4;
+
+  /**
+   * Konstante fuer Status "Durch Benutzer abgebrochen".
+   */
+  public final static int STATUS_CANCEL   = 5;
+
 	/**
 	 * Teilt dem Monitor mit, wieviel Prozent der Aufgabe bereits abgearbeitet sind.
 	 * Bitte einen absoluten Wert angeben. Der Fortschritt wird dann unabhaengig
@@ -45,8 +70,12 @@ public interface ProgressMonitor
   
 	/**
 	 * Teilt dem Monitor den aktuellen Status mit.
-   * Das koennen selbst definierte Konstanten sein.
    * @param status der aktuelle Status.
+   * @see ProgressMonitor#STATUS_NONE
+   * @see ProgressMonitor#STATUS_RUNNING
+   * @see ProgressMonitor#STATUS_DONE
+   * @see ProgressMonitor#STATUS_CANCEL
+   * @see ProgressMonitor#STATUS_ERROR
    */
   public void setStatus(int status);
 
@@ -66,6 +95,9 @@ public interface ProgressMonitor
 
 /**********************************************************************
  * $Log: ProgressMonitor.java,v $
+ * Revision 1.4  2005/07/07 22:15:40  web0
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/11/04 22:41:46  willuhn
  * *** empty log message ***
  *
