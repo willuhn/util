@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.3 $
- * $Date: 2005/04/28 15:43:33 $
+ * $Revision: 1.4 $
+ * $Date: 2005/07/08 16:42:31 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -29,6 +29,14 @@ public class Session extends Observable
   private Worker worker = null;
   private long timeout;
   private Hashtable data = new Hashtable();
+
+  /**
+   * Erzeugt eine Session mit dem Default-Timeout von 30 Minuten.
+   */
+  public Session()
+  {
+    this(1000l * 60 * 30);
+  }
 
   /**
    * ct.
@@ -132,17 +140,20 @@ public class Session extends Observable
   private class SessionObject
   {
     private Object value;
-    private long timeout;
+    private long myTimeout;
 
-    private SessionObject(Object value, long timeout)
+    private SessionObject(Object value, long t)
     {
       this.value = value;
-      this.timeout = timeout;
+      this.myTimeout = t;
     }
   }
 
   private class Worker extends Thread
   {
+    /**
+     * ct.
+     */
     public Worker()
     {
       super("Worker Thread for Session " + Session.this.hashCode());
@@ -167,7 +178,7 @@ public class Session extends Observable
             {
               Object key          = i.next();
               SessionObject value = (SessionObject) data.get(key);
-              if (current > value.timeout)
+              if (current > value.myTimeout)
               {
                 Logger.debug("removing object " + key + " from session");
                 data.remove(key);
@@ -190,6 +201,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.4  2005/07/08 16:42:31  web0
+ * *** empty log message ***
+ *
  * Revision 1.3  2005/04/28 15:43:33  web0
  * *** empty log message ***
  *
