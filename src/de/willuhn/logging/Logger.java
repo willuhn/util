@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.4 $
- * $Date: 2005/01/11 19:01:26 $
- * $Author: willuhn $
+ * $Revision: 1.5 $
+ * $Date: 2005/07/14 21:52:11 $
+ * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
  *
@@ -153,8 +153,21 @@ public class Logger
 			}
 			catch (Exception npe) {}
 		}
-		
 	}
+
+  /**
+   * Flusht die noch nicht geschriebenen Log-Meldungen.
+   * Eigentlich macht die Funktion nichts anderes, als solange
+   * zu warten, bis die Queue leer ist ;).
+   * @throws InterruptedException
+   */
+  public static void flush() throws InterruptedException
+  {
+    while(lt.messages.size() > 0)
+    {
+      Thread.sleep(100l);
+    }
+  }
 
   /**
    * Schliesst den Logger und die damit verbundene Log-Datei.
@@ -361,6 +374,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.5  2005/07/14 21:52:11  web0
+ * *** empty log message ***
+ *
  * Revision 1.4  2005/01/11 19:01:26  willuhn
  * @N added security.Wallet
  *
