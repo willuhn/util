@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/JarInfo.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/07/14 17:56:53 $
+ * $Revision: 1.7 $
+ * $Date: 2005/07/14 20:28:57 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -104,7 +104,7 @@ public class JarInfo {
   public String getBuildDate()
   {
     try {
-      return getAttribute(ATTRIBUTE_BUILDNUMBER);
+      return getAttribute(ATTRIBUTE_BUILDDATE);
     }
     catch (Exception e)
     {
@@ -116,6 +116,9 @@ public class JarInfo {
 
 /**********************************************************************
  * $Log: JarInfo.java,v $
+ * Revision 1.7  2005/07/14 20:28:57  web0
+ * *** empty log message ***
+ *
  * Revision 1.6  2005/07/14 17:56:53  web0
  * @N JarInfo wieder hinzugefuegt
  *
