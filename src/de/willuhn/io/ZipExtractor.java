@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.5 $
- * $Date: 2005/03/09 01:06:20 $
+ * $Revision: 1.6 $
+ * $Date: 2005/07/15 08:53:17 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -82,9 +82,6 @@ public class ZipExtractor
     // einen Anhaltspunkt fuer die Fortschrittsanzeige.
     int size = zip.size();
     monitor.log("  uncompressing " + size + " elements");
-
-    // Buffer
-    byte b[] = new byte[8192];
 
     String currentName = null;
     File currentFile   = null;
@@ -176,13 +173,16 @@ public class ZipExtractor
         monitor.log("    uncompressing");
         InputStream is = zip.getInputStream(entry);
         OutputStream os = new FileOutputStream(currentFile);
-        while (is.available() > 0)
+        byte b[] = new byte[1028];
+        int read = 0;
+        do
         {
-          int l = is.read(b);
-          if (l <= 0)
-            break;
-          os.write(b, 0, l);
+          read = is.read(b);
+          if (read > 0)
+            os.write(b,0,read);
         }
+        while(read != -1);
+
         is.close();
         os.flush();
         os.close();
@@ -249,6 +249,9 @@ public class ZipExtractor
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.6  2005/07/15 08:53:17  web0
+ * *** empty log message ***
+ *
  * Revision 1.5  2005/03/09 01:06:20  web0
  * @D javadoc fixes
  *
