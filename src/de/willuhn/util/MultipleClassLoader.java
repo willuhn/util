@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.28 $
- * $Date: 2005/05/19 17:43:58 $
+ * $Revision: 1.29 $
+ * $Date: 2005/07/24 16:59:17 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -233,6 +233,9 @@ public class MultipleClassLoader extends ClassLoader
   private class URLLoader extends URLClassLoader
   {
 
+    /**
+     * 
+     */
     public URLLoader()
     {
       // Niemals den MultipleClassLoader selbst uebergeben, das wuerde eine
@@ -254,6 +257,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.29  2005/07/24 16:59:17  web0
+ * @B fix in settings watcher
+ *
  * Revision 1.28  2005/05/19 17:43:58  web0
  * @B Uralt-Fehler im URLClassloader gefixt
  *

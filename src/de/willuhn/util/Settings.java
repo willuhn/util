@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.7 $
- * $Date: 2005/06/27 11:52:14 $
+ * $Revision: 1.8 $
+ * $Date: 2005/07/24 16:59:17 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -18,10 +18,10 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Vector;
 
 import de.willuhn.logging.Logger;
 
@@ -40,11 +40,12 @@ public class Settings
 {
 
   private static Thread watcher        = null;
-  private static Hashtable files       = new Hashtable();
+  private static Session files         = new Session();
 
   private File file;
   private Class clazz;
   private Properties properties;
+  private SessionObject session;
 
 	private boolean storeWhenRead = true;
 
@@ -76,8 +77,15 @@ public class Settings
       store();
 
     load();
-    
-    files.put(this, new Long(this.file.lastModified()));
+
+    this.session = (SessionObject) files.get(this.file.getAbsolutePath());
+    if (this.session == null)
+    {
+      this.session = new SessionObject();
+      this.session.lastModified = this.file.lastModified();
+      files.put(this.file.getAbsolutePath(),this.session);
+    }
+    this.session.settings.add(this);
     
     if (watcher == null)
     {
@@ -340,9 +348,6 @@ public class Settings
     try
     {
       properties.store(new FileOutputStream(this.file),"Settings for class " + this.clazz.getName());
-      // Wenn wir selbst geaendert haben, aktualisieren wir den Zeitstempel damit
-      // deswegen nicht die Datei neu geladen wird
-      files.put(this,new Long(this.file.lastModified()));
     }
     catch (Exception e1)
     {
@@ -374,18 +379,24 @@ public class Settings
    */
   protected void finalize() throws Throwable
   {
-    Logger.debug("removing " + this.file.getAbsolutePath() + " from watcher");
+    Logger.debug("removing from watcher");
     try
     {
-      files.remove(this);
+      this.session.settings.remove(this);
     }
     catch (Exception e)
     {
-      Logger.info("unable to remove " + this.file.getAbsolutePath() + " from watcher");
+      Logger.info("unable to remove from watcher");
     }
     super.finalize();
   }
 
+  private class SessionObject
+  {
+    private Vector settings = new Vector();
+    private long lastModified = 0;
+  }
+  
   /**
    * Watcher-Thread, der die Zeitstempel der Properties-Files ueberwacht und
    * bei Datei-Aenderungen automatisch neu laedt.
@@ -406,9 +417,10 @@ public class Settings
     public void run()
     {
       Enumeration e     = null;
-      Settings s        = null;
-      Long last         = null;
-      Long current      = null;
+      String sfile      = null;
+      File file         = null;
+      SessionObject o   = null;
+      long current      = 0;
       Random r = new Random();
       while (true)
       {
@@ -419,16 +431,31 @@ public class Settings
             e = files.keys();
             while (e.hasMoreElements())
             {
-              s = (Settings) e.nextElement();
-              last = (Long) files.get(s);
-              if (last == null || s == null)
+              sfile = (String) e.nextElement();
+              if (sfile == null || sfile.length() == 0)
                 continue;
-              current = new Long(s.file.lastModified());
-              if (last.longValue() < current.longValue())
+              
+              file = new File(sfile);
+              if (file == null || !file.exists() || !file.isFile() || !file.canRead())
+                continue;
+              
+              o = (SessionObject) files.get(sfile);
+              if (o == null)
+                continue;
+              
+              current = file.lastModified();
+              if (o.lastModified < current)
               {
-                Logger.debug("file " + s.file.getAbsolutePath() + " has changed, reloading");
-                s.load();
-                files.put(s,current);
+                Logger.debug("file " + sfile + " has changed, reloading");
+                synchronized (o.settings)
+                {
+                  for (int i=0;i<o.settings.size();++i)
+                  {
+                    ((Settings)o.settings.get(i)).load();
+                  }
+                }
+                o.lastModified = current;
+                Logger.debug("file " + sfile + " reloaded");
               }
             }
           }
@@ -450,6 +477,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.8  2005/07/24 16:59:17  web0
+ * @B fix in settings watcher
+ *
  * Revision 1.7  2005/06/27 11:52:14  web0
  * *** empty log message ***
  *

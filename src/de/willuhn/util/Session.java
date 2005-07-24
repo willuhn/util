@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.4 $
- * $Date: 2005/07/08 16:42:31 $
+ * $Revision: 1.5 $
+ * $Date: 2005/07/24 16:59:17 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 package de.willuhn.util;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
@@ -58,6 +59,15 @@ public class Session extends Observable
   public void put(Object key, Object value)
   {
     put(key,value,this.timeout);
+  }
+
+  /**
+   * Liefert eine Liste aller in der Session vorhandenen Schluessel.
+   * @return Liste der Schluessel.
+   */
+  public Enumeration keys()
+  {
+    return data.keys();
   }
 
   /**
@@ -201,6 +211,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.5  2005/07/24 16:59:17  web0
+ * @B fix in settings watcher
+ *
  * Revision 1.4  2005/07/08 16:42:31  web0
  * *** empty log message ***
  *
