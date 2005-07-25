@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.5 $
- * $Date: 2005/07/24 16:59:17 $
+ * $Revision: 1.6 $
+ * $Date: 2005/07/25 22:12:45 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -183,10 +183,10 @@ public class Session extends Observable
         {
           synchronized(data)
           {
-            Iterator i = data.keySet().iterator();
-            while (i.hasNext())
+            Enumeration e = data.keys();
+            while (e.hasMoreElements())
             {
-              Object key          = i.next();
+              Object key          = e.nextElement();
               SessionObject value = (SessionObject) data.get(key);
               if (current > value.myTimeout)
               {
@@ -211,6 +211,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.6  2005/07/25 22:12:45  web0
+ * *** empty log message ***
+ *
  * Revision 1.5  2005/07/24 16:59:17  web0
  * @B fix in settings watcher
  *
