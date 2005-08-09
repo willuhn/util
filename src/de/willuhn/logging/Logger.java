@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.5 $
- * $Date: 2005/07/14 21:52:11 $
+ * $Revision: 1.6 $
+ * $Date: 2005/08/09 14:09:26 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -30,7 +30,7 @@ public class Logger
 {
 
   // maximale Groesse des Log-Puffers (Zeilen-Anzahl)
-  private final static int BUFFER_SIZE = 40;
+  private final static int BUFFER_SIZE = 200;
 
 	// Die Liste der Log-Targets
 	private static ArrayList targets = new ArrayList();
@@ -374,6 +374,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.6  2005/08/09 14:09:26  web0
+ * @N added logrotate target
+ *
  * Revision 1.5  2005/07/14 21:52:11  web0
  * *** empty log message ***
  *
