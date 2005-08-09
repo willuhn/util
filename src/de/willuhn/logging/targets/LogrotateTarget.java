@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.1 $
- * $Date: 2005/08/09 14:09:26 $
+ * $Revision: 1.2 $
+ * $Date: 2005/08/09 14:27:36 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -120,7 +120,7 @@ public class LogrotateTarget implements Target
 
       if (zip)
       {
-        Logger.info("compressing old log file to " + rf.getAbsolutePath() + ".gz [background thread");
+        Logger.info("compressing old log file to " + rf.getAbsolutePath() + ".gz [background thread]");
         Thread t = new Thread("logrotate")
         {
           public void run()
@@ -184,6 +184,9 @@ public class LogrotateTarget implements Target
 
 /*********************************************************************
  * $Log: LogrotateTarget.java,v $
+ * Revision 1.2  2005/08/09 14:27:36  web0
+ * *** empty log message ***
+ *
  * Revision 1.1  2005/08/09 14:09:26  web0
  * @N added logrotate target
  *
