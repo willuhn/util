@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/08/09 14:27:36 $
+ * $Revision: 1.3 $
+ * $Date: 2005/08/16 21:42:02 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -39,6 +39,7 @@ public class LogrotateTarget implements Target
 
   private File file = null;
   private OutputStream os = null;
+  private boolean append = true;
   
   private long maxLength = 1L * 1024L * 1024L;
   private boolean zip = true;
@@ -48,17 +49,20 @@ public class LogrotateTarget implements Target
   /**
    * ct.
    * @param target Die Ziel-Datei.
+   * @param append Legt fest, ob an das Log angehaengt oder ueberschrieben werden soll.
    * @throws IOException
    */
-  public LogrotateTarget(File target) throws IOException
+  public LogrotateTarget(File target, boolean append) throws IOException
   {
     this.file = target;
-    this.os = new FileOutputStream(this.file);
+    this.append = append;
+    this.os = new FileOutputStream(this.file,this.append);
   }
 
   /**
    * Legt die Maximal-Groesse des Log-Files fest, nach dessen
    * Erreichen es rotiert werden soll.
+   * Default-Groesse: 1MB.
    * @param length Angabe der Maximalgroesse in Bytes.
    */
   public void setMaxLength(long length)
@@ -68,6 +72,7 @@ public class LogrotateTarget implements Target
   
   /**
    * Legt fest, ob die rotierten Logs gezippt werden sollen.
+   * Default: Aktiv.
    * @param zip
    */
   public void setZip(boolean zip)
@@ -116,7 +121,7 @@ public class LogrotateTarget implements Target
         throw new IOException("error while renaming log file to " + rf.getAbsolutePath());
       
       this.file = new File(this.file.getParent(),name);
-      this.os = new FileOutputStream(this.file);
+      this.os = new FileOutputStream(this.file,this.append);
 
       if (zip)
       {
@@ -184,6 +189,9 @@ public class LogrotateTarget implements Target
 
 /*********************************************************************
  * $Log: LogrotateTarget.java,v $
+ * Revision 1.3  2005/08/16 21:42:02  web0
+ * @N support for appending to log files
+ *
  * Revision 1.2  2005/08/09 14:27:36  web0
  * *** empty log message ***
  *
