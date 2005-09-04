@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/07/25 22:12:45 $
+ * $Revision: 1.7 $
+ * $Date: 2005/09/04 21:50:27 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -15,7 +15,6 @@ package de.willuhn.util;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Observable;
 
 import de.willuhn.logging.Logger;
@@ -211,6 +210,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.7  2005/09/04 21:50:27  web0
+ * *** empty log message ***
+ *
  * Revision 1.6  2005/07/25 22:12:45  web0
  * *** empty log message ***
  *
