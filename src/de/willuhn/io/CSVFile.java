@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/CSVFile.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/03/09 01:06:20 $
+ * $Revision: 1.3 $
+ * $Date: 2005/10/25 22:34:39 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
 /**
  * Parser fuer CSV-Dateien.
@@ -84,13 +83,7 @@ public class CSVFile
 		if (!hasNext())
 			throw new IOException("no more lines");
 
-		StringTokenizer t = new StringTokenizer(currentLine,separator);
-		String[] cols = new String[t.countTokens()];
-		int i=0;
-		while (t.hasMoreTokens())
-		{
-			cols[i++] = t.nextToken();
-		}
+    String[] cols = currentLine.split(separator+"(?=([^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 		recall = false; // recall flag zuruecksetzen
 		return cols;
 	}
@@ -108,6 +101,9 @@ public class CSVFile
 
 /**********************************************************************
  * $Log: CSVFile.java,v $
+ * Revision 1.3  2005/10/25 22:34:39  web0
+ * @C CSV-Reader auf Regex umgestellt
+ *
  * Revision 1.2  2005/03/09 01:06:20  web0
  * @D javadoc fixes
  *
