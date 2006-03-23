@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.3 $
- * $Date: 2005/08/16 21:42:02 $
+ * $Revision: 1.4 $
+ * $Date: 2006/03/23 14:02:47 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
+import de.willuhn.io.FileCopy;
 import de.willuhn.logging.Logger;
 import de.willuhn.logging.Message;
 
@@ -112,83 +113,101 @@ public class LogrotateTarget implements Target
         return;
 
       Logger.info("rotating log file " + this.file.getAbsolutePath());
+
+      Logger.debug("closing old log file");
       os.close();
 
       String name = this.file.getName();
 
-      final File rf = new File(this.file.getParent(),name + "-" + DF.format(new Date()));
-      if (!this.file.renameTo(rf))
-        throw new IOException("error while renaming log file to " + rf.getAbsolutePath());
-      
-      this.file = new File(this.file.getParent(),name);
-      this.os = new FileOutputStream(this.file,this.append);
-
       if (zip)
       {
-        Logger.info("compressing old log file to " + rf.getAbsolutePath() + ".gz [background thread]");
-        Thread t = new Thread("logrotate")
+        File archiveFile = new File(this.file.getParent(),name + "-" + DF.format(new Date()) + ".gz");
+
+        Logger.info("compressing old log file to " + archiveFile.getAbsolutePath());
+
+        OutputStream os = null;
+        InputStream is  = null;
+        try
         {
-          public void run()
+          os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(archiveFile)));
+          is = new BufferedInputStream(new FileInputStream(this.file));
+          byte[] buf = new byte[4096];
+          int read = 0;
+          do
           {
-            OutputStream os = null;
-            InputStream is  = null;
+            read = is.read(buf);
+            if (read > 0)
+              os.write(buf,0,read);
+          }
+          while(read != -1);
+          Logger.info("old log file compressed");
+        }
+        catch (Throwable t)
+        {
+          Logger.error("error while rotating logfile",t);
+        }
+        finally
+        {
+          if (os != null)
+          {
             try
             {
-              os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(rf.getAbsolutePath() + ".gz")));
-              is = new BufferedInputStream(new FileInputStream(rf));
-              byte[] buf = new byte[4096];
-              int read = 0;
-              do
-              {
-                read = is.read(buf);
-                if (read > 0)
-                  os.write(buf,0,read);
-              }
-              while(read != -1);
+              os.close();
             }
-            catch (Throwable t)
+            catch (Exception e)
             {
-              Logger.error("error while rotating logfile",t);
-            }
-            finally
-            {
-              rf.delete();
-              if (os != null)
-              {
-                try
-                {
-                  os.close();
-                }
-                catch (Exception e)
-                {
-                  Logger.error("error while closing outputstream");
-                }
-              }
-              if (is != null)
-              {
-                try
-                {
-                  is.close();
-                }
-                catch (Exception e)
-                {
-                  Logger.error("error while closing inputstream");
-                }
-              }
+              Logger.error("error while closing outputstream");
             }
           }
-        };
-        
-        t.start();
+          if (is != null)
+          {
+            try
+            {
+              is.close();
+            }
+            catch (Exception e)
+            {
+              Logger.error("error while closing inputstream");
+            }
+          }
+        }
       }
+      else
+      {
+        File archiveFile = new File(this.file.getParent(),name + "-" + DF.format(new Date()));
+        Logger.info("copying log file to " + archiveFile.getAbsolutePath());
+        try
+        {
+          FileCopy.copy(this.file,archiveFile,true);
+        }
+        catch (FileCopy.FileExistsException e)
+        {
+          Logger.error("unable to copy log file",e);
+        }
+      }
+ 
+      Logger.info("deleting old log file");
+      if (this.file.delete())
+      {
+        Logger.info("creating new log file " + name);
+        this.file = new File(this.file.getParent(),name);
+      }
+      else
+      {
+        Logger.error("unable to delete old log file " + name + ", appending");
+      }
+      this.os = new FileOutputStream(this.file,this.append);
+      Logger.info("logrotation done");
     }
-    Logger.info("logrotation done");
   }
 }
 
 
 /*********************************************************************
  * $Log: LogrotateTarget.java,v $
+ * Revision 1.4  2006/03/23 14:02:47  web0
+ * @N new logrotate mechanism (runs no longer in background)
+ *
  * Revision 1.3  2005/08/16 21:42:02  web0
  * @N support for appending to log files
  *
