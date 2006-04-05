@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.7 $
- * $Date: 2005/09/04 21:50:27 $
+ * $Revision: 1.8 $
+ * $Date: 2006/04/05 09:00:41 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -44,20 +44,10 @@ public class Session extends Observable
    */
   public Session(long timeout)
   {
-    Logger.debug("creating new session. default timeout: " + timeout + " millis");
+    Logger.info("creating new session. default timeout: " + timeout + " millis");
     this.timeout = timeout;
     this.worker = new Worker();
     this.worker.start();
-  }
-
-  /**
-   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit dem Default-Timeout.
-   * @param key Name des Schluessels.
-   * @param value Wert des Schluessels.
-   */
-  public void put(Object key, Object value)
-  {
-    put(key,value,this.timeout);
   }
 
   /**
@@ -69,30 +59,44 @@ public class Session extends Observable
     return data.keys();
   }
 
+
   /**
-   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit einem separaten Timeoout.
+   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit dem Default-Timeout.
+   * Das Objekt wird nur dann nach Ablauf des Timeouts entfernt, wenn es innerhalb dieses
+   * Zeitraumes nicht benutzt wurde.
    * @param key Name des Schluessels.
    * @param value Wert des Schluessels.
-   * @param timeout Timeout in Millisekunden.
    */
-  public void put(Object key, Object value, long timeout)
+  public void put(Object key, Object value)
   {
-    put(key,value,new Date(System.currentTimeMillis() + timeout));
+    put(key,value,this.timeout);
   }
 
   /**
-   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit einem konkreten Ziel-Datum fuer das Timeout.
+   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit einem Timeoout.
+   * Das Objekt wird nur dann nach Ablauf des Timeouts entfernt, wenn es innerhalb dieses
+   * Zeitraumes nicht benutzt wurde.
    * @param key Name des Schluessels.
    * @param value Wert des Schluessels.
-   * @param timeout Timeout als Datum.
+   * @param t Timeout in Millisekunden.
    */
-  public void put(Object key, Object value, Date timeout)
+  public void put(Object key, Object value, long t)
   {
-    synchronized(data)
-    {
-      data.put(key,new SessionObject(value, timeout.getTime()));
-      Logger.debug("added object to session, object: " + key.toString() + ", timeout: " + timeout.toString());
-    }
+    data.put(key,new SessionObject(value,t,false));
+  }
+
+  /**
+   * Speichert einen Wert unter dem angegebenen Schluessel in der Session mit einem
+   * konkreten Ziel-Datum fuer das Timeout.
+   * Unabhaengig davon, ob das Objekt benutzt wird oder nicht, wird es zum angegebenen
+   * Timeout entfernt.
+   * @param key Name des Schluessels.
+   * @param value Wert des Schluessels.
+   * @param t Timeout als Datum.
+   */
+  public void put(Object key, Object value, Date t)
+  {
+    data.put(key,new SessionObject(value, t.getTime(),true));
   }
 
   
@@ -106,7 +110,7 @@ public class Session extends Observable
     synchronized(data)
     {
       SessionObject o = (SessionObject) data.get(key);
-      return o == null ? null : o.value;
+      return o == null ? null : o.getValue();
     }
   }
 
@@ -149,12 +153,50 @@ public class Session extends Observable
   private class SessionObject
   {
     private Object value;
-    private long myTimeout;
+
+    private long timestamp      = System.currentTimeMillis();
+    private long myTimeout      = timeout;
+    private boolean hardTimeout = false;
+
+    private SessionObject(Object value)
+    {
+      this(value,Session.this.timeout);
+    }
 
     private SessionObject(Object value, long t)
     {
+      this(value,t,false);
+    }
+
+    private SessionObject(Object value, long t, boolean hardTimeout)
+    {
       this.value = value;
-      this.myTimeout = t;
+      this.hardTimeout = hardTimeout;
+      if (this.hardTimeout)
+      {
+        Logger.debug("added object \"" + value + "\" to session. hard timeout: " + new Date(t).toString());
+        this.timestamp = t;
+        this.myTimeout = 0;
+      }
+      else
+      {
+        this.myTimeout = t;
+        Logger.debug("added object \"" + value + "\" to session. timeout: " + t + " millis");
+      }
+    }
+    
+    /**
+     * Liefert den Wert des Keys.
+     * @return der Wert.
+     */
+    private Object getValue()
+    {
+      if (!hardTimeout)
+      {
+        this.timestamp = System.currentTimeMillis();
+        Logger.debug("new timeout for object \"" + value + "\" " + new Date(this.timestamp + this.myTimeout).toString());
+      }
+      return this.value;
     }
   }
 
@@ -187,7 +229,7 @@ public class Session extends Observable
             {
               Object key          = e.nextElement();
               SessionObject value = (SessionObject) data.get(key);
-              if (current > value.myTimeout)
+              if (current > (value.timestamp + value.myTimeout))
               {
                 Logger.debug("removing object " + key + " from session");
                 data.remove(key);
@@ -210,6 +252,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.8  2006/04/05 09:00:41  web0
+ * *** empty log message ***
+ *
  * Revision 1.7  2005/09/04 21:50:27  web0
  * *** empty log message ***
  *
