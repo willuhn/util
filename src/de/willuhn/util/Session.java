@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.8 $
- * $Date: 2006/04/05 09:00:41 $
+ * $Revision: 1.9 $
+ * $Date: 2006/04/26 15:04:13 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -158,16 +158,6 @@ public class Session extends Observable
     private long myTimeout      = timeout;
     private boolean hardTimeout = false;
 
-    private SessionObject(Object value)
-    {
-      this(value,Session.this.timeout);
-    }
-
-    private SessionObject(Object value, long t)
-    {
-      this(value,t,false);
-    }
-
     private SessionObject(Object value, long t, boolean hardTimeout)
     {
       this.value = value;
@@ -252,6 +242,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.9  2006/04/26 15:04:13  web0
+ * *** empty log message ***
+ *
  * Revision 1.8  2006/04/05 09:00:41  web0
  * *** empty log message ***
  *

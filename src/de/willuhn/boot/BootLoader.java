@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.9 $
- * $Date: 2006/04/26 09:37:07 $
+ * $Revision: 1.10 $
+ * $Date: 2006/04/26 15:04:13 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -64,10 +64,9 @@ public class BootLoader {
 	 * Bevor der Loader die Klasse <code>target</code> via <code>init()</code>
 	 * initialisiert, wird er alle Abhaengigkeiten aufloesen und zuvor alle
 	 * entsprechend <code>depends</code> angegebenen Services starten.
-	 * @throws Exception
 	 * @return der instanziierte Dienst.
 	 */
-	public final Bootable getBootable(Class target) throws Exception
+	public final Bootable getBootable(Class target)
 	{
 		return resolve(target,null);
 	}
@@ -79,7 +78,7 @@ public class BootLoader {
 	 * @return der instanziierte Dienst.
 	 * @throws Exception
 	 */
-	private final Bootable resolve(Class target,Bootable caller) throws Exception
+	private final Bootable resolve(Class target,Bootable caller)
 	{
 
 		// Target schon gebootet
@@ -94,7 +93,15 @@ public class BootLoader {
 		indent++;
 
 		// Instanziieren
-		Bootable s = (Bootable) target.newInstance();
+		Bootable s = null;
+    try
+    {
+      s = (Bootable) target.newInstance();
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException("unable to create instance of " + target.getName(),e);
+    }
 
 		Logger.info(indent() + "checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
@@ -192,6 +199,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.10  2006/04/26 15:04:13  web0
+ * *** empty log message ***
+ *
  * Revision 1.9  2006/04/26 09:37:07  web0
  * @N bootloader redesign
  *
