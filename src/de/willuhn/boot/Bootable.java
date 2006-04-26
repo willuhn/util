@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/Bootable.java,v $
- * $Revision: 1.2 $
- * $Date: 2005/02/27 15:25:32 $
+ * $Revision: 1.3 $
+ * $Date: 2006/04/26 09:37:07 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -12,7 +12,6 @@
  **********************************************************************/
 package de.willuhn.boot;
 
-import de.willuhn.util.ProgressMonitor;
 
 /**
  * Interface eines ueber den BootLoader startfaehigen Dienst.
@@ -25,19 +24,16 @@ public interface Bootable {
 
   /**
 	 * Wird vom BootLoader aufgerufen, wenn der Dienst initialisiert werden soll.
-   * @param caller der Dienst, welcher das init ausgeloest hat und somit
-   * von diesem Dienst abhaengig ist.
-   * @param monitor Monitor, ueber den der Dienst Log-Ausgaben zum Bootprozess ausgeben kann.
-   * @return Liste von weiteren Klassen, die <b>nach</b> der erfolgreichen
-   * Initialisierung zusaetzlich gestartet werden sollen.
-   * @throws SkipServiceException wenn der Service uebersprungen werden soll. 
+   * @param loader der Bootloader selbst.
+   * @param caller der vorherige Dienst, welcher das init ausgeloest hat.
+   * @throws SkipServiceException wenn der Service uebersprungen werden soll.
    * Die Exception kann vom Service bei der Initialisierung
-   * geworfen werden kann, wenn diese zwar fehlschlug, sie jedoch
+   * geworfen werden, wenn diese zwar fehlschlug, sie jedoch
    * nicht dazu fuehren soll, dass der gesamte Boot-Prozess abgebrochen wird.
    * Stattdessen wird lediglich dieser Service uebersprungen. Um den gesamten
    * Boot-Prozess abzubrechen, muss folglich eine RuntimeException geworfen werden.
    */
-  public Class[] init(Bootable caller, ProgressMonitor monitor) throws SkipServiceException;
+  public void init(BootLoader loader, Bootable caller) throws SkipServiceException;
 	
 	/**
 	 * Liste von Abhaengigkeiten in Form von Class-Objekten.
@@ -49,23 +45,6 @@ public interface Bootable {
   public Class[] depends();
   
   /**
-   * Diese Funktion wird aufgerufen, wenn eine Abhaengigkeiten nicht erfuellt
-   * werden konnte.
-   * @param e die vom Service geworfene Exception.
-   */
-  public void failedDependency(SkipServiceException e);
-  
-	/**
-	 * Liefert den Wert des benannten Parameters.
-	 * Diese Funktion dient der Kommunikation zwischen Diensten.
-	 * Ein Dienst kann ueber die Funktion zB Startparameter von
-	 * seinem Aufrufer abfragen.
-   * @param key Schluessel des Parameters.
-   * @return Wert des Parameters.
-   */
-  public Object getParam(Object key);
-  
-  /**
    * Wird aufgerufen, wenn die Anwendung beendet wird.
    * Hier kann der Dienst Aufraeum-Arbeiten vornehmen.
    */
@@ -75,6 +54,9 @@ public interface Bootable {
 
 /**********************************************************************
  * $Log: Bootable.java,v $
+ * Revision 1.3  2006/04/26 09:37:07  web0
+ * @N bootloader redesign
+ *
  * Revision 1.2  2005/02/27 15:25:32  web0
  * *** empty log message ***
  *

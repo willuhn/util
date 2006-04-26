@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.8 $
- * $Date: 2005/02/27 15:25:32 $
+ * $Revision: 1.9 $
+ * $Date: 2006/04/26 09:37:07 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 package de.willuhn.boot;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ProgressMonitor;
@@ -24,9 +25,14 @@ import de.willuhn.util.ProgressMonitor;
 public class BootLoader {
 
 	/**
-	 * Liste der initialisierten Services.
+	 * Lookup der initialisierten Services.
 	 */
 	private HashMap services = new HashMap();
+  
+  /**
+   * Reihenfolge, in der die Services gebootet wurden.
+   */
+  private Stack order = new Stack();
 
 	private int indent = 0;
 
@@ -41,35 +47,45 @@ public class BootLoader {
 	{
 		this.monitor = monitor;
 	}
+  
+  /**
+   * Liefert den Progress-Monitor.
+   * @return der Progress-Monitor.
+   */
+  public final ProgressMonitor getMonitor()
+  {
+    return this.monitor;
+  }
 
 	/**
-	 * Startet den Boot-Prozess.
-	 * @param target das zu bootende Ziel.
+   * Liefert den gewuenschten Dienst und bootet das System
+   * bei Bedarf bis genau zu diesem.
+	 * @param target das gweuenschte (ung ggf zu bootende) Ziel.
 	 * Bevor der Loader die Klasse <code>target</code> via <code>init()</code>
 	 * initialisiert, wird er alle Abhaengigkeiten aufloesen und zuvor alle
 	 * entsprechend <code>depends</code> angegebenen Services starten.
 	 * @throws Exception
 	 * @return der instanziierte Dienst.
 	 */
-	public final Bootable boot(Class target) throws Exception
+	public final Bootable getBootable(Class target) throws Exception
 	{
-		return boot(target,null);
+		return resolve(target,null);
 	}
 
-	private final Bootable boot(Class target,Bootable caller) throws Exception
+	/**
+   * Loest die Abhnaegigkeiten fuer einen Dienst auf.
+	 * @param target der gewuenschte Dienst.
+	 * @param caller der Aufrufer. Kann <code>null</code> sein.
+	 * @return der instanziierte Dienst.
+	 * @throws Exception
+	 */
+	private final Bootable resolve(Class target,Bootable caller) throws Exception
 	{
 
-		// Kein Target definiert
-		if (target == null)
-		{
-			Logger.warn("not service given");
-			return null;
-		}
-		
 		// Target schon gebootet
 		if (services.get(target) != null)
 		{
-			Logger.info(indent() + "service " + target.getName() + " allready booted, skipping");
+			Logger.debug(indent() + "service " + target.getName() + " allready booted, skipping");
 			return (Bootable) services.get(target);
 		}
 
@@ -82,60 +98,42 @@ public class BootLoader {
 
 		Logger.info(indent() + "checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
-		if (deps == null || deps.length == 0)
+		if (deps != null)
 		{
-			Logger.info(indent() + "no dependencies found for " + target.getName());
-			init(caller,s);
-			return s;
-		}
+      // Alle Abhaengigkeiten booten
+      Logger.debug(indent() + "booting dependencies for " + target.getName());
 
-		// Alle Abhaengigkeiten booten
-		for (int j=0;j<deps.length;++j)
-		{
-			if (deps[j].equals(target))
-			{
-				Logger.info(indent() + deps[j].getName() + " cannot have itself as dependency, skipping");
-				indent--;
-				continue;
-			}
-			boot(deps[j],s);
+      for (int j=0;j<deps.length;++j)
+      {
+        if (deps[j].equals(target))
+        {
+          Logger.info(indent() + deps[j].getName() + " cannot have itself as dependency, skipping");
+          indent--;
+          continue;
+        }
+        resolve(deps[j],s);
+      }
 		}
+    else
+    {
+      Logger.debug(indent() + "no dependencies found for " + target.getName());
+    }
+
 
 		// Abhaengigkeiten sind alle gebootet, jetzt koennen wir uns selbst initialisieren
-		return init(caller,s);
-	}
-
-	private Bootable init(Bootable caller,Bootable s) throws Exception
-	{
-		Class target = s.getClass();
-
-		Class[] childs;
-		try {
-			childs = s.init(s,this.monitor);
-		}
-		catch (SkipServiceException e)
-		{
-			indent--;
-			Logger.info(indent() + "init of service " + target.getName() + " failed [message: " + e.getMessage() + "], skipping");
-			if (caller != null)
-				caller.failedDependency(e);
-			return s;
-		}
-
-		if (childs != null && childs.length > 0)
-		{
-			// huh, der Service will noch mehr Zeug starten
-			for (int k=0;k<childs.length;++k)
-			{
-				boot(childs[k],s);
-			}
-		}
-
-		indent--;
-
-		Logger.info(indent() + "service " + target.getName() + " booted successfully");
-		services.put(target,s);
-		return s;
+    try
+    {
+      Logger.info(indent() + "init service " + target.getName());
+      s.init(this,caller);
+      this.services.put(s.getClass(),s);
+      this.order.add(s);
+    }
+    catch (SkipServiceException e)
+    {
+      Logger.warn(indent() + "skipping service " + s.getClass().getName() + ". message: " + e.getMessage());
+    }
+    indent--;
+    return s;
 	}
 
 	/**
@@ -155,9 +153,38 @@ public class BootLoader {
   /**
    * @see java.lang.Object#finalize()
    */
-  protected void finalize() throws Throwable {
- 		Logger.close();
-    super.finalize();
+  protected void finalize() throws Throwable
+  {
+    try
+    {
+      shutdown();
+    }
+    finally
+    {
+      super.finalize();
+    }
+  }
+  
+  /**
+   * Faehrt alle Services in genau umgekehrter Reihenfolge wieder herunter, in der sie gebootet wurden.
+   */
+  public void shutdown()
+  {
+    try
+    {
+      Bootable service = null;
+      while (!this.order.empty())
+      {
+        service = (Bootable) this.order.pop();
+        Logger.info("shutting down service " + service.getClass().getName());
+        service.shutdown();
+      }
+    }
+    finally
+    {
+      this.order.clear();
+      this.services.clear();
+    }
   }
 
 }
@@ -165,6 +192,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.9  2006/04/26 09:37:07  web0
+ * @N bootloader redesign
+ *
  * Revision 1.8  2005/02/27 15:25:32  web0
  * *** empty log message ***
  *
