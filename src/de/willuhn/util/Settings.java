@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.8 $
- * $Date: 2005/07/24 16:59:17 $
+ * $Revision: 1.9 $
+ * $Date: 2006/05/03 13:14:16 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -34,6 +34,9 @@ import de.willuhn.logging.Logger;
  * Config-Dateien mit den Default-Werten angelegt werden damit dieser
  * nicht in der Dokumentation nach den Schluesselnamen suchen muss
  * sondern sie bereits mit Default-Werten in den Dateien vorfindet.
+ * TODO: Sollte man mal gegen java.util.prefs.Preferences ersetzen.
+ * Allerdings muesste man hier noch klaeren, wie man den Pfad vorgeben
+ * kann, ohne das System-Property java.util.prefs.userRoot aendern zu muessen.
  * @author willuhn
  */
 public class Settings
@@ -477,6 +480,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.9  2006/05/03 13:14:16  web0
+ * *** empty log message ***
+ *
  * Revision 1.8  2005/07/24 16:59:17  web0
  * @B fix in settings watcher
  *
