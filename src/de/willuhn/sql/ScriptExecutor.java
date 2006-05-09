@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/ScriptExecutor.java,v $
- * $Revision: 1.1 $
- * $Date: 2006/01/30 14:54:11 $
+ * $Revision: 1.2 $
+ * $Date: 2006/05/09 23:17:44 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ProgressMonitor;
 
 /**
  * Util-Klasse, mit der ein SQL-Script auf einer Connection
@@ -38,6 +39,20 @@ public class ScriptExecutor
    */
   public static void execute(Reader reader, Connection conn) throws IOException, SQLException
   {
+    execute(reader, conn, null);
+  }
+
+  /**
+   * Fuehrt ein SQL-Script auf einer Datenbank-Verbindung aus.
+   * Hinweis: Weder die Connection noch der Reader wird geschlossen.
+   * @param reader das auszufuehrende SQL-Script.
+   * @param conn die Connection.
+   * @param monitor ein Monitor, ueber den der Fortschritt der Ausfuehrung ausgegeben werden kann.
+   * @throws IOException
+   * @throws SQLException
+   */
+  public static void execute(Reader reader, Connection conn, ProgressMonitor monitor) throws IOException, SQLException
+  {
     Statement stmt = null;
     String currentStatement = null;
 
@@ -48,10 +63,15 @@ public class ScriptExecutor
       String thisLine = null;
       StringBuffer all = new StringBuffer();
 
+      int lines = 0;
       try {
+
+        if (monitor != null) monitor.setStatusText("reading sql script");
+        Logger.debug("reading sql script");
         br =  new BufferedReader(reader);
         while ((thisLine =  br.readLine()) != null)
         {
+          if (monitor != null && lines++ % 20 == 0) monitor.addPercentComplete(1);
           if (!(thisLine.length() > 0))  // Zeile enthaelt nichts
             continue;
           if (thisLine.matches(" *?"))   // Zeile enthaelt nur Leerzeichen
@@ -79,25 +99,40 @@ public class ScriptExecutor
       }
 
       commitState = conn.getAutoCommit();
+      if (monitor != null) monitor.setStatusText("starting transaction");
+      Logger.info("starting transaction");
       conn.setAutoCommit(false);
 
       stmt = conn.createStatement();
-      Logger.info("executing sql commands");
+      if (monitor != null) monitor.setStatusText("executing sql commands");
       String[] commands = all.toString().split(";");
+      
+      if (monitor != null) monitor.setStatusText("executing sql commands");
+      int faktor = lines / (monitor == null ? 100 : monitor.getPercentComplete());
+
       for (int i=0;i<commands.length;++i)
       {
+        if (monitor != null && i % faktor == 0) monitor.addPercentComplete(1);
         currentStatement = commands[i];
         Logger.debug("executing: " + currentStatement);
         stmt.executeUpdate(currentStatement);
       }
+      if (monitor != null) monitor.setStatusText("commit transaction");
+      Logger.info("commit transaction");
       conn.commit();
+      if (monitor != null) monitor.setStatus(ProgressMonitor.STATUS_DONE);
     }
     catch (SQLException e)
     {
+      if (monitor != null) monitor.setStatus(ProgressMonitor.STATUS_ERROR);
       try
       {
         if (conn != null)
+        {
+          if (monitor != null) monitor.setStatusText("rollback transaction");
+          Logger.info("rollback transaction");
           conn.rollback();
+        }
       }
       catch (Exception e2)
       {
@@ -133,6 +168,9 @@ public class ScriptExecutor
 
 /*********************************************************************
  * $Log: ScriptExecutor.java,v $
+ * Revision 1.2  2006/05/09 23:17:44  web0
+ * *** empty log message ***
+ *
  * Revision 1.1  2006/01/30 14:54:11  web0
  * @N de.willuhn.sql
  *
