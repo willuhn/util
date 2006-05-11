@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/ScriptExecutor.java,v $
- * $Revision: 1.2 $
- * $Date: 2006/05/09 23:17:44 $
+ * $Revision: 1.3 $
+ * $Date: 2006/05/11 20:31:32 $
  * $Author: web0 $
  * $Locker:  $
  * $State: Exp $
@@ -98,6 +98,12 @@ public class ScriptExecutor
         }
       }
 
+      String s = all.toString();
+      if (s == null || s.length() == 0)
+      {
+        Logger.info("no sql statements found in sql script");
+        return;
+      }
       commitState = conn.getAutoCommit();
       if (monitor != null) monitor.setStatusText("starting transaction");
       Logger.info("starting transaction");
@@ -105,7 +111,7 @@ public class ScriptExecutor
 
       stmt = conn.createStatement();
       if (monitor != null) monitor.setStatusText("executing sql commands");
-      String[] commands = all.toString().split(";");
+      String[] commands = s.split(";");
       
       if (monitor != null) monitor.setStatusText("executing sql commands");
       int faktor = lines / (monitor == null ? 100 : monitor.getPercentComplete());
@@ -168,6 +174,9 @@ public class ScriptExecutor
 
 /*********************************************************************
  * $Log: ScriptExecutor.java,v $
+ * Revision 1.3  2006/05/11 20:31:32  web0
+ * *** empty log message ***
+ *
  * Revision 1.2  2006/05/09 23:17:44  web0
  * *** empty log message ***
  *
