@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/ScriptExecutor.java,v $
- * $Revision: 1.3 $
- * $Date: 2006/05/11 20:31:32 $
- * $Author: web0 $
+ * $Revision: 1.4 $
+ * $Date: 2006/06/08 22:41:42 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -120,6 +120,8 @@ public class ScriptExecutor
       {
         if (monitor != null && i % faktor == 0) monitor.addPercentComplete(1);
         currentStatement = commands[i];
+        if (currentStatement == null || currentStatement.length() == 0)
+          continue; //skip empty line
         Logger.debug("executing: " + currentStatement);
         stmt.executeUpdate(currentStatement);
       }
@@ -174,6 +176,9 @@ public class ScriptExecutor
 
 /*********************************************************************
  * $Log: ScriptExecutor.java,v $
+ * Revision 1.4  2006/06/08 22:41:42  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.3  2006/05/11 20:31:32  web0
  * *** empty log message ***
  *
