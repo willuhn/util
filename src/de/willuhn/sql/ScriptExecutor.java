@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/ScriptExecutor.java,v $
- * $Revision: 1.4 $
- * $Date: 2006/06/08 22:41:42 $
+ * $Revision: 1.5 $
+ * $Date: 2006/06/12 22:10:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -113,12 +113,17 @@ public class ScriptExecutor
       if (monitor != null) monitor.setStatusText("executing sql commands");
       String[] commands = s.split(";");
       
-      if (monitor != null) monitor.setStatusText("executing sql commands");
-      int faktor = lines / (monitor == null ? 100 : monitor.getPercentComplete());
+      double factor = 1;
+      if (monitor != null)
+      {
+        factor = ((double)(100 - monitor.getPercentComplete())) / commands.length;
+        monitor.setStatusText("executing sql commands");
+      }
 
       for (int i=0;i<commands.length;++i)
       {
-        if (monitor != null && i % faktor == 0) monitor.addPercentComplete(1);
+        if (monitor != null)  monitor.setPercentComplete((int)(i * factor));
+
         currentStatement = commands[i];
         if (currentStatement == null || currentStatement.length() == 0)
           continue; //skip empty line
@@ -128,7 +133,11 @@ public class ScriptExecutor
       if (monitor != null) monitor.setStatusText("commit transaction");
       Logger.info("commit transaction");
       conn.commit();
-      if (monitor != null) monitor.setStatus(ProgressMonitor.STATUS_DONE);
+      if (monitor != null)
+      {
+        monitor.setPercentComplete(100);
+        monitor.setStatus(ProgressMonitor.STATUS_DONE);
+      }
     }
     catch (SQLException e)
     {
@@ -176,6 +185,9 @@ public class ScriptExecutor
 
 /*********************************************************************
  * $Log: ScriptExecutor.java,v $
+ * Revision 1.5  2006/06/12 22:10:48  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.4  2006/06/08 22:41:42  willuhn
  * *** empty log message ***
  *
