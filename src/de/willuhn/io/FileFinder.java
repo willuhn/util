@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/FileFinder.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.2 $
+ * $Date: 2006/06/30 13:42:46 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -69,30 +69,53 @@ public class FileFinder
 
 	/**
 	 * Sucht im aktuellen Verzeichnis und liefert das Ergebnis zurueck.
+   * Hinweis: Die Funktion liefert nur Dateien, keine Verzeichnisse.
    * @return Liste der gefundenen Dateien.
    */
   public File[] find()
 	{
-		find(this.baseDir,false);
+		find(this.baseDir,false,false);
 		return (File[]) found.toArray(new File[found.size()]);
 	}
 
 	/**
 	 * Sucht rekursiv ab dem aktuellen Verzeichnis und liefert das Ergebnis zurueck.
+   * Hinweis: Die Funktion liefert nur Dateien, keine Verzeichnisse.
 	 * @return Liste der gefundenen Dateien.
 	 */
   public File[] findRecursive()
 	{
-		find(this.baseDir,true);
+		find(this.baseDir,true,false);
 		return (File[]) found.toArray(new File[found.size()]);
 	}
 
-	/**
+  /**
+   * Sucht im aktuellen Verzeichnis und liefert das Ergebnis zurueck.
+   * @return Liste der gefundenen Dateien und Verzeichnisse.
+   */
+  public File[] findAll()
+  {
+    find(this.baseDir,false,true);
+    return (File[]) found.toArray(new File[found.size()]);
+  }
+
+  /**
+   * Sucht rekursiv ab dem aktuellen Verzeichnis und liefert das Ergebnis zurueck.
+   * @return Liste der gefundenen Dateien und Verzeichnisse.
+   */
+  public File[] findAllRecursive()
+  {
+    find(this.baseDir,true, true);
+    return (File[]) found.toArray(new File[found.size()]);
+  }
+
+  /**
 	 * interne Suchfunktion.
    * @param dir Verzeichnis, ab dem gesucht werden soll.
    * @param recursive true, wenn rekursiv gesucht werden soll.
+   * @param all true, wenn auch Verzeichnisse gefunden werden sollen.
    */
-  private void find(File dir, boolean recursive)
+  private void find(File dir, boolean recursive, final boolean all)
 	{
 
 		// Alle Dateien des Verzeichnisses suchen
@@ -100,8 +123,8 @@ public class FileFinder
 		{
 			public boolean accept(File dir, String name)
 			{
-				File f = new File(dir.getPath() + "/" + name);
-				if (!f.isFile()) return false;
+				File f = new File(dir,name);
+				if (!all && !f.isFile()) return false;
 				if (contains.size() == 0)
 				{
 					// es wurden keine Filter definiert, also matcht alles
@@ -136,7 +159,7 @@ public class FileFinder
 		{
 			public boolean accept(File dir, String name)
 			{
-				File f = new File(dir.getPath() + "/" + name);
+				File f = new File(dir,name);
 				return (f.isDirectory());
 			}
 		});
@@ -144,7 +167,7 @@ public class FileFinder
 		for (int i=0;i<dirs.length;++i)
 		{
 			// und jetzt kommt die Rekursion
-			find(dirs[i],true);
+			find(dirs[i],true,all);
 		}
 
 	}
@@ -153,6 +176,9 @@ public class FileFinder
 
 /**********************************************************************
  * $Log: FileFinder.java,v $
+ * Revision 1.2  2006/06/30 13:42:46  willuhn
+ * @B FileFinder hatte nur Dateien gefunden, aber keine Verzeichnisse
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *
