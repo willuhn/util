@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.9 $
- * $Date: 2006/04/26 15:04:13 $
- * $Author: web0 $
+ * $Revision: 1.10 $
+ * $Date: 2006/09/05 20:40:11 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -12,6 +12,7 @@
  **********************************************************************/
 package de.willuhn.util;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -26,10 +27,26 @@ import de.willuhn.logging.Logger;
 public class Session extends Observable
 {
 
-  private Worker worker = null;
+  private static Worker worker = null;
+
+  
+  /**
+   * Liefert den Worker-Thread und erstellt ggf einen neuen.
+   * @return der Worker-Thread.
+   */
+  private final static synchronized Worker getWorker()
+  {
+    if (worker != null)
+      return worker;
+    worker = new Worker();
+    worker.start();
+    return worker;
+  }
+
+
   private long timeout;
   private Hashtable data = new Hashtable();
-
+  
   /**
    * Erzeugt eine Session mit dem Default-Timeout von 30 Minuten.
    */
@@ -46,8 +63,7 @@ public class Session extends Observable
   {
     Logger.info("creating new session. default timeout: " + timeout + " millis");
     this.timeout = timeout;
-    this.worker = new Worker();
-    this.worker.start();
+    getWorker().register(this);
   }
 
   /**
@@ -146,7 +162,7 @@ public class Session extends Observable
    */
   protected void finalize() throws Throwable
   {
-    worker.interrupt();
+    getWorker().unregister(this);
     super.finalize();
   }
 
@@ -182,23 +198,68 @@ public class Session extends Observable
     private Object getValue()
     {
       if (!hardTimeout)
-      {
         this.timestamp = System.currentTimeMillis();
-        Logger.debug("new timeout for object \"" + value + "\" " + new Date(this.timestamp + this.myTimeout).toString());
-      }
       return this.value;
     }
   }
 
-  private class Worker extends Thread
+  
+  /**
+   * Der Worker-Thread.
+   * @author willuhn
+   */
+  private final static class Worker extends Thread
   {
+    private ArrayList sessions = new ArrayList();
+    
     /**
      * ct.
      */
     public Worker()
     {
-      super("Worker Thread for Session " + Session.this.hashCode());
-      Logger.debug("Created Worker Thread for Session " + Session.this.hashCode());
+      super("Session Worker Thread");
+      Logger.info("Starting Session Worker Thread");
+    }
+    
+    /**
+     * Registriert eine neue Session in dem Worker.
+     * @param session
+     */
+    private void register(Session session)
+    {
+      synchronized(this.sessions)
+      {
+        this.sessions.add(session);
+      }
+    }
+    
+    /**
+     * Entfernt eine Session aus dem Worker.
+     * @param session die Session.
+     */
+    private void unregister(Session session)
+    {
+      synchronized(this.sessions)
+      {
+        this.sessions.remove(session);
+        if (this.sessions.size() == 0)
+        {
+          // wir haben keine Sessions mehr. Dann koennen wir uns beenden.
+          try
+          {
+            Logger.info("session worker thread no longer needed, shutting down");
+            interrupt();
+          }
+          catch (Exception e)
+          {
+            Logger.error("unable to shut down worker thread",e);
+          }
+          finally
+          {
+            Session.worker = null;
+          }
+        }
+      }
     }
 
     /**
@@ -206,25 +267,33 @@ public class Session extends Observable
      */
     public void run()
     {
-      Logger.debug("starting worker thread");
       while (true)
       {
         long current = System.currentTimeMillis();
         try
         {
-          synchronized(data)
+          synchronized(this.sessions)
           {
-            Enumeration e = data.keys();
-            while (e.hasMoreElements())
+            for (int i=0;i<this.sessions.size();++i)
             {
-              Object key          = e.nextElement();
-              SessionObject value = (SessionObject) data.get(key);
-              if (current > (value.timestamp + value.myTimeout))
+              Session s = (Session) this.sessions.get(i);
+              Hashtable data = s.data;
+
+              synchronized(data)
               {
-                Logger.debug("removing object " + key + " from session");
-                data.remove(key);
-                Session.this.setChanged();
-                Session.this.notifyObservers(value.value);
+                Enumeration e = data.keys();
+                while (e.hasMoreElements())
+                {
+                  Object key          = e.nextElement();
+                  SessionObject value = (SessionObject) data.get(key);
+                  if (current > (value.timestamp + value.myTimeout))
+                  {
+                    Logger.debug("removing object " + key + " from session");
+                    data.remove(key);
+                    s.setChanged();
+                    s.notifyObservers(value.value);
+                  }
+                }
               }
             }
           }
@@ -232,7 +301,7 @@ public class Session extends Observable
         }
         catch (InterruptedException e)
         {
-          Logger.info("worker thread for session " + Session.this.hashCode() + " interrupted");
+          Logger.info("session worker thread interrupted");
         }
       }
     }
@@ -242,6 +311,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.10  2006/09/05 20:40:11  willuhn
+ * @N Worker-Thread Redesign
+ *
  * Revision 1.9  2006/04/26 15:04:13  web0
  * *** empty log message ***
  *
