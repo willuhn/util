@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.9 $
- * $Date: 2006/05/03 13:14:16 $
- * $Author: web0 $
+ * $Revision: 1.10 $
+ * $Date: 2006/09/05 22:02:01 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -21,7 +21,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Vector;
 
 import de.willuhn.logging.Logger;
 
@@ -42,13 +41,9 @@ import de.willuhn.logging.Logger;
 public class Settings
 {
 
-  private static Thread watcher        = null;
-  private static Session files         = new Session();
-
   private File file;
   private Class clazz;
   private Properties properties;
-  private SessionObject session;
 
 	private boolean storeWhenRead = true;
 
@@ -57,6 +52,24 @@ public class Settings
     // disabled
   }
 
+  private static Watcher watcher = null;
+
+  
+  /**
+   * Liefert den Worker-Thread und erstellt ggf einen neuen.
+   * @return der Worker-Thread.
+   */
+  private final static synchronized Watcher getWatcher()
+  {
+    if (watcher != null)
+      return watcher;
+    watcher = new Watcher();
+    watcher.start();
+    return watcher;
+  }
+
+
+  
   /**
    * Erzeugt eine neue Instanz der Settings, die exclusiv
    * nur fuer diese Klasse gelten. Existieren bereits Settings
@@ -80,21 +93,8 @@ public class Settings
       store();
 
     load();
-
-    this.session = (SessionObject) files.get(this.file.getAbsolutePath());
-    if (this.session == null)
-    {
-      this.session = new SessionObject();
-      this.session.lastModified = this.file.lastModified();
-      files.put(this.file.getAbsolutePath(),this.session);
-    }
-    this.session.settings.add(this);
     
-    if (watcher == null)
-    {
-      watcher = new Watcher();
-      watcher.start();
-    }
+    getWatcher().register(this);
   }
 
 	/**
@@ -382,21 +382,18 @@ public class Settings
    */
   protected void finalize() throws Throwable
   {
-    Logger.debug("removing from watcher");
-    try
-    {
-      this.session.settings.remove(this);
-    }
-    catch (Exception e)
-    {
-      Logger.info("unable to remove from watcher");
-    }
+    getWatcher().unregister(this);
     super.finalize();
   }
 
-  private class SessionObject
+  /**
+   * Hilfsobjekt zum Halten der Modifikationszeit der
+   * Datei und der Settings-Referenzen darauf.
+   */
+  private static class SessionObject
   {
-    private Vector settings = new Vector();
+    // Die Settings-Instanzen, die auf diese Datei zeigen
+    private ArrayList settings = new ArrayList();
     private long lastModified = 0;
   }
   
@@ -406,28 +403,106 @@ public class Settings
    */
   private static class Watcher extends Thread
   {
+
+    private final Session files = new Session();
+    
     /**
      * ct.
      */
     public Watcher()
     {
-      super("configfile modification watcher");
+      super("Configfile modification watcher");
     }
+    
+    /**
+     * Registriert eine neue Settings-Instanz.
+     * @param settings
+     */
+    private void register(Settings settings)
+    {
+      synchronized(this.files)
+      {
+        // Haben wir die Datei schon?
+        SessionObject so = (SessionObject) this.files.get(settings.file.getAbsolutePath());
+
+        if (so == null)
+        {
+          // Ne, haben wir noch nicht.
+          // Also erstellen wir ein neues SessionObject
+          so = new SessionObject();
+          so.lastModified = settings.file.lastModified();
+          this.files.put(settings.file.getAbsolutePath(),so);
+        }
+
+        // Unabhaengig davon tun wir uns in die Liste der Settings-Instanzen
+        // dazu, die zu dieser Datei gehoeren.
+        if (!so.settings.contains(settings))
+          so.settings.add(settings);
+      }
+    }
+    
+    /**
+     * Entfernt die Registrierung.
+     * @param settings
+     */
+    private void unregister(Settings settings)
+    {
+      synchronized(this.files)
+      {
+        String path = settings.file.getAbsolutePath();
+        SessionObject so = (SessionObject) this.files.get(path);
+        if (so == null)
+        {
+          Logger.warn("hu? these settings are not registered in watcher? Config-File: " + path);
+          return;
+        }
+        so.settings.remove(settings);
+        if (so.settings.size() == 0)
+        {
+          // Die Datei wird nicht mehr ueberwacht. Also kann sie aus
+          // der Watcher-Liste
+          this.files.remove(path);
+          
+          // Wenn wir ueberhaupt keine Dateien mehr zu ueberwachen haben,
+          // koennen wir uns beenden
+          if (this.files.size() == 0)
+          {
+            try
+            {
+              Logger.info("Configfile watcher no longer needed, shutting down");
+              interrupt();
+            }
+            catch (Exception e)
+            {
+              Logger.error("unable to shut down watcher thread",e);
+            }
+            finally
+            {
+              Settings.watcher = null;
+            }
+          }
+        }
+      }
+      
+    }
+    
+    
 
    /**
     * @see java.lang.Runnable#run()
     */
     public void run()
     {
-      Enumeration e     = null;
-      String sfile      = null;
-      File file         = null;
-      SessionObject o   = null;
-      long current      = 0;
-      Random r = new Random();
-      while (true)
+      try
       {
-        try
+
+        Enumeration e     = null;
+        String sfile      = null;
+        File file         = null;
+        SessionObject o   = null;
+        long current      = 0;
+        Random r = new Random();
+        while (!this.isInterrupted())
         {
           try
           {
@@ -468,11 +543,10 @@ public class Settings
           }
           sleep(10000l + r.nextInt(100));
         }
-        catch (InterruptedException ie)
-        {
-          Logger.error("configfile watcher interrupted, modifications will no longer be deteced automatically",ie);
-          return;
-        }
+      }
+      catch (InterruptedException ie)
+      {
+        Logger.info("Configfile watcher interrupted");
       }
     }
   }
@@ -480,6 +554,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.10  2006/09/05 22:02:01  willuhn
+ * @C Worker-Redesign in Settings und Session
+ *
  * Revision 1.9  2006/05/03 13:14:16  web0
  * *** empty log message ***
  *

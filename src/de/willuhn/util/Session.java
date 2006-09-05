@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.10 $
- * $Date: 2006/09/05 20:40:11 $
+ * $Revision: 1.11 $
+ * $Date: 2006/09/05 22:02:01 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -229,7 +229,8 @@ public class Session extends Observable
     {
       synchronized(this.sessions)
       {
-        this.sessions.add(session);
+        if (!this.sessions.contains(session))
+          this.sessions.add(session);
       }
     }
     
@@ -267,10 +268,11 @@ public class Session extends Observable
      */
     public void run()
     {
-      while (true)
+      long current = System.currentTimeMillis();
+
+      try
       {
-        long current = System.currentTimeMillis();
-        try
+        while (!this.isInterrupted())
         {
           synchronized(this.sessions)
           {
@@ -278,7 +280,7 @@ public class Session extends Observable
             {
               Session s = (Session) this.sessions.get(i);
               Hashtable data = s.data;
-
+  
               synchronized(data)
               {
                 Enumeration e = data.keys();
@@ -299,10 +301,10 @@ public class Session extends Observable
           }
           sleep(1000l);
         }
-        catch (InterruptedException e)
-        {
-          Logger.info("session worker thread interrupted");
-        }
+      }
+      catch (InterruptedException e)
+      {
+        Logger.info("session worker thread interrupted");
       }
     }
 
@@ -311,6 +313,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.11  2006/09/05 22:02:01  willuhn
+ * @C Worker-Redesign in Settings und Session
+ *
  * Revision 1.10  2006/09/05 20:40:11  willuhn
  * @N Worker-Thread Redesign
  *
