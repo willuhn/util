@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.29 $
- * $Date: 2005/07/24 16:59:17 $
- * $Author: web0 $
+ * $Revision: 1.30 $
+ * $Date: 2007/03/09 18:03:32 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -57,6 +57,52 @@ public class MultipleClassLoader extends ClassLoader
     Logger.debug("multipleClassLoader: adding class loader " + loader.getClass().getName());
     loaders.add(loader);
   }
+  
+  /**
+   * Fuegt die uebergebene URL dem Class-Loader hinzu.
+   * @param url die URL.
+   */
+  public void add(URL url)
+  {
+    this.ucl.addURL(url);
+  }
+  
+  /**
+   * Liefert eine Liste aller URLs, die im Classloader registriert sind.
+   * Diese Liste enthaelt sowohl lokale Ressourcen als auch remote Ressourcen.
+   * @return Liste aller URLs.
+   */
+  public URL[] getURLs()
+  {
+    return this.ucl.getURLs();
+  }
+  
+  /**
+   * Liefert eine Liste aller lokalen Ressourcen. Also getURLs() abzueglich remote Ressourcen.  
+   * @return Liste der lokalen Files/Jars.
+   */
+  public File[] getFiles()
+  {
+    ArrayList l = new ArrayList();
+    URL[] urls = getURLs();
+    for (int i=0;i<urls.length;++i)
+    {
+      try
+      {
+        File f = new File(urls[i].getFile());
+        if (!f.exists())
+          continue;
+        l.add(f);
+      }
+      catch (Exception e)
+      {
+        // ignore
+      }
+    }
+    return (File[])l.toArray(new File[l.size()]);
+  }
+  
+  
 
   /**
    * Fuegt das uebergebene Jar-File oder Verzeichnis zum Class-Loader hinzu.
@@ -65,11 +111,8 @@ public class MultipleClassLoader extends ClassLoader
    */
   public void add(File file) throws MalformedURLException
   {
-    if (file == null)
-      return;
-
     Logger.info("multipleClassLoader: adding file " + file.getAbsolutePath());
-    this.ucl.addURL(file.toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
+    add(file.toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
   }
 
   /**
@@ -98,7 +141,7 @@ public class MultipleClassLoader extends ClassLoader
     for(int i=0;i<jars.length;++i)
     {
 			Logger.debug("multipleClassLoader: adding file " + jars[i].getAbsolutePath());
-      this.ucl.addURL(jars[i].toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
+      add(jars[i].toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
     }
     return jars;
   }
@@ -257,6 +300,10 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.30  2007/03/09 18:03:32  willuhn
+ * @N classloader updates
+ * @N FileWatch
+ *
  * Revision 1.29  2005/07/24 16:59:17  web0
  * @B fix in settings watcher
  *

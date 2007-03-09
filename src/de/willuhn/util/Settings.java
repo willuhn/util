@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.10 $
- * $Date: 2006/09/05 22:02:01 $
+ * $Revision: 1.11 $
+ * $Date: 2007/03/09 18:03:32 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,12 +16,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Properties;
-import java.util.Random;
 
+import de.willuhn.io.FileWatch;
 import de.willuhn.logging.Logger;
 
 /**
@@ -38,7 +38,7 @@ import de.willuhn.logging.Logger;
  * kann, ohne das System-Property java.util.prefs.userRoot aendern zu muessen.
  * @author willuhn
  */
-public class Settings
+public class Settings implements Observer
 {
 
   private File file;
@@ -52,24 +52,6 @@ public class Settings
     // disabled
   }
 
-  private static Watcher watcher = null;
-
-  
-  /**
-   * Liefert den Worker-Thread und erstellt ggf einen neuen.
-   * @return der Worker-Thread.
-   */
-  private final static synchronized Watcher getWatcher()
-  {
-    if (watcher != null)
-      return watcher;
-    watcher = new Watcher();
-    watcher.start();
-    return watcher;
-  }
-
-
-  
   /**
    * Erzeugt eine neue Instanz der Settings, die exclusiv
    * nur fuer diese Klasse gelten. Existieren bereits Settings
@@ -92,9 +74,8 @@ public class Settings
     if (!this.file.exists() || !this.file.canRead())
       store();
 
-    load();
-    
-    getWatcher().register(this);
+    update(null,null);
+    FileWatch.addFile(this.file,this);
   }
 
 	/**
@@ -340,6 +321,8 @@ public class Settings
     }
     store();
   }
+  
+  private boolean inStore = false;
 
   /**
    * Schreibt die Properties in die Datei.
@@ -350,6 +333,7 @@ public class Settings
   {
     try
     {
+      inStore = true;
       properties.store(new FileOutputStream(this.file),"Settings for class " + this.clazz.getName());
     }
     catch (Exception e1)
@@ -361,199 +345,34 @@ public class Settings
   }
 
   /**
-   * Liest die Properties aus der Datei.
+   * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
    */
-  private synchronized void load()
+  public void update(Observable o, Object arg)
   {
     try
     {
-      this.properties.load(new FileInputStream(this.file));
+      // Wir muessen nur laden, wenn das Event nicht von uns ausgeloest wurde
+      if (!inStore)
+        this.properties.load(new FileInputStream(this.file));
     }
     catch (Exception e1)
     {
       Logger.error("unable to load settings. Do you " +
         "have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
-
-  }
-
-  /**
-   * @see java.lang.Object#finalize()
-   */
-  protected void finalize() throws Throwable
-  {
-    getWatcher().unregister(this);
-    super.finalize();
-  }
-
-  /**
-   * Hilfsobjekt zum Halten der Modifikationszeit der
-   * Datei und der Settings-Referenzen darauf.
-   */
-  private static class SessionObject
-  {
-    // Die Settings-Instanzen, die auf diese Datei zeigen
-    private ArrayList settings = new ArrayList();
-    private long lastModified = 0;
-  }
-  
-  /**
-   * Watcher-Thread, der die Zeitstempel der Properties-Files ueberwacht und
-   * bei Datei-Aenderungen automatisch neu laedt.
-   */
-  private static class Watcher extends Thread
-  {
-
-    private final Session files = new Session();
-    
-    /**
-     * ct.
-     */
-    public Watcher()
+    finally
     {
-      super("Configfile modification watcher");
-    }
-    
-    /**
-     * Registriert eine neue Settings-Instanz.
-     * @param settings
-     */
-    private void register(Settings settings)
-    {
-      synchronized(this.files)
-      {
-        // Haben wir die Datei schon?
-        SessionObject so = (SessionObject) this.files.get(settings.file.getAbsolutePath());
-
-        if (so == null)
-        {
-          // Ne, haben wir noch nicht.
-          // Also erstellen wir ein neues SessionObject
-          so = new SessionObject();
-          so.lastModified = settings.file.lastModified();
-          this.files.put(settings.file.getAbsolutePath(),so);
-        }
-
-        // Unabhaengig davon tun wir uns in die Liste der Settings-Instanzen
-        // dazu, die zu dieser Datei gehoeren.
-        if (!so.settings.contains(settings))
-          so.settings.add(settings);
-      }
-    }
-    
-    /**
-     * Entfernt die Registrierung.
-     * @param settings
-     */
-    private void unregister(Settings settings)
-    {
-      synchronized(this.files)
-      {
-        String path = settings.file.getAbsolutePath();
-        SessionObject so = (SessionObject) this.files.get(path);
-        if (so == null)
-        {
-          Logger.warn("hu? these settings are not registered in watcher? Config-File: " + path);
-          return;
-        }
-        so.settings.remove(settings);
-        if (so.settings.size() == 0)
-        {
-          // Die Datei wird nicht mehr ueberwacht. Also kann sie aus
-          // der Watcher-Liste
-          this.files.remove(path);
-          
-          // Wenn wir ueberhaupt keine Dateien mehr zu ueberwachen haben,
-          // koennen wir uns beenden
-          if (this.files.size() == 0)
-          {
-            try
-            {
-              Logger.info("Configfile watcher no longer needed, shutting down");
-              interrupt();
-            }
-            catch (Exception e)
-            {
-              Logger.error("unable to shut down watcher thread",e);
-            }
-            finally
-            {
-              Settings.watcher = null;
-            }
-          }
-        }
-      }
-      
-    }
-    
-    
-
-   /**
-    * @see java.lang.Runnable#run()
-    */
-    public void run()
-    {
-      try
-      {
-
-        Enumeration e     = null;
-        String sfile      = null;
-        File file         = null;
-        SessionObject o   = null;
-        long current      = 0;
-        Random r = new Random();
-        while (!this.isInterrupted())
-        {
-          try
-          {
-            e = files.keys();
-            while (e.hasMoreElements())
-            {
-              sfile = (String) e.nextElement();
-              if (sfile == null || sfile.length() == 0)
-                continue;
-              
-              file = new File(sfile);
-              if (file == null || !file.exists() || !file.isFile() || !file.canRead())
-                continue;
-              
-              o = (SessionObject) files.get(sfile);
-              if (o == null)
-                continue;
-              
-              current = file.lastModified();
-              if (o.lastModified < current)
-              {
-                Logger.debug("file " + sfile + " has changed, reloading");
-                synchronized (o.settings)
-                {
-                  for (int i=0;i<o.settings.size();++i)
-                  {
-                    ((Settings)o.settings.get(i)).load();
-                  }
-                }
-                o.lastModified = current;
-                Logger.debug("file " + sfile + " reloaded");
-              }
-            }
-          }
-          catch (ConcurrentModificationException ce)
-          {
-            // nicht weiter schlimm, dann beim naechsten mal
-          }
-          sleep(10000l + r.nextInt(100));
-        }
-      }
-      catch (InterruptedException ie)
-      {
-        Logger.info("Configfile watcher interrupted");
-      }
+      inStore = false;
     }
   }
 }
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.11  2007/03/09 18:03:32  willuhn
+ * @N classloader updates
+ * @N FileWatch
+ *
  * Revision 1.10  2006/09/05 22:02:01  willuhn
  * @C Worker-Redesign in Settings und Session
  *

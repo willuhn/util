@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/08/09 14:09:26 $
- * $Author: web0 $
+ * $Revision: 1.7 $
+ * $Date: 2007/03/09 18:03:32 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -261,6 +261,7 @@ public class Logger
     public LoggerThread(String name)
   	{
   		super(name);
+      setDaemon(true);
   	}
 
     /**
@@ -374,6 +375,10 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.7  2007/03/09 18:03:32  willuhn
+ * @N classloader updates
+ * @N FileWatch
+ *
  * Revision 1.6  2005/08/09 14:09:26  web0
  * @N added logrotate target
  *
