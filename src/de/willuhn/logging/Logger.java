@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.8 $
- * $Date: 2007/03/15 11:29:37 $
+ * $Revision: 1.9 $
+ * $Date: 2007/03/15 11:32:44 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -217,7 +217,7 @@ public class Logger
   }
 
   /**
-   * Interne Methode zum Formatieren und Schreiben der Meldungen.
+   * Schreibt eine Log-Meldung mit direkter Angabe des Log-Levels.
    * @param level Log-Levels.
    * @param message zu loggende Nachricht.
    */
@@ -375,6 +375,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.9  2007/03/15 11:32:44  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.8  2007/03/15 11:29:37  willuhn
  * @N made write(Level,String) public
  *
