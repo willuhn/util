@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.10 $
- * $Date: 2007/03/15 11:52:12 $
+ * $Revision: 1.11 $
+ * $Date: 2007/03/15 12:34:18 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -245,12 +245,20 @@ public class Logger
 
     String clazz = null;
 		String method = null;
+    
+    // Wir suchen den Verursacher, in dem wir den Stacktrace hochwandern,
+    // bis wir nicht mehr selbst drin stehen
 		StackTraceElement[] stack = new Throwable().getStackTrace();
-		if (stack.length >= 3)
-		{
-			clazz = stack[2].getClassName();
-			method = stack[2].getMethodName();
-		}
+    if (stack != null)
+    {
+      for (int i=0;i<stack.length;++i)
+      {
+        clazz = stack[i].getClassName();
+        method = stack[2].getMethodName();
+        if (!Logger.class.getName().equals(clazz))
+          break;
+      }
+    }
 		
 		Message msg = new Message(new Date(),level,clazz,method,message);
 		lastLines.push(msg);
@@ -390,6 +398,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.11  2007/03/15 12:34:18  willuhn
+ * @B wrong caller
+ *
  * Revision 1.10  2007/03/15 11:52:12  willuhn
  * @N Exceptions bei jedem Level mitloggbar
  *
