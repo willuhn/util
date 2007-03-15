@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.9 $
- * $Date: 2007/03/15 11:32:44 $
+ * $Revision: 1.10 $
+ * $Date: 2007/03/15 11:52:12 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -140,19 +140,7 @@ public class Logger
    */
   public static void error(String message, Throwable t)
 	{
-		write(Level.ERROR,message);
-		ByteArrayOutputStream bos = null;
-		try {
-			bos = new ByteArrayOutputStream();
-			t.printStackTrace(new PrintStream(bos));
-			write(Level.ERROR,bos.toString());
-		}
-		finally {
-			try {
-				bos.close();
-			}
-			catch (Exception npe) {}
-		}
+		write(Level.ERROR,message,t);
 	}
 
   /**
@@ -223,12 +211,39 @@ public class Logger
    */
   public static void write(Level level, String message)
   {
+    write(level,message,null);
+  }
+
+  /**
+   * Schreibt eine Log-Meldung mit direkter Angabe des Log-Levels.
+   * @param level Log-Levels.
+   * @param message zu loggende Nachricht.
+   * @param t optionale Angabe einer Exception.
+   */
+  public static void write(Level level, String message, Throwable t)
+  {
 		// Wir checken, ob der uebergebene Level mindestens genauso wertig ist,
 		// wie unser aktueller
   	if (level.getValue() < Logger.level.getValue())
   		return;
 
-		String clazz = null;
+    if (t != null)
+    {
+      ByteArrayOutputStream bos = null;
+      try {
+        bos = new ByteArrayOutputStream();
+        t.printStackTrace(new PrintStream(bos));
+        message += "\n" + bos.toString();
+      }
+      finally {
+        try {
+          bos.close();
+        }
+        catch (Exception npe) {}
+      }
+    }
+
+    String clazz = null;
 		String method = null;
 		StackTraceElement[] stack = new Throwable().getStackTrace();
 		if (stack.length >= 3)
@@ -375,6 +390,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.10  2007/03/15 11:52:12  willuhn
+ * @N Exceptions bei jedem Level mitloggbar
+ *
  * Revision 1.9  2007/03/15 11:32:44  willuhn
  * *** empty log message ***
  *
