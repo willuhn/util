@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.7 $
- * $Date: 2007/03/09 18:03:32 $
+ * $Revision: 1.8 $
+ * $Date: 2007/03/15 11:29:37 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -221,7 +221,7 @@ public class Logger
    * @param level Log-Levels.
    * @param message zu loggende Nachricht.
    */
-  protected static void write(Level level, String message)
+  public static void write(Level level, String message)
   {
 		// Wir checken, ob der uebergebene Level mindestens genauso wertig ist,
 		// wie unser aktueller
@@ -375,6 +375,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.8  2007/03/15 11:29:37  willuhn
+ * @N made write(Level,String) public
+ *
  * Revision 1.7  2007/03/09 18:03:32  willuhn
  * @N classloader updates
  * @N FileWatch
