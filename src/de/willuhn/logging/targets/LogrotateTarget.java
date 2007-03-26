@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.4 $
- * $Date: 2006/03/23 14:02:47 $
- * $Author: web0 $
+ * $Revision: 1.5 $
+ * $Date: 2007/03/26 23:52:08 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -45,7 +45,8 @@ public class LogrotateTarget implements Target
   private long maxLength = 1L * 1024L * 1024L;
   private boolean zip = true;
   
-  private static DateFormat DF = new SimpleDateFormat("yyyyMMdd-HHmm_ss");
+  private final static DateFormat DF = new SimpleDateFormat("yyyyMMdd-HHmm_ss");
+  private final static String lineSep = System.getProperty("line.separator");
 
   /**
    * ct.
@@ -90,7 +91,7 @@ public class LogrotateTarget implements Target
       return;
 
     checkRotate();
-    os.write((message.toString() + "\n").getBytes());
+    os.write((message.toString() + lineSep).getBytes());
   }
 
   /**
@@ -205,6 +206,9 @@ public class LogrotateTarget implements Target
 
 /*********************************************************************
  * $Log: LogrotateTarget.java,v $
+ * Revision 1.5  2007/03/26 23:52:08  willuhn
+ * @N plattform specific line separator in logfiles
+ *
  * Revision 1.4  2006/03/23 14:02:47  web0
  * @N new logrotate mechanism (runs no longer in background)
  *

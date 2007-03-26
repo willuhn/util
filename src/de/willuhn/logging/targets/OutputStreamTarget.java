@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/OutputStreamTarget.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/12/31 19:34:22 $
+ * $Revision: 1.2 $
+ * $Date: 2007/03/26 23:52:08 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,6 +23,7 @@ public class OutputStreamTarget implements Target
 {
 
 	private OutputStream os = null;
+  private final static String lineSep = System.getProperty("line.separator");
 
   /**
    * ct.
@@ -41,7 +42,7 @@ public class OutputStreamTarget implements Target
   	if (message == null)
   		return;
   	
-		os.write((message.toString() + "\n").getBytes());
+		os.write((message.toString() + lineSep).getBytes());
   }
 
   /**
@@ -57,6 +58,9 @@ public class OutputStreamTarget implements Target
 
 /**********************************************************************
  * $Log: OutputStreamTarget.java,v $
+ * Revision 1.2  2007/03/26 23:52:08  willuhn
+ * @N plattform specific line separator in logfiles
+ *
  * Revision 1.1  2004/12/31 19:34:22  willuhn
  * @C some logging refactoring
  * @N syslog support for logging
