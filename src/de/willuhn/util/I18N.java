@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.8 $
- * $Date: 2004/11/12 18:18:19 $
+ * $Revision: 1.9 $
+ * $Date: 2007/03/26 23:58:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -164,7 +164,7 @@ public class I18N
    */
   public String tr(String key, String[] replacements)
   {
-    return MessageFormat.format(tr(key),replacements);
+    return MessageFormat.format(tr(key),(Object[])replacements);
   }
   
   /**
@@ -179,7 +179,7 @@ public class I18N
    */
   public String tr(String key, String replacement)
   {
-    return MessageFormat.format(tr(key),new String[] {replacement});
+    return tr(key,new String[]{replacement});
   }
 
   /**
@@ -196,6 +196,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.9  2007/03/26 23:58:19  willuhn
+ * @C compiler warnings
+ *
  * Revision 1.8  2004/11/12 18:18:19  willuhn
  * @C Logging refactoring
  *
