@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.11 $
- * $Date: 2007/03/15 12:34:18 $
+ * $Revision: 1.12 $
+ * $Date: 2007/03/27 17:14:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -254,7 +254,7 @@ public class Logger
       for (int i=0;i<stack.length;++i)
       {
         clazz = stack[i].getClassName();
-        method = stack[2].getMethodName();
+        method = stack[i].getMethodName();
         if (!Logger.class.getName().equals(clazz))
           break;
       }
@@ -398,6 +398,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.12  2007/03/27 17:14:34  willuhn
+ * @B wrong method name in logger
+ *
  * Revision 1.11  2007/03/15 12:34:18  willuhn
  * @B wrong caller
  *
