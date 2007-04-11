@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.12 $
- * $Date: 2007/03/27 17:14:34 $
+ * $Revision: 1.13 $
+ * $Date: 2007/04/11 23:59:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -260,11 +260,19 @@ public class Logger
       }
     }
 		
-		Message msg = new Message(new Date(),level,clazz,method,message);
-		lastLines.push(msg);
-		lt.write(msg);
+		write(new Message(new Date(),level,clazz,method,message));
   }
   
+  /**
+   * Schreibt eine fertige Message ins Log.
+   * @param message zu loggende Nachricht.
+   */
+  public static void write(Message message)
+  {
+    lastLines.push(message);
+    lt.write(message);
+  }
+
   /**
    * Das eigentliche Schreiben erfolgt in einem extra Thread damit's hoffentlich schneller geht.
    */
@@ -398,6 +406,9 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.13  2007/04/11 23:59:22  willuhn
+ * @N Log-Adapter fuer Java-Logging
+ *
  * Revision 1.12  2007/03/27 17:14:34  willuhn
  * @B wrong method name in logger
  *
