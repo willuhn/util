@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/FileFinder.java,v $
- * $Revision: 1.2 $
- * $Date: 2006/06/30 13:42:46 $
+ * $Revision: 1.3 $
+ * $Date: 2007/04/19 00:01:26 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -117,6 +117,8 @@ public class FileFinder
    */
   private void find(File dir, boolean recursive, final boolean all)
 	{
+    if (dir == null || !dir.canRead())
+      return;
 
 		// Alle Dateien des Verzeichnisses suchen
 		File[] files = dir.listFiles(new FilenameFilter()
@@ -155,7 +157,7 @@ public class FileFinder
 		}
 
 		// So, und jetzt alle Unterverzeichnisse
-		File[] dirs = dir.listFiles(new FilenameFilter()
+		final File[] dirs = dir.listFiles(new FilenameFilter()
 		{
 			public boolean accept(File dir, String name)
 			{
@@ -176,6 +178,9 @@ public class FileFinder
 
 /**********************************************************************
  * $Log: FileFinder.java,v $
+ * Revision 1.3  2007/04/19 00:01:26  willuhn
+ * @B check if dirs are not readable (causes NPE)
+ *
  * Revision 1.2  2006/06/30 13:42:46  willuhn
  * @B FileFinder hatte nur Dateien gefunden, aber keine Verzeichnisse
  *
