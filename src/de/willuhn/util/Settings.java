@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.11 $
- * $Date: 2007/03/09 18:03:32 $
+ * $Revision: 1.12 $
+ * $Date: 2007/05/09 09:42:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -17,11 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Properties;
 
-import de.willuhn.io.FileWatch;
 import de.willuhn.logging.Logger;
 
 /**
@@ -33,15 +30,18 @@ import de.willuhn.logging.Logger;
  * Config-Dateien mit den Default-Werten angelegt werden damit dieser
  * nicht in der Dokumentation nach den Schluesselnamen suchen muss
  * sondern sie bereits mit Default-Werten in den Dateien vorfindet.
+ * Wird die Properties-Datei von aussen (z.Bsp. mit einem Texteditor)
+ * geaendert, wird das automatisch erkannt und die Datei intern neu geladen.
  * TODO: Sollte man mal gegen java.util.prefs.Preferences ersetzen.
  * Allerdings muesste man hier noch klaeren, wie man den Pfad vorgeben
  * kann, ohne das System-Property java.util.prefs.userRoot aendern zu muessen.
  * @author willuhn
  */
-public class Settings implements Observer
+public class Settings
 {
 
   private File file;
+  private double lastModified;
   private Class clazz;
   private Properties properties;
 
@@ -73,9 +73,8 @@ public class Settings implements Observer
     // wir testen mal, ob wir die Datei lesen koennen.
     if (!this.file.exists() || !this.file.canRead())
       store();
-
-    update(null,null);
-    FileWatch.addFile(this.file,this);
+    else
+      reload();
   }
 
 	/**
@@ -104,6 +103,7 @@ public class Settings implements Observer
    */
   public String[] getAttributes()
 	{
+    reload();
 		synchronized (properties)
 		{
 			Iterator it = properties.keySet().iterator();
@@ -126,6 +126,7 @@ public class Settings implements Observer
    */
   public boolean getBoolean(String name, boolean defaultValue)
 	{
+    reload();
 		String s = getProperty(name,defaultValue ? "true" : "false");
 		boolean b = "true".equalsIgnoreCase(s);
 		if (storeWhenRead)
@@ -145,6 +146,7 @@ public class Settings implements Observer
 	 */
 	public int getInt(String name, int defaultValue)
 	{
+    reload();
 		String s = getProperty(name,""+defaultValue);
 		int i = defaultValue;
 		try {
@@ -171,6 +173,7 @@ public class Settings implements Observer
 	 */
 	public double getDouble(String name, double defaultValue)
 	{
+    reload();
 		String s = getProperty(name,""+defaultValue);
 		double d = defaultValue;
 		try {
@@ -205,6 +208,7 @@ public class Settings implements Observer
 	 */
 	public String getString(String name, String defaultValue)
 	{
+    reload();
 		String s = getProperty(name,defaultValue);
 		if (storeWhenRead)
 			setAttribute(name,s);
@@ -221,6 +225,7 @@ public class Settings implements Observer
    */
   public String[] getList(String name, String[] defaultValues)
   {
+    reload();
     ArrayList l = new ArrayList();
     String s = null;
     for (int i=0;i<255;++i)
@@ -322,8 +327,6 @@ public class Settings implements Observer
     store();
   }
   
-  private boolean inStore = false;
-
   /**
    * Schreibt die Properties in die Datei.
    * Hinweis: Die Funktion wirft keine IOException, wenn die Datei nicht
@@ -333,7 +336,6 @@ public class Settings implements Observer
   {
     try
     {
-      inStore = true;
       properties.store(new FileOutputStream(this.file),"Settings for class " + this.clazz.getName());
     }
     catch (Exception e1)
@@ -341,34 +343,44 @@ public class Settings implements Observer
       Logger.error("unable to create settings. Do you " +
         "have write permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
-
+    finally
+    {
+      this.lastModified = this.file.lastModified();
+    }
   }
 
   /**
-   * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+   * Laedt die Datei neu.
    */
-  public void update(Observable o, Object arg)
+  private synchronized void reload()
   {
+    long modified = this.file.lastModified();
+
+    if (this.lastModified == modified)
+      return; // Kein Reload noetig
+
     try
     {
-      // Wir muessen nur laden, wenn das Event nicht von uns ausgeloest wurde
-      if (!inStore)
-        this.properties.load(new FileInputStream(this.file));
+      if (this.lastModified > 0) // wenn lastModified 0 ist, wurde die Datei noch gar nicht geladen
+        Logger.info(this.file.getAbsolutePath() + " has changed, reloading");
+      this.properties.load(new FileInputStream(this.file));
     }
     catch (Exception e1)
     {
-      Logger.error("unable to load settings. Do you " +
-        "have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
+      Logger.error("unable to load settings. Do you have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
     finally
     {
-      inStore = false;
+      this.lastModified = modified;
     }
   }
 }
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.12  2007/05/09 09:42:55  willuhn
+ * @N Config-Reload without watcher thread
+ *
  * Revision 1.11  2007/03/09 18:03:32  willuhn
  * @N classloader updates
  * @N FileWatch
