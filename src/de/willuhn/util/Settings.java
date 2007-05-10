@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.12 $
- * $Date: 2007/05/09 09:42:55 $
+ * $Revision: 1.13 $
+ * $Date: 2007/05/10 16:49:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -362,7 +362,7 @@ public class Settings
     try
     {
       if (this.lastModified > 0) // wenn lastModified 0 ist, wurde die Datei noch gar nicht geladen
-        Logger.info(this.file.getAbsolutePath() + " has changed, reloading");
+        Logger.debug(this.file.getAbsolutePath() + " has changed, reloading");
       this.properties.load(new FileInputStream(this.file));
     }
     catch (Exception e1)
@@ -378,6 +378,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.13  2007/05/10 16:49:52  willuhn
+ * @C changed log level
+ *
  * Revision 1.12  2007/05/09 09:42:55  willuhn
  * @N Config-Reload without watcher thread
  *
