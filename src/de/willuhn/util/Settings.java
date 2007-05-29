@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.13 $
- * $Date: 2007/05/10 16:49:52 $
+ * $Revision: 1.14 $
+ * $Date: 2007/05/29 12:55:59 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,6 +14,7 @@ package de.willuhn.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -365,6 +366,11 @@ public class Settings
         Logger.debug(this.file.getAbsolutePath() + " has changed, reloading");
       this.properties.load(new FileInputStream(this.file));
     }
+    catch (FileNotFoundException nfe)
+    {
+      Logger.warn("file " + this.file.getAbsolutePath() + " has been deleted");
+      this.properties.clear();
+    }
     catch (Exception e1)
     {
       Logger.error("unable to load settings. Do you have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
@@ -378,6 +384,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.14  2007/05/29 12:55:59  willuhn
+ * @C flush properties if settings file has been deleted
+ *
  * Revision 1.13  2007/05/10 16:49:52  willuhn
  * @C changed log level
  *
