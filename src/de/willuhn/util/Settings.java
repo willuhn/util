@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.14 $
- * $Date: 2007/05/29 12:55:59 $
+ * $Revision: 1.15 $
+ * $Date: 2007/06/21 09:01:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,11 +41,9 @@ import de.willuhn.logging.Logger;
 public class Settings
 {
 
-  private File file;
-  private double lastModified;
-  private Class clazz;
-  private Properties properties;
-
+  private File file             = null;
+  private double lastModified   = 0;
+  private Properties properties = null;
 	private boolean storeWhenRead = true;
 
   private Settings()
@@ -59,20 +57,55 @@ public class Settings
    * fuer die Klasse, werden sie gleich geladen.
    * Hierbei wird eine Properties-Datei
    * [classname].properties im angegebenen Verzeichnis angelegt.
-   * @param path
+   * @param path Pfad zu den Einstellungen.
    * @param clazz Klasse, fuer die diese Settings gelten.
    */
   public Settings(String path, Class clazz)
   {
-    this.clazz = clazz;
+    this(null,path,clazz);
+  }
 
-    properties = new Properties();
-    
+  /**
+   * Erzeugt eine neue Instanz der Settings, die exclusiv
+   * nur fuer diese Klasse gelten. Existieren bereits Settings
+   * fuer die Klasse, werden sie gleich geladen.
+   * Hierbei wird eine Properties-Datei
+   * [classname].properties im angegebenen Verzeichnis angelegt.
+   * @param systemPath Pfad zu ggf vorhandenen System-Presets.
+   * @param userPath Pfad zu den User-Einstellungen.
+   * @param clazz Klasse, fuer die diese Settings gelten.
+   */
+  public Settings(String systemPath, String userPath, Class clazz)
+  {
     // Filenamen ermitteln
-    this.file = new File(path + File.separator + clazz.getName() + ".properties");
+    this.file = new File(userPath + File.separator + clazz.getName() + ".properties");
 
-    // wir testen mal, ob wir die Datei lesen koennen.
-    if (!this.file.exists() || !this.file.canRead())
+    Properties presets = null;
+
+    // Checken, ob System-Presets existieren
+    if (systemPath != null)
+    {
+      File systemPresets = new File(systemPath + File.separator + clazz.getName() + ".properties");
+      if (systemPresets.exists() && systemPresets.canRead())
+      {
+        try
+        {
+          Logger.debug("loading system presets from " + systemPresets.getAbsolutePath());
+          presets = new Properties();
+          presets.load(new FileInputStream(systemPresets));
+        }
+        catch (Exception e1)
+        {
+          Logger.error("unable to load system presets from " + systemPresets.getAbsolutePath(),e1);
+          presets = null;
+        }
+      }
+    }
+    
+    this.properties = new Properties(presets);
+
+    // wir erzeugen die Datei, wenn sie noch nicht existiert
+    if (!this.file.exists())
       store();
     else
       reload();
@@ -197,7 +230,7 @@ public class Settings
    */
   private String getProperty(String name, String defaultValue)
 	{
-		return properties.getProperty(name,defaultValue);
+    return properties.getProperty(name, defaultValue);
 	}
 
 	/**
@@ -337,12 +370,11 @@ public class Settings
   {
     try
     {
-      properties.store(new FileOutputStream(this.file),"Settings for class " + this.clazz.getName());
+      properties.store(new FileOutputStream(this.file),null);
     }
     catch (Exception e1)
     {
-      Logger.error("unable to create settings. Do you " +
-        "have write permissions in " + this.file.getAbsolutePath() + " ?",e1);
+      Logger.error("unable to store settings. Do you have write permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
     finally
     {
@@ -373,7 +405,7 @@ public class Settings
     }
     catch (Exception e1)
     {
-      Logger.error("unable to load settings. Do you have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
+      Logger.error("unable to (re)load settings. Do you have read permissions in " + this.file.getAbsolutePath() + " ?",e1);
     }
     finally
     {
@@ -384,6 +416,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.15  2007/06/21 09:01:49  willuhn
+ * @N System-Presets
+ *
  * Revision 1.14  2007/05/29 12:55:59  willuhn
  * @C flush properties if settings file has been deleted
  *

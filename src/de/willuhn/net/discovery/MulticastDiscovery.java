@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/net/discovery/Attic/MulticastDiscovery.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/06/20 00:17:40 $
+ * $Revision: 1.2 $
+ * $Date: 2007/06/21 09:01:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -32,7 +32,15 @@ import de.willuhn.logging.Logger;
 public class MulticastDiscovery
 {
   private final static String HEADER         = "RMID";
+  
+  /**
+   * Default-Multicast-Adresse.
+   */
   public final static String DEFAULT_ADDRESS = "224.0.0.1";
+
+  /**
+   * Default-Port.
+   */
   public final static int DEFAULT_PORT       = 6789;
   
   private int port               = DEFAULT_PORT;
@@ -233,6 +241,9 @@ public class MulticastDiscovery
 
 /*******************************************************************************
  * $Log: MulticastDiscovery.java,v $
+ * Revision 1.2  2007/06/21 09:01:49  willuhn
+ * @N System-Presets
+ *
  * Revision 1.1  2007/06/20 00:17:40  willuhn
  * @N Spiel-Code fuer ein RMI-Service-Discovery via TCP Multicast
  *
