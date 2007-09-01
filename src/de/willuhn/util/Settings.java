@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.15 $
- * $Date: 2007/06/21 09:01:49 $
+ * $Revision: 1.16 $
+ * $Date: 2007/09/01 21:38:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -162,6 +162,7 @@ public class Settings
 	{
     reload();
 		String s = getProperty(name,defaultValue ? "true" : "false");
+    if (s != null) s = s.trim(); // BUGZILLA 477
 		boolean b = "true".equalsIgnoreCase(s);
 		if (storeWhenRead)
 			setAttribute(name,b);
@@ -182,6 +183,7 @@ public class Settings
 	{
     reload();
 		String s = getProperty(name,""+defaultValue);
+    if (s != null) s = s.trim(); // BUGZILLA 477
 		int i = defaultValue;
 		try {
 			i = Integer.parseInt(s);
@@ -209,6 +211,7 @@ public class Settings
 	{
     reload();
 		String s = getProperty(name,""+defaultValue);
+    if (s != null) s = s.trim(); // BUGZILLA 477
 		double d = defaultValue;
 		try {
 			d = Double.parseDouble(s);
@@ -416,6 +419,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.16  2007/09/01 21:38:35  willuhn
+ * @B Bug 477
+ *
  * Revision 1.15  2007/06/21 09:01:49  willuhn
  * @N System-Presets
  *
