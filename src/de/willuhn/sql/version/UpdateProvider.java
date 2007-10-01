@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/UpdateProvider.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/10/01 23:16:56 $
+ * $Revision: 1.2 $
+ * $Date: 2007/10/01 23:29:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -51,7 +51,7 @@ public interface UpdateProvider
   public ProgressMonitor getProgressMonitor();
   
   /**
-   * Liefert den Pfad, in dem der Update-Prozess 
+   * Liefert den Pfad, in dem der Update-Prozess nach Updates suchen soll.
    * @return Pfad, in dem nach den Update gesucht werden soll.
    * @throws ApplicationException
    */
@@ -61,6 +61,9 @@ public interface UpdateProvider
 
 /**********************************************************************
  * $Log: UpdateProvider.java,v $
+ * Revision 1.2  2007/10/01 23:29:55  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2007/10/01 23:16:56  willuhn
  * @N Erste voellig ungetestete Version eines generischen Updaters.
  *
