@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.30 $
- * $Date: 2007/03/09 18:03:32 $
+ * $Revision: 1.31 $
+ * $Date: 2007/10/25 23:13:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -34,8 +34,7 @@ public class MultipleClassLoader extends ClassLoader
   private ArrayList loaders   	= new ArrayList();
   private Hashtable cache     	= new Hashtable();
   private ClassFinder finder   	= new ClassFinder();
-
-  private URLLoader ucl       	= null;
+  private URLLoader ucl       	= new URLLoader();
 
 	/**
 	 * Erzeugt eine neue Instanz des Classloaders.
@@ -43,7 +42,6 @@ public class MultipleClassLoader extends ClassLoader
 	public MultipleClassLoader()
 	{
 		super();
-    this.ucl = new URLLoader();
 	}
 
   /**
@@ -56,6 +54,10 @@ public class MultipleClassLoader extends ClassLoader
       return;
     Logger.debug("multipleClassLoader: adding class loader " + loader.getClass().getName());
     loaders.add(loader);
+    if (loader instanceof MultipleClassLoader)
+    {
+      finder.addFinder(((MultipleClassLoader) loader).getClassFinder());
+    }
   }
   
   /**
@@ -111,7 +113,6 @@ public class MultipleClassLoader extends ClassLoader
    */
   public void add(File file) throws MalformedURLException
   {
-    Logger.info("multipleClassLoader: adding file " + file.getAbsolutePath());
     add(file.toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
   }
 
@@ -213,16 +214,10 @@ public class MultipleClassLoader extends ClassLoader
       // Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
       // ist, dass dieser eine alle Plugins und deren Jars kennt.
       // URLClassLoader checken
+      // Da wir dem UCL als Parent-Classloader nicht uns selbst sondern
+      // den System-Classloader uebergeben haben, brauchen wir nur
+      // den UCL fragen und nicht extra nochmal den System-Classloader
       return findVia(ucl,className);
-    }
-    catch (Throwable r) {}
-
-    // Ich weiss, es verstoesst gegen das SUN-Paradigma, dass man zuerst
-    // den Parent-Classloader fragen soll. Wir haben es hier aber mit
-    // Plugins und deren Jars zu tun. Und die kennt der System-Classloader
-    // definitiv nicht.
-    try {
-      return findVia(getParent(),className);
     }
     catch (Throwable r) {}
 
@@ -256,7 +251,10 @@ public class MultipleClassLoader extends ClassLoader
     {
       // und registrieren sie im ClassFinder. Aber nur, wenn
       // sie im Cache noch nicht existierte.
-      finder.addClass(c);
+      if (loader instanceof MultipleClassLoader)
+        ((MultipleClassLoader)loader).finder.addClass(c);
+      else
+        finder.addClass(c);
     }
     return c;
   }
@@ -300,6 +298,10 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.31  2007/10/25 23:13:22  willuhn
+ * @N Support fuer kaskadierende Classloader und -finder
+ * @C Classfinder ignoriert jetzt Inner-Classes
+ *
  * Revision 1.30  2007/03/09 18:03:32  willuhn
  * @N classloader updates
  * @N FileWatch

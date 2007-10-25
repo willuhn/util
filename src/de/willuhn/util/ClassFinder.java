@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ClassFinder.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/02/21 23:38:47 $
- * $Author: web0 $
+ * $Revision: 1.7 $
+ * $Date: 2007/10/25 23:13:22 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -14,9 +14,10 @@ package de.willuhn.util;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 
-import de.willuhn.logging.*;
+import de.willuhn.logging.Logger;
 
 /**
  */
@@ -27,29 +28,34 @@ import de.willuhn.logging.*;
 public class ClassFinder
 {
 
-	private Hashtable cache = new Hashtable();
-	private ArrayList classes = new ArrayList();
+	private Hashtable cache    = new Hashtable();
+	private ArrayList classes  = new ArrayList();
+  private ArrayList children = new ArrayList();
 
 	/**
 	 * ct.
 	 */
-	public ClassFinder()
+	ClassFinder()
 	{
 	}
+  
+  /**
+   * Fuegt einen Child-Finder hinzu.
+   * @param finder
+   */
+  void addFinder(ClassFinder finder)
+  {
+    this.children.add(finder);
+  }
 
 	/**
 	 * Fuegt die Klasse dem Finder hinzu.
 	 * @param clazz die Klasse.
 	 */
-	public void addClass(Class clazz)
+	void addClass(Class clazz)
 	{
-		if (isStub(clazz))
-			return;
-
-		if (clazz.isInterface() || clazz.isPrimitive())
-			return;
-
-		classes.add(clazz);
+    if (isImpl(clazz))
+      classes.add(clazz);
 	}
 
 	/**
@@ -64,28 +70,43 @@ public class ClassFinder
 	 */
 	public Class[] findImplementors(Class interphase) throws ClassNotFoundException
 	{
+    // erstmal im Cache checken
+    Class[] found = (Class[]) cache.get(interphase);
+    if (found != null && found.length > 0)
+      return found;
 
-		if (!interphase.isInterface() &&
-				!Modifier.isAbstract(interphase.getModifiers()) &&
-				!isStub(interphase)) // kein Interface, nicht abstract, kein Stub
-			return new Class[] {interphase}; //dann geben wir das Ding so zurueck, wie es ist
+    // Wenn eines eine Implementierung ist, liefern
+    // wir sie direkt zurueck
+    if (isImpl(interphase))
+      return new Class[] {interphase};
 
-		long start = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
 
-		// erstmal im Cache checken
-		Class[] found = (Class[]) cache.get(interphase);
-		if (found != null && found.length > 0)
-		{
-			return found;
-		}
+    // So, jetzt geht die Suche los
+    // Ggf. muessen wir die Ableitungshierachie hochwandern.
+    // Wenn mehrere Klassen das Interface implementieren, sammeln
+    // wir diese in einer Ranking-Liste.
+    ArrayList ranking = new ArrayList();
 
-		Class test = null;
+    // Wir suchen in den Child-Findern
+    for (int i=0;i<children.size();++i)
+    {
+      ClassFinder child = (ClassFinder) children.get(i);
+      try
+      {
+        found = child.findImplementors(interphase);
+        if (found != null && found.length > 0)
+          ranking.addAll(Arrays.asList(found));
+      }
+      catch (ClassNotFoundException e)
+      {
+        // Wenn die Kinder nichts gefunden haben, machen wir weiter
+      }
+    }
 
-		// So, jetzt geht die Suche los
-		// Ggf. muessen wir die Ableitungshierachie hochwandern.
-		// Wenn mehrere Klassen das Interface implementieren, sammeln
-		// wir diese in einer Ranking-Liste.
-		ArrayList ranking = new ArrayList();
+    // Jetzt suchen wir lokal
+    Class test = null;
+
 
 		// Hier speichern wir alle direkten Treffer um bei der
 		// Suche in der Ableitungs-Hierachie keine Duplikate
@@ -101,15 +122,8 @@ public class ClassFinder
 			if (duplicates.get(test) != null)
 				continue;
 
-			// ist ein Stub - koennen wir ganz vergessen
-			if (isStub(test))
-				continue;
-
-			// checken, ob die Klasse das Interface
-			// irgendwie implementiert und nicht abstrakt ist.
-			if (implementor(test,interphase) &&
-					!Modifier.isAbstract(test.getModifiers())
-			)
+			// checken, ob die Klasse das Interface irgendwie implementiert
+			if (implementor(test,interphase))
 			{
 				// hier, wir haben einen direkten Implementor.
 				// Wenn das der Fall ist, schenken wir uns
@@ -140,17 +154,27 @@ public class ClassFinder
 
 	}
 
-	/**
-	 * Prueft, ob die Klasse ein Stub oder Skel ist.
-	 * @param clazz zu pruefende Klasse.
-	 * @return true wenn es einer ist.
-	 */
-	private boolean isStub(Class clazz)
-	{
-		return (clazz.getName().endsWith("_Stub") || clazz.getName().endsWith("_Skel"));
-	}
+  /**
+   * Prueft, ob die Klasse eine Implementierung ist.
+   * @param clazz zu testende Klasse.
+   * @return true, wenn sie akzeptiert wird.
+   */
+  private boolean isImpl(Class clazz)
+  {
+    if (clazz.isInterface() || clazz.isPrimitive())
+      return false;
 
+    if (Modifier.isAbstract(clazz.getModifiers()))
+      return false;
 
+    String s = clazz.getName();
+    // Inner Classes ignorieren
+    if (s.indexOf("$") != -1 || s.endsWith("_Stub") || s.endsWith("_Skel"))
+      return false;
+    
+    return true;
+  }
+  
 	/**
 	 * Checkt, ob die Klasse das Interface implementiert.
 	 * @param test Test-Klasse.
@@ -165,10 +189,9 @@ public class ClassFinder
 		for (int j=0;j<interfaces.length;++j)
 		{
 			if (interfaces[j].equals(interphase))
-			{
 				return true;
-			}
-			// Bevor wir die naechste Iteration durchlaufen muessen wir nun
+
+      // Bevor wir die naechste Iteration durchlaufen muessen wir nun
 			// aber noch pruefen, ob das aktuell getestete Interface vielleicht
 			// vom gewuenschten Interface abgeleitet ist. Also z.Bsp:
 			// interface a;
@@ -214,6 +237,10 @@ public class ClassFinder
 
 /**********************************************************************
  * $Log: ClassFinder.java,v $
+ * Revision 1.7  2007/10/25 23:13:22  willuhn
+ * @N Support fuer kaskadierende Classloader und -finder
+ * @C Classfinder ignoriert jetzt Inner-Classes
+ *
  * Revision 1.6  2005/02/21 23:38:47  web0
  * undo
  *
