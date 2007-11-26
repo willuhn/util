@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.11 $
- * $Date: 2006/09/05 22:02:01 $
+ * $Revision: 1.12 $
+ * $Date: 2007/11/26 15:11:36 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -268,12 +268,12 @@ public class Session extends Observable
      */
     public void run()
     {
-      long current = System.currentTimeMillis();
-
       try
       {
         while (!this.isInterrupted())
         {
+          long current = System.currentTimeMillis();
+
           synchronized(this.sessions)
           {
             for (int i=0;i<this.sessions.size();++i)
@@ -313,6 +313,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.12  2007/11/26 15:11:36  willuhn
+ * @B Objekte in  Session liefen nicht ab
+ *
  * Revision 1.11  2006/09/05 22:02:01  willuhn
  * @C Worker-Redesign in Settings und Session
  *
