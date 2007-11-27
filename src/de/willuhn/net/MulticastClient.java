@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/net/MulticastClient.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/08/01 17:21:40 $
+ * $Revision: 1.2 $
+ * $Date: 2007/11/27 18:52:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,7 +19,9 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Enumeration;
 
 import de.willuhn.logging.Logger;
 
@@ -153,7 +155,7 @@ public class MulticastClient
           socket.receive(packet);
 
           InetAddress sender = packet.getAddress();
-          if (sender.equals(self))
+          if (isOwn(sender))
             continue; // sind wir selbst
           
           received(packet);
@@ -196,10 +198,10 @@ public class MulticastClient
       {
         InetAddress sender = packet.getAddress();
         InetAddress self   = InetAddress.getLocalHost();
-        System.out.println("\n" + sender.getHostName() + "> " + new String(packet.getData()));
+        System.out.println("\n" + sender.getCanonicalHostName() + "> " + new String(packet.getData()));
 
         // Prompt wieder anzeigen
-        System.out.print(self.getHostName() + "> ");
+        System.out.print(self.getCanonicalHostName() + "> ");
       }
     
     };
@@ -226,12 +228,36 @@ public class MulticastClient
       Logger.close();
       client.stop();
     }
-
+  }
+  
+  /**
+   * Prueft, ob die uebergebene IP-Adresse eine eigen ist.
+   * @param address die zu pruefende Adresse.
+   * @return true, wenn es die eigene ist.
+   * @throws SocketException
+   */
+  private static boolean isOwn(InetAddress address) throws SocketException
+  {
+    Enumeration ifaces = NetworkInterface.getNetworkInterfaces();
+    while (ifaces.hasMoreElements())
+    {
+      NetworkInterface i = (NetworkInterface) ifaces.nextElement();
+      Enumeration ips = i.getInetAddresses();
+      while (ips.hasMoreElements())
+      {
+        if (address.equals(ips.nextElement()))
+          return true;
+      }
+    }
+    return false;
   }
 }
 
 /*******************************************************************************
  * $Log: MulticastClient.java,v $
+ * Revision 1.2  2007/11/27 18:52:56  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2007/08/01 17:21:40  willuhn
  * @N generischer Multicast-Client, mit dem man P2P Daten austauschen. In der Main-Methode befindet sich eine Beispiel-Anwendung (Chat)
  *
