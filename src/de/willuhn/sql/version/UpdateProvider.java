@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/UpdateProvider.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/10/01 23:29:55 $
+ * $Revision: 1.3 $
+ * $Date: 2007/12/03 09:36:27 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,7 @@ public interface UpdateProvider
 {
   /**
    * Liefert die aktuelle Version
+   * @return die aktuelle Versionsnummer.
    * @throws ApplicationException wenn beim Ermitteln ein Fehler auftrat.
    */
   public int getCurrentVersion() throws ApplicationException;
@@ -34,8 +35,9 @@ public interface UpdateProvider
   /**
    * Wird mit der neuen Versionsnummer aufgerufen, wenn das Update durchlief.
    * @param newVersion die neue Versionsnummer.
+   * @throws ApplicationException Wenn beim Uebernehmen der Versionsnummer ein Fehler auftrat.
    */
-  public void setNewVersion(int newVersion);
+  public void setNewVersion(int newVersion) throws ApplicationException;
   
   /**
    * Liefert die zu verwendende Connection.
@@ -61,6 +63,9 @@ public interface UpdateProvider
 
 /**********************************************************************
  * $Log: UpdateProvider.java,v $
+ * Revision 1.3  2007/12/03 09:36:27  willuhn
+ * @N Patch von Heiner
+ *
  * Revision 1.2  2007/10/01 23:29:55  willuhn
  * *** empty log message ***
  *

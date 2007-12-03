@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/10/01 23:16:56 $
+ * $Revision: 1.2 $
+ * $Date: 2007/12/03 09:36:27 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -138,6 +138,10 @@ public class Updater
         int number = Integer.parseInt(name.substring(0,name.lastIndexOf(".")));
         provider.setNewVersion(number);
       }
+      catch (ApplicationException ae)
+      {
+        throw ae;
+      }
       catch (Exception e)
       {
         throw new ApplicationException(e);
@@ -252,6 +256,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.2  2007/12/03 09:36:27  willuhn
+ * @N Patch von Heiner
+ *
  * Revision 1.1  2007/10/01 23:16:56  willuhn
  * @N Erste voellig ungetestete Version eines generischen Updaters.
  *
