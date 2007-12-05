@@ -4,140 +4,140 @@
 
 
 
-    <target name="init" description="inits the build">
+	<target name="init" description="inits the build">
 
-      <property environment="env"/>
+		<property environment="env" />
 
-      <property name="build.dir" value="build"/>
+		<property name="build.dir" value="build" />
 
-    <!-- read build number -->
-      <buildnumber file="${build.dir}/BUILD"/>
+		<!-- read build number -->
+		<buildnumber file="${build.dir}/BUILD" />
 
-    <!-- read version number -->
-      <loadfile property="appversion" srcFile="${build.dir}/RELEASE">
-      <filterchain>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
+		<!-- read version number -->
+		<loadfile property="appversion" srcFile="${build.dir}/RELEASE">
+			<filterchain>
+				<striplinebreaks />
+			</filterchain>
+		</loadfile>
 
-    <!-- prepare cvs tag -->
-    <copy file="${build.dir}/RELEASE" tofile="${build.dir}/TAG" />
-    <replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_"/>
-    <loadfile property="mytag" srcFile="${build.dir}/TAG">
-      <filterchain>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
-      <delete file="${build.dir}/TAG" />
-      <property name="tag" value="V_${mytag}_BUILD_${build.number}"/>
+		<!-- prepare cvs tag -->
+		<copy file="${build.dir}/RELEASE" tofile="${build.dir}/TAG" />
+		<replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_" />
+		<loadfile property="mytag" srcFile="${build.dir}/TAG">
+			<filterchain>
+				<striplinebreaks />
+			</filterchain>
+		</loadfile>
+		<delete file="${build.dir}/TAG" />
+		<property name="tag" value="V_${mytag}_BUILD_${build.number}" />
 
-      <echo message="VERSION: ${appversion}"/>
-      <echo message="CVS-Tag: ${tag}"/>
-      <echo message="BUILD  : ${build.number}"/>
-      <echo message="JVM    : ${java.version} ${java.vendor}" />
+		<echo message="VERSION: ${appversion}" />
+		<echo message="CVS-Tag: ${tag}" />
+		<echo message="BUILD  : ${build.number}" />
+		<echo message="JVM    : ${java.version} ${java.vendor}" />
 
-      <property name="define.jarfilename"  value="de_willuhn_util.jar"/>
-      <property name="define.srcfilename"  value="de_willuhn_util.src.zip"/>
-      <property name="define.package"      value="de.willuhn"/>
+		<property name="define.jarfilename" value="de_willuhn_util.jar" />
+		<property name="define.srcfilename" value="de_willuhn_util.src.zip" />
+		<property name="define.package" value="de.willuhn" />
 
-        <property name="project.release"   value="releases/${appversion}-${build.number}"/>
-        <property name="project.src"         value="${project.release}/src/classes"/>
-        <property name="project.tmp"         value="${project.release}/tmp"/>
-        <property name="project.javadoc"     value="${project.release}/javadoc"/>
-        <property name="src.dir"             value="src"/>
-        <property name="class.dir"           value="${project.tmp}/bin"/>
-    </target>
-
-
-
-
-    <target depends="init" name="compile" description="compiles everything">
-        <mkdir dir="${class.dir}"/>
-      <javac fork="true" debug="true" deprecation="true" destdir="${class.dir}" srcdir="${src.dir}" />
-  </target>
+		<property name="project.release" value="releases/${appversion}-${build.number}" />
+		<property name="project.src" value="${project.release}/src/classes" />
+		<property name="project.tmp" value="${project.release}/tmp" />
+		<property name="project.javadoc" value="${project.release}/javadoc" />
+		<property name="src.dir" value="src" />
+		<property name="class.dir" value="${project.tmp}/bin" />
+	</target>
 
 
 
-  <target depends="compile" name="cvstag" description="tags the source in the CVS">
-    <exec executable="cvs" failonerror="true" dir="${basedir}">
-          <arg line="tag ${tag}"/>
-    </exec>
-  </target>
+
+	<target depends="init" name="compile" description="compiles everything">
+		<mkdir dir="${class.dir}" />
+		<javac debug="true" debuglevel="lines,vars,source" source="1.4" target="1.4" encoding="ISO-8859-1" deprecation="true" destdir="${class.dir}" srcdir="${src.dir}"/>
+	</target>
 
 
 
-    <target depends="compile" name="jar" description="generates the jar file">
-
-    <mkdir dir="${project.release}"/>
-    <jar destfile="${project.release}/${define.jarfilename}">
-
-          <manifest>
-            <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Title" value="${define.jarfilename}"/>
-        <attribute name="Implementation-Version" value="${appversion}"/>
-        <attribute name="Implementation-Buildnumber" value="${build.number}"/>
-      </manifest>
-      <fileset dir="${class.dir}"/>
-      </jar>
-
-      <copy file="${build.dir}/COPYING"           tofile="${project.release}/COPYING" />
-      <copy file="${build.dir}/README"            tofile="${project.release}/README" />
-
-    </target>
+	<target depends="compile" name="cvstag" description="tags the source in the CVS">
+		<exec executable="cvs" failonerror="true" dir="${basedir}">
+			<arg line="tag ${tag}" />
+		</exec>
+	</target>
 
 
 
-    <target depends="compile" name="javadoc" description="creates the api doc">
-        <mkdir dir="${project.javadoc}"/>
-        <javadoc destdir="${project.javadoc}" packagenames="${define.package}.*">
-            <sourcepath>
-                <pathelement location="${src.dir}"/>
-            </sourcepath>
-        </javadoc>
+	<target depends="compile" name="jar" description="generates the jar file">
 
-    </target>
+		<mkdir dir="${project.release}" />
+		<jar destfile="${project.release}/${define.jarfilename}">
 
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Implementation-Title" value="${define.jarfilename}" />
+				<attribute name="Implementation-Version" value="${appversion}" />
+				<attribute name="Implementation-Buildnumber" value="${build.number}" />
+			</manifest>
+			<fileset dir="${class.dir}" />
+		</jar>
 
+		<copy file="${build.dir}/COPYING" tofile="${project.release}/COPYING" />
+		<copy file="${build.dir}/README" tofile="${project.release}/README" />
 
-  <target depends="compile" name="src" description="build source package, depends compile target to make sure, the code has no errors">
-    <mkdir dir="${project.release}"/>
-    <zip casesensitive="true" zipfile="${project.release}/${define.srcfilename}">
-      <fileset dir="." >
-        <include name=".project"/>
-        <include name=".classpath"/>
-        <include name="${src.dir}/**"/>
-        <include name="${build.dir}/**"/>
-        <exclude name="${build.dir}/BUILD"/>
-      </fileset>
-    </zip>
-  </target>
-
-
-  <target name="clean" description="cleanup">
-    <delete dir="${project.tmp}"/>
-  </target>
-
-  <target name="sign" description="signs the jar/zip file">
-    <checksum file="${project.release}/${define.jarfilename}" />
-    <echo message="Creating PGP signature" />
-    <exec executable="gpg" failonerror="true" timeout="60000">
-      <arg line="-asb --use-agent ${project.release}/${define.jarfilename}"/>
-    </exec>
-  </target>
-
-  <target name="signsrc" description="signs the source zip">
-  <checksum file="${project.release}/${define.srcfilename}" />
-  <echo message="Creating PGP signature" />
-  <exec executable="gpg" failonerror="true" timeout="60000">
-    <arg line="-asb --use-agent ${project.release}/${define.srcfilename}"/>
-  </exec>
-  </target>
-
-
-  <target depends="init,compile,cvstag,jar,javadoc,src,sign,signsrc,clean" description="build an official release" name="all" />
+	</target>
 
 
 
-  <target depends="init,compile,jar,src,clean" description="build inofficial release" name="fast" />
+	<target depends="compile" name="javadoc" description="creates the api doc">
+		<mkdir dir="${project.javadoc}" />
+		<javadoc destdir="${project.javadoc}" packagenames="${define.package}.*">
+			<sourcepath>
+				<pathelement location="${src.dir}" />
+			</sourcepath>
+		</javadoc>
+
+	</target>
+
+
+
+	<target depends="compile" name="src" description="build source package, depends compile target to make sure, the code has no errors">
+		<mkdir dir="${project.release}" />
+		<zip casesensitive="true" zipfile="${project.release}/${define.srcfilename}">
+			<fileset dir=".">
+				<include name=".project" />
+				<include name=".classpath" />
+				<include name="${src.dir}/**" />
+				<include name="${build.dir}/**" />
+				<exclude name="${build.dir}/BUILD" />
+			</fileset>
+		</zip>
+	</target>
+
+
+	<target name="clean" description="cleanup">
+		<delete dir="${project.tmp}" />
+	</target>
+
+	<target name="sign" description="signs the jar/zip file">
+		<checksum file="${project.release}/${define.jarfilename}" />
+		<echo message="Creating PGP signature" />
+		<exec executable="gpg" failonerror="true" timeout="60000">
+			<arg line="-asb --use-agent ${project.release}/${define.jarfilename}" />
+		</exec>
+	</target>
+
+	<target name="signsrc" description="signs the source zip">
+		<checksum file="${project.release}/${define.srcfilename}" />
+		<echo message="Creating PGP signature" />
+		<exec executable="gpg" failonerror="true" timeout="60000">
+			<arg line="-asb --use-agent ${project.release}/${define.srcfilename}" />
+		</exec>
+	</target>
+
+
+	<target depends="init,compile,cvstag,jar,javadoc,src,sign,signsrc,clean" description="build an official release" name="all" />
+
+
+
+	<target depends="init,compile,jar,src,clean" description="build inofficial release" name="fast" />
 
 </project>
