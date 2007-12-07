@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/12/03 09:36:27 $
+ * $Revision: 1.3 $
+ * $Date: 2007/12/07 00:42:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -95,10 +95,14 @@ public class Updater
       }
       
       String name = current.getName();
-      
+
       // Dateiendung abschneiden
       name = name.substring(0,name.lastIndexOf("."));
-      
+
+      // Alles bis auf Zahlen entfernen
+      // Ist auch noetig, weil Klassennamen nicht nur aus Zahlen bestehen duerfen
+      name = name.replaceAll("[^0-9]","");
+
       // Wir versuchen den Dateinamen als Zahl zu parsen
       try
       {
@@ -256,6 +260,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.3  2007/12/07 00:42:56  willuhn
+ * @B Alles ausser Zahlen aus Dateinamen von Updates streichen
+ *
  * Revision 1.2  2007/12/03 09:36:27  willuhn
  * @N Patch von Heiner
  *
