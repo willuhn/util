@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.4 $
- * $Date: 2007/12/11 00:27:22 $
+ * $Revision: 1.5 $
+ * $Date: 2007/12/11 14:33:46 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -244,7 +244,10 @@ public class Updater
         is = new FileInputStream(f);
         byte[] data = new byte[(int)f.length()];
         is.read(data);
-        
+
+        // Verzeichnis-Angaben ignorieren
+        name = f.getName();
+
         // ".class" abschneiden
         name = name.substring(0,name.lastIndexOf("."));
         
@@ -272,6 +275,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.5  2007/12/11 14:33:46  willuhn
+ * @B Verzeichnis-Angaben in Klassennamen ignorieren
+ *
  * Revision 1.4  2007/12/11 00:27:22  willuhn
  * @B Bug beim Uebernehmen der Versionsnummer
  *
