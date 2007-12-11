@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/12/07 00:42:56 $
+ * $Revision: 1.4 $
+ * $Date: 2007/12/11 00:27:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -94,30 +94,17 @@ public class Updater
         continue;
       }
       
-      String name = current.getName();
-
-      // Dateiendung abschneiden
-      name = name.substring(0,name.lastIndexOf("."));
-
-      // Alles bis auf Zahlen entfernen
-      // Ist auch noetig, weil Klassennamen nicht nur aus Zahlen bestehen duerfen
-      name = name.replaceAll("[^0-9]","");
-
-      // Wir versuchen den Dateinamen als Zahl zu parsen
-      try
-      {
-        int number = Integer.parseInt(name);
-        
-        // Wir uebernehmen das Update nur, wenn dessen
-        // Versionsnummer hoeher als die aktuelle ist.
-        if (number > currentVersion)
-          updates.add(current);
-      }
-      catch (Exception e)
+      int number = toNumber(current.getName());
+      if (number < 0)
       {
         Logger.error("invalid update filename: " + current.getName() + ", skipping");
         continue;
       }
+
+      // Wir uebernehmen das Update nur, wenn dessen
+      // Versionsnummer hoeher als die aktuelle ist.
+      if (number > currentVersion)
+        updates.add(current);
     }
 
     // Keine Updates gefunden
@@ -138,9 +125,7 @@ public class Updater
       // Neue Versionsnummer an Provider mitteilen
       try
       {
-        String name = f.getName();
-        int number = Integer.parseInt(name.substring(0,name.lastIndexOf(".")));
-        provider.setNewVersion(number);
+        provider.setNewVersion(toNumber(f.getName()));
       }
       catch (ApplicationException ae)
       {
@@ -152,6 +137,33 @@ public class Updater
       }
     }
     Logger.info("update completed");
+  }
+  
+  /**
+   * Macht eine Versionsnummer aus dem Dateinamen.
+   * @param filename Dateiname.
+   * @return Versionsnummer oder -1 wenn sie ungueltig ist.
+   */
+  private int toNumber(String filename)
+  {
+    try
+    {
+      String number = filename;
+      // Dateiendung abschneiden
+      int ext = number.lastIndexOf(".");
+      if (ext != -1)
+        number = number.substring(0,ext);
+
+      // Alles bis auf Zahlen entfernen
+      // Ist auch noetig, weil Klassennamen nicht nur aus Zahlen bestehen duerfen
+      number = number.replaceAll("[^0-9]","");
+      return Integer.parseInt(number);
+    }
+    catch (Exception e)
+    {
+      Logger.error("invalid update filename: " + filename);
+    }
+    return -1;
   }
   
   /**
@@ -260,6 +272,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.4  2007/12/11 00:27:22  willuhn
+ * @B Bug beim Uebernehmen der Versionsnummer
+ *
  * Revision 1.3  2007/12/07 00:42:56  willuhn
  * @B Alles ausser Zahlen aus Dateinamen von Updates streichen
  *
