@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/12/11 14:33:46 $
+ * $Revision: 1.6 $
+ * $Date: 2007/12/11 15:19:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,6 +16,7 @@ package de.willuhn.sql.version;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Updater
   public Updater(UpdateProvider provider)
   {
     this.provider = provider;
-    this.loader   = new MyClassloader();
+    this.loader   = new MyClassloader(provider.getClass().getClassLoader());
   }
   
   /**
@@ -65,7 +66,14 @@ public class Updater
       return;
     }
     
-    File[] files = baseDir.listFiles();
+    File[] files = baseDir.listFiles(new FilenameFilter() {
+      public boolean accept(File dir, String name)
+      {
+        if (name == null)
+          return false;
+        return name.endsWith(".sql") || name.endsWith(".class");
+      }
+    });
     
     // Jetzt sortieren wir die Dateien und holen uns anschliessend
     // nur die, welche sich hinter der aktuellen Versionsnummer
@@ -184,6 +192,7 @@ public class Updater
         reader = new FileReader(update);
         Logger.info("  executing " + filename);
         ScriptExecutor.execute(reader,provider.getConnection(),provider.getProgressMonitor());
+        return;
       }
       catch (Exception e)
       {
@@ -198,7 +207,6 @@ public class Updater
           } catch (Exception e) {/*useless*/}
         }
       }
-      return;
     }
 
     // .class-File. Also Klasse laden, auf "Update" casten
@@ -209,8 +217,9 @@ public class Updater
       {
         Class clazz = this.loader.findClass(update.getAbsolutePath());
         Update u = (Update) clazz.newInstance();
-        Logger.info("  executing " + u.getName());
+        Logger.info("  executing " + u.getClass().getName() + ": " + u.getName());
         u.execute(this.provider);
+        return;
       }
       catch (ApplicationException ae)
       {
@@ -222,7 +231,7 @@ public class Updater
       }
     }
 
-    Logger.error("unknown update format: " + filename);
+    Logger.warn("unknown update file format: " + filename + ", skipping");
   }
   
   /**
@@ -231,6 +240,15 @@ public class Updater
    */
   private class MyClassloader extends ClassLoader
   {
+    /**
+     * ct
+     * @param parent
+     */
+    public MyClassloader(ClassLoader parent)
+    {
+      super(parent);
+    }
+    
     /**
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
@@ -275,6 +293,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.6  2007/12/11 15:19:20  willuhn
+ * @N Alles ausser *.class und *.sql ignorieren
+ *
  * Revision 1.5  2007/12/11 14:33:46  willuhn
  * @B Verzeichnis-Angaben in Klassennamen ignorieren
  *
