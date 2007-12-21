@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.31 $
- * $Date: 2007/10/25 23:13:22 $
+ * $Revision: 1.32 $
+ * $Date: 2007/12/21 16:49:06 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -200,8 +200,9 @@ public class MultipleClassLoader extends ClassLoader
    * @param className Name der Klasse.
    * @return Die Klasse.
    * @throws ClassNotFoundException
+   * @throws LinkageError Das sind NoClassDefFoundError und Co.
    */
-  public Class load(String className) throws ClassNotFoundException
+  public Class load(String className) throws ClassNotFoundException, LinkageError
   {
 
     // zuerst im Cache schauen.
@@ -209,6 +210,7 @@ public class MultipleClassLoader extends ClassLoader
     if (c != null)
       return c;
 
+    LinkageError error = null;
     try {
       // Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
       // Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
@@ -219,7 +221,9 @@ public class MultipleClassLoader extends ClassLoader
       // den UCL fragen und nicht extra nochmal den System-Classloader
       return findVia(ucl,className);
     }
-    catch (Throwable r) {}
+    catch (LinkageError r) {
+      error = r;
+    }
 
     // ok, wir fragen die anderen ClassLoader
     ClassLoader l = null;
@@ -229,10 +233,13 @@ public class MultipleClassLoader extends ClassLoader
         l = (ClassLoader) loaders.get(i);
         return findVia(l,className);
       }
-      catch (Throwable t)
+      catch (LinkageError r)
       {
+        error = r;
       }
     }
+    if (error != null)
+      throw error;
     throw new ClassNotFoundException("class not found: " + className);
   }
 
@@ -298,6 +305,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.32  2007/12/21 16:49:06  willuhn
+ * @C Classloader wirft jetzt auch ggf. LinkageErrors - wurden vorher vom Classloader verschluckt und lediglich als "ClassNotFoundException" gemeldet
+ *
  * Revision 1.31  2007/10/25 23:13:22  willuhn
  * @N Support fuer kaskadierende Classloader und -finder
  * @C Classfinder ignoriert jetzt Inner-Classes
