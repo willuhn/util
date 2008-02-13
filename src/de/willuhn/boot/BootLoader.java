@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.12 $
- * $Date: 2008/02/13 00:29:18 $
+ * $Revision: 1.13 $
+ * $Date: 2008/02/13 13:33:46 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -134,13 +134,16 @@ public class BootLoader {
       // den Service braucht -> wuerde sonst eine Rekursion ausloesen
       this.services.put(s.getClass(),s);
       
+      long start = System.currentTimeMillis();
       s.init(this,caller);
       this.order.add(s);
+      long used = System.currentTimeMillis() - start;
+      Logger.info("used time to init " + target.getName() + ": " + used + " millis");
     }
     catch (SkipServiceException e)
     {
       this.services.remove(s.getClass());
-      Logger.warn(indent() + "skipping service " + s.getClass().getName() + ". message: " + e.getMessage());
+      Logger.warn(indent() + "skipping service " + target.getName() + ". message: " + e.getMessage());
     }
     indent--;
     return s;
@@ -202,6 +205,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.13  2008/02/13 13:33:46  willuhn
+ * @N timing information
+ *
  * Revision 1.12  2008/02/13 00:29:18  willuhn
  * @C Log-Ausgaben
  *
