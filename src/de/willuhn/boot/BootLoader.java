@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.10 $
- * $Date: 2006/04/26 15:04:13 $
- * $Author: web0 $
+ * $Revision: 1.11 $
+ * $Date: 2008/02/13 00:27:17 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -131,12 +131,18 @@ public class BootLoader {
     try
     {
       Logger.info(indent() + "init service " + target.getName());
-      s.init(this,caller);
+
+      // Muss vor dem Initialisieren passieren,
+      // damit der Service schon bekannt ist, wenn in Init jemand
+      // den Service braucht -> wuerde sonst eine Rekursion ausloesen
       this.services.put(s.getClass(),s);
+      
+      s.init(this,caller);
       this.order.add(s);
     }
     catch (SkipServiceException e)
     {
+      this.services.remove(s.getClass());
       Logger.warn(indent() + "skipping service " + s.getClass().getName() + ". message: " + e.getMessage());
     }
     indent--;
@@ -199,6 +205,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.11  2008/02/13 00:27:17  willuhn
+ * @N Service bereits nach Erstellung verfuegbar machen
+ *
  * Revision 1.10  2006/04/26 15:04:13  web0
  * *** empty log message ***
  *
