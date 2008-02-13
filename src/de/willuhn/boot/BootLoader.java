@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.11 $
- * $Date: 2008/02/13 00:27:17 $
+ * $Revision: 1.12 $
+ * $Date: 2008/02/13 00:29:18 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -82,18 +82,15 @@ public class BootLoader {
 	{
 
 		// Target schon gebootet
-		if (services.get(target) != null)
-		{
-			Logger.debug(indent() + "service " + target.getName() + " allready booted, skipping");
-			return (Bootable) services.get(target);
-		}
+    Bootable s = (Bootable) services.get(target);
+		if (s != null)
+			return s;
 
-		Logger.info(indent() + "booting service " + target.getName());
+		Logger.debug(indent() + "booting service " + target.getName());
 
 		indent++;
 
 		// Instanziieren
-		Bootable s = null;
     try
     {
       s = (Bootable) target.newInstance();
@@ -103,7 +100,7 @@ public class BootLoader {
       throw new RuntimeException("unable to create instance of " + target.getName(),e);
     }
 
-		Logger.info(indent() + "checking dependencies for " + target.getName());
+		Logger.debug(indent() + "checking dependencies for " + target.getName());
 		Class[] deps = s.depends();
 		if (deps != null)
 		{
@@ -205,6 +202,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.12  2008/02/13 00:29:18  willuhn
+ * @C Log-Ausgaben
+ *
  * Revision 1.11  2008/02/13 00:27:17  willuhn
  * @N Service bereits nach Erstellung verfuegbar machen
  *
