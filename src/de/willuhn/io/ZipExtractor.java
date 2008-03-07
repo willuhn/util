@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.6 $
- * $Date: 2005/07/15 08:53:17 $
- * $Author: web0 $
+ * $Revision: 1.7 $
+ * $Date: 2008/03/07 00:46:53 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -12,6 +12,7 @@
  **********************************************************************/
 package de.willuhn.io;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,30 +28,20 @@ import de.willuhn.util.ProgressMonitor;
  * Hilfklasse zum Entpacken von ZIP-Archiven.
  * @author willuhn
  */
-public class ZipExtractor
+public class ZipExtractor extends AbstractZipSupport
 {
 
   private ZipFile zip = null;
-  private ProgressMonitor monitor = new DummyMonitor();
 
   /**
    * ct.
    * @param zip das zu entpackende ZIP-File.
+   * Das Zip-File wird nach dem Entpacken automatisch geschlossen.
+   * Hierbei wird dessen <code>close()</code>-Methode aufgerufen.
    */
   public ZipExtractor(ZipFile zip)
   {
     this.zip = zip;
-  }
-
-  /**
-   * Legt den Progress-Monitor fest, ueber den Ausgaben waehrend des Entpackens ausgegeben werden sollen.
-   * Wird dieser nicht definiert, werden keine Ausgaben vorgenommen.
-   * @param monitor
-   */
-  public void setMonitor(ProgressMonitor monitor)
-  {
-    if (monitor != null)
-      this.monitor = monitor;
   }
 
   /**
@@ -62,9 +53,7 @@ public class ZipExtractor
    */
   public void extract(File targetDirectory) throws IOException
   {
-    if (targetDirectory == null)
-      throw new IOException("no target directory defined");
-
+    monitor.setStatus(ProgressMonitor.STATUS_RUNNING);
     monitor.setStatusText("extracting zip file " + zip.getName() + " to " + targetDirectory.getAbsolutePath());
     monitor.log("extracting zip file " + zip.getName() + " to " + targetDirectory.getAbsolutePath());
 
@@ -171,17 +160,9 @@ public class ZipExtractor
           throw new IOException("unable to create file " + currentFile.getAbsolutePath());
       
         monitor.log("    uncompressing");
-        InputStream is = zip.getInputStream(entry);
-        OutputStream os = new FileOutputStream(currentFile);
-        byte b[] = new byte[1028];
-        int read = 0;
-        do
-        {
-          read = is.read(b);
-          if (read > 0)
-            os.write(b,0,read);
-        }
-        while(read != -1);
+        InputStream is  = zip.getInputStream(entry);
+        OutputStream os = new BufferedOutputStream(new FileOutputStream(currentFile));
+        copy(is,os);
 
         is.close();
         os.flush();
@@ -192,9 +173,11 @@ public class ZipExtractor
       }
       monitor.setPercentComplete(100);
       monitor.setStatusText("zip file " + zip.getName() + " uncompressed successfully");
+      monitor.setStatus(ProgressMonitor.STATUS_DONE);
     }
     catch (IOException e)
     {
+      monitor.setStatus(ProgressMonitor.STATUS_ERROR);
       // Wenn es irgends zu einem Fehler kommt, benennen wir die ggf. letzte
       // existierende Backup-Datei schnell noch wieder zurueck
       try
@@ -213,42 +196,28 @@ public class ZipExtractor
       }
       throw e;
     }
-  }
-
-  /**
-   * Dummy-Implementierung.
-   */
-  private class DummyMonitor implements ProgressMonitor
-  {
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setPercentComplete(int)
-     */
-    public void setPercentComplete(int percent) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#addPercentComplete(int)
-     */
-    public void addPercentComplete(int percent) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
-     */
-    public int getPercentComplete() {return 0;}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatus(int)
-     */
-    public void setStatus(int status) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatusText(java.lang.String)
-     */
-    public void setStatusText(String text) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#log(java.lang.String)
-     */
-    public void log(String msg) {}
+    finally
+    {
+      if (zip != null)
+      {
+        try
+        {
+          zip.close();
+        }
+        catch (Exception e)
+        {
+          // useless
+        }
+      }
+    }
   }
 }
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.7  2008/03/07 00:46:53  willuhn
+ * @N ZipCreator
+ *
  * Revision 1.6  2005/07/15 08:53:17  web0
  * *** empty log message ***
  *
