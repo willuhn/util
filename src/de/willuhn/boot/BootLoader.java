@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.14 $
- * $Date: 2008/03/07 11:32:26 $
+ * $Revision: 1.15 $
+ * $Date: 2008/03/07 16:29:16 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -189,6 +189,12 @@ public class BootLoader {
       while (!this.order.empty())
       {
         service = (Bootable) this.order.pop();
+        if (monitor != null)
+        {
+          monitor.setStatusText("shutting down service " + service.getClass().getName());
+          monitor.addPercentComplete(1);
+        }
+        
         Logger.info("shutting down service " + service.getClass().getName());
         service.shutdown();
       }
@@ -235,6 +241,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.15  2008/03/07 16:29:16  willuhn
+ * @N ProgressMonitor auch beim Shutdown verwenden
+ *
  * Revision 1.14  2008/03/07 11:32:26  willuhn
  * *** empty log message ***
  *
