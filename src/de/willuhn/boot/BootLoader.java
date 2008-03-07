@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.13 $
- * $Date: 2008/02/13 13:33:46 $
+ * $Revision: 1.14 $
+ * $Date: 2008/03/07 11:32:26 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -36,28 +36,28 @@ public class BootLoader {
 
 	private int indent = 0;
 
+  private ProgressMonitor dummy   = new DummyMonitor();
 	private ProgressMonitor monitor = null;
 
-  /**
-   * ct.
-   * Erzeugt einen neuen BootLoader. 
-   * @param monitor Monitor, ueber den die Dienste ihre Informationen ueber den Boot-Vorgang ausgeben koennen.
-   */
-  public BootLoader(ProgressMonitor monitor)
-	{
-		this.monitor = monitor;
-	}
-  
   /**
    * Liefert den Progress-Monitor.
    * @return der Progress-Monitor.
    */
   public final ProgressMonitor getMonitor()
   {
-    return this.monitor;
+    return this.monitor == null ? this.dummy : this.monitor;
   }
 
-	/**
+  /**
+   * Speichert den Progress-Monitor.
+   * @param monitor Monitor, ueber den die Dienste ihre Informationen ueber den Boot-Vorgang ausgeben koennen.
+   */
+  public final void setMonitor(ProgressMonitor monitor)
+  {
+    this.monitor = monitor;
+  }
+
+  /**
    * Liefert den gewuenschten Dienst und bootet das System
    * bei Bedarf bis genau zu diesem.
 	 * @param target das gweuenschte (ung ggf zu bootende) Ziel.
@@ -200,11 +200,44 @@ public class BootLoader {
     }
   }
 
+  /**
+   * Dummy-Implementierung.
+   */
+  private class DummyMonitor implements ProgressMonitor
+  {
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setPercentComplete(int)
+     */
+    public void setPercentComplete(int percent) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#addPercentComplete(int)
+     */
+    public void addPercentComplete(int percent) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
+     */
+    public int getPercentComplete() {return 0;}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setStatus(int)
+     */
+    public void setStatus(int status) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#setStatusText(java.lang.String)
+     */
+    public void setStatusText(String text) {}
+    /**
+     * @see de.willuhn.util.ProgressMonitor#log(java.lang.String)
+     */
+    public void log(String msg) {}
+  }
 }
 
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.14  2008/03/07 11:32:26  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.13  2008/02/13 13:33:46  willuhn
  * @N timing information
  *
