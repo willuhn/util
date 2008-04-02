@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.16 $
- * $Date: 2007/09/01 21:38:35 $
+ * $Revision: 1.17 $
+ * $Date: 2008/04/02 21:16:30 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -12,10 +12,12 @@
  **********************************************************************/
 package de.willuhn.util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
@@ -371,9 +373,11 @@ public class Settings
    */
   private synchronized void store()
   {
+    OutputStream os = null;
     try
     {
-      properties.store(new FileOutputStream(this.file),null);
+      os = new BufferedOutputStream(new FileOutputStream(this.file));
+      properties.store(os,null);
     }
     catch (Exception e1)
     {
@@ -382,6 +386,17 @@ public class Settings
     finally
     {
       this.lastModified = this.file.lastModified();
+      if (os != null)
+      {
+        try
+        {
+          os.close();
+        }
+        catch (Exception e)
+        {
+          Logger.error("unable to close settings file: " + this.file.getAbsolutePath(),e);
+        }
+      }
     }
   }
 
@@ -419,6 +434,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.17  2008/04/02 21:16:30  willuhn
+ * @B OutputStream not closed in store()
+ *
  * Revision 1.16  2007/09/01 21:38:35  willuhn
  * @B Bug 477
  *
