@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.10 $
- * $Date: 2008/05/19 10:02:38 $
+ * $Revision: 1.11 $
+ * $Date: 2008/05/19 22:19:54 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,17 +98,10 @@ public class I18N
 
 
 		Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
-    try
-    {
-      if (loader != null)
-        bundle = ResourceBundle.getBundle(resourcePath,l,loader);
-      else
-        bundle = ResourceBundle.getBundle(resourcePath,l);
-    }
-    catch (Exception e)
-    {
-      Logger.error("unable to load resource bundle - strings will not be translated",e);
-    }
+  	if (loader != null)
+      bundle = ResourceBundle.getBundle(resourcePath,l,loader);
+    else
+			bundle = ResourceBundle.getBundle(resourcePath,l);
   }
   
   /**
@@ -203,8 +196,8 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
- * Revision 1.10  2008/05/19 10:02:38  willuhn
- * @B ungueltige Resource-Bundle tolerieren
+ * Revision 1.11  2008/05/19 22:19:54  willuhn
+ * @R UNDO: Fuehrt dazu, dass nicht mehr erkannt werden kann, ob ein Resource-Bundle ueberhaupt existiert.
  *
  * Revision 1.9  2007/03/26 23:58:19  willuhn
  * @C compiler warnings
