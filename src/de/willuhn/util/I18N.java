@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.9 $
- * $Date: 2007/03/26 23:58:19 $
+ * $Revision: 1.10 $
+ * $Date: 2008/05/19 10:02:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,10 +98,17 @@ public class I18N
 
 
 		Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
-  	if (loader != null)
-      bundle = ResourceBundle.getBundle(resourcePath,l,loader);
-    else
-			bundle = ResourceBundle.getBundle(resourcePath,l);
+    try
+    {
+      if (loader != null)
+        bundle = ResourceBundle.getBundle(resourcePath,l,loader);
+      else
+        bundle = ResourceBundle.getBundle(resourcePath,l);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load resource bundle - strings will not be translated",e);
+    }
   }
   
   /**
@@ -196,6 +203,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.10  2008/05/19 10:02:38  willuhn
+ * @B ungueltige Resource-Bundle tolerieren
+ *
  * Revision 1.9  2007/03/26 23:58:19  willuhn
  * @C compiler warnings
  *
