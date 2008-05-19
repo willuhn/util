@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.12 $
- * $Date: 2008/05/19 22:25:55 $
+ * $Revision: 1.13 $
+ * $Date: 2008/05/19 22:29:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,6 +98,9 @@ public class I18N
 
     Logger.info("loading resource bundle " + resourcePath + " for locale " + (l == null ? "<default>" : l.toString()));
 
+    if (l == null || resourcePath == null)
+      return;
+    
   	if (loader != null)
       bundle = ResourceBundle.getBundle(resourcePath,l,loader);
     else
@@ -196,6 +199,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.13  2008/05/19 22:29:49  willuhn
+ * @B NPE
+ *
  * Revision 1.12  2008/05/19 22:25:55  willuhn
  * @B NPE
  *
