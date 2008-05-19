@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.11 $
- * $Date: 2008/05/19 22:19:54 $
+ * $Revision: 1.12 $
+ * $Date: 2008/05/19 22:25:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -96,8 +96,8 @@ public class I18N
     else
       this.locale = l;
 
+    Logger.info("loading resource bundle " + resourcePath + " for locale " + (l == null ? "<default>" : l.toString()));
 
-		Logger.info("loading resource bundle " + resourcePath + " for locale " + l.toString());
   	if (loader != null)
       bundle = ResourceBundle.getBundle(resourcePath,l,loader);
     else
@@ -196,6 +196,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.12  2008/05/19 22:25:55  willuhn
+ * @B NPE
+ *
  * Revision 1.11  2008/05/19 22:19:54  willuhn
  * @R UNDO: Fuehrt dazu, dass nicht mehr erkannt werden kann, ob ein Resource-Bundle ueberhaupt existiert.
  *
