@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.13 $
- * $Date: 2007/04/11 23:59:22 $
+ * $Revision: 1.14 $
+ * $Date: 2008/06/13 13:40:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -222,10 +222,24 @@ public class Logger
    */
   public static void write(Level level, String message, Throwable t)
   {
-		// Wir checken, ob der uebergebene Level mindestens genauso wertig ist,
-		// wie unser aktueller
-  	if (level.getValue() < Logger.level.getValue())
-  		return;
+		write(level,null,null,null,message,t);
+  }
+  
+  /**
+   * Schreibt eine Log-Meldung mit direkter Angabe des Log-Levels.
+   * @param level Log-Levels.
+   * @param host optionale Angabe des Hostnamens.
+   * @param clazz Name der loggenden Klasse.
+   * @param method Name der loggenden Funktion.
+   * @param message zu loggende Nachricht.
+   * @param t optionale Angabe einer Exception.
+   */
+  public static void write(Level level, String host, String clazz, String method, String message, Throwable t)
+  {
+    // Wir checken, ob der uebergebene Level mindestens genauso wertig ist,
+    // wie unser aktueller
+    if (level.getValue() < Logger.level.getValue())
+      return;
 
     if (t != null)
     {
@@ -243,26 +257,26 @@ public class Logger
       }
     }
 
-    String clazz = null;
-		String method = null;
-    
-    // Wir suchen den Verursacher, in dem wir den Stacktrace hochwandern,
-    // bis wir nicht mehr selbst drin stehen
-		StackTraceElement[] stack = new Throwable().getStackTrace();
-    if (stack != null)
+    if (clazz == null || method == null)
     {
-      for (int i=0;i<stack.length;++i)
+      // Wir suchen den Verursacher, in dem wir den Stacktrace hochwandern,
+      // bis wir nicht mehr selbst drin stehen
+      StackTraceElement[] stack = new Throwable().getStackTrace();
+      if (stack != null)
       {
-        clazz = stack[i].getClassName();
-        method = stack[i].getMethodName();
-        if (!Logger.class.getName().equals(clazz))
-          break;
+        for (int i=0;i<stack.length;++i)
+        {
+          clazz = stack[i].getClassName();
+          method = stack[i].getMethodName();
+          if (!Logger.class.getName().equals(clazz))
+            break;
+        }
       }
     }
-		
-		write(new Message(new Date(),level,clazz,method,message));
+
+    write(new Message(new Date(),level,host,clazz,method,message));
   }
-  
+
   /**
    * Schreibt eine fertige Message ins Log.
    * @param message zu loggende Nachricht.
@@ -406,6 +420,10 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.14  2008/06/13 13:40:47  willuhn
+ * @N Class und Method kann nun explizit angegeben werden
+ * @N Hostname kann mitgeloggt werden
+ *
  * Revision 1.13  2007/04/11 23:59:22  willuhn
  * @N Log-Adapter fuer Java-Logging
  *

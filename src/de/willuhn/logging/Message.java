@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Message.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/12/31 19:34:22 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/13 13:40:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,28 +21,38 @@ public class Message
 {
 	private Date date 	  = null;
 	private Level level   = null;
+  private String host   = null;
 	private String text   = null;
 	private String clazz  = null;
 	private String method = null;
 
-	/**
-	 * ct.
+  /**
+   * ct.
    * @param d
    * @param l
    * @param clazz
    * @param method
    * @param text
    */
-  Message(
-		Date d,
-		Level l,
-		String clazz,
-		String method,
-		String text
-	)
+  Message(Date d, Level l, String clazz, String method, String text)
+  {
+    this(d,l,null,clazz,method,text);
+  }
+  
+	/**
+	 * ct.
+   * @param d
+   * @param l
+   * @param host
+   * @param clazz
+   * @param method
+   * @param text
+   */
+  Message(Date d, Level l, String host, String clazz, String method, String text)
 	{
 		this.date = d;
 		this.level = l;
+    this.host = host;
 		this.clazz = clazz;
 		this.method = method;
 		this.text = text;
@@ -65,6 +75,15 @@ public class Message
 	{
 		return level;
 	}
+  
+  /**
+   * Liefert den Hostnamen oder <code>null</code> wenn es Localhost ist oder er nicht angegeben ist.
+   * @return der Hostname oder <code>null</code>.
+   */
+  public String getHost()
+  {
+    return this.host;
+  }
 
 	/**
 	 * Liefert die eigentliche Nachricht.
@@ -112,6 +131,10 @@ public class Message
 
 /**********************************************************************
  * $Log: Message.java,v $
+ * Revision 1.2  2008/06/13 13:40:47  willuhn
+ * @N Class und Method kann nun explizit angegeben werden
+ * @N Hostname kann mitgeloggt werden
+ *
  * Revision 1.1  2004/12/31 19:34:22  willuhn
  * @C some logging refactoring
  * @N syslog support for logging
