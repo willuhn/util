@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Message.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/13 13:40:47 $
+ * $Revision: 1.3 $
+ * $Date: 2008/06/13 13:48:01 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -12,6 +12,7 @@
  **********************************************************************/
 package de.willuhn.logging;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -116,11 +117,37 @@ public class Message
    */
   public String toString()
   {
-		StringBuffer sb = new StringBuffer("[" + getDate().toString() + "]" +
-							 												 "[" + getLevel().getName() + "]");
+    StringBuffer sb = new StringBuffer();
+    if (this.host != null && this.host.length() > 0)
+    {
+      sb.append("[");
+      sb.append(host);
+      sb.append("]");
+    }
+    
+    if (this.date != null)
+    {
+      sb.append("[");
+      sb.append(this.date.toString());
+      sb.append("]");
+    }
+    
+    if (this.level != null)
+    {
+      sb.append("[");
+      sb.append(this.level.getName());
+      sb.append("]");
+    }
+    
 		if (clazz != null && method != null)
-			sb.append("[" + clazz + "." + method + "]");
-
+    {
+      sb.append("[");
+      sb.append(clazz);
+      sb.append(".");
+      sb.append(method);
+      sb.append("]");
+    }
+    
 		sb.append(" ");
 		sb.append(text);
 		return sb.toString();
@@ -131,6 +158,9 @@ public class Message
 
 /**********************************************************************
  * $Log: Message.java,v $
+ * Revision 1.3  2008/06/13 13:48:01  willuhn
+ * @N Hostname mit ausgeben
+ *
  * Revision 1.2  2008/06/13 13:40:47  willuhn
  * @N Class und Method kann nun explizit angegeben werden
  * @N Hostname kann mitgeloggt werden
