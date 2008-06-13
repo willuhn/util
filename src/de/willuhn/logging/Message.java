@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Message.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/06/13 13:48:01 $
+ * $Revision: 1.4 $
+ * $Date: 2008/06/13 13:48:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -12,7 +12,6 @@
  **********************************************************************/
 package de.willuhn.logging;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -158,6 +157,9 @@ public class Message
 
 /**********************************************************************
  * $Log: Message.java,v $
+ * Revision 1.4  2008/06/13 13:48:17  willuhn
+ * @R removed unused import
+ *
  * Revision 1.3  2008/06/13 13:48:01  willuhn
  * @N Hostname mit ausgeben
  *
