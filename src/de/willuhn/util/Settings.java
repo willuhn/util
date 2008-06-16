@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.18 $
- * $Date: 2008/06/16 22:01:36 $
+ * $Revision: 1.19 $
+ * $Date: 2008/06/16 22:04:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -84,7 +84,8 @@ public class Settings
     this.properties = new Properties();
 
     // Checken, ob System-Presets existieren
-    if (systemPath != null)
+    // Uebernehmen wir nur, wenn die Datei noch nicht im User-Path existiert
+    if (systemPath != null && !this.file.exists())
     {
       File systemPresets = new File(systemPath + File.separator + clazz.getName() + ".properties");
       if (systemPresets.exists() && systemPresets.canRead())
@@ -431,6 +432,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.19  2008/06/16 22:04:20  willuhn
+ * @N System-Presets nur uebernehmen, wenn noch keine User-Config vorhanden
+ *
  * Revision 1.18  2008/06/16 22:01:36  willuhn
  * @B Uebernehmen der System-Presets
  *
