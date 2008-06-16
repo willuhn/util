@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.17 $
- * $Date: 2008/04/02 21:16:30 $
+ * $Revision: 1.18 $
+ * $Date: 2008/06/16 22:01:36 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -81,8 +81,7 @@ public class Settings
   {
     // Filenamen ermitteln
     this.file = new File(userPath + File.separator + clazz.getName() + ".properties");
-
-    Properties presets = null;
+    this.properties = new Properties();
 
     // Checken, ob System-Presets existieren
     if (systemPath != null)
@@ -93,19 +92,17 @@ public class Settings
         try
         {
           Logger.debug("loading system presets from " + systemPresets.getAbsolutePath());
-          presets = new Properties();
+          Properties presets = new Properties();
           presets.load(new FileInputStream(systemPresets));
+          this.properties.putAll(presets);
         }
         catch (Exception e1)
         {
           Logger.error("unable to load system presets from " + systemPresets.getAbsolutePath(),e1);
-          presets = null;
         }
       }
     }
     
-    this.properties = new Properties(presets);
-
     // wir erzeugen die Datei, wenn sie noch nicht existiert
     if (!this.file.exists())
       store();
@@ -434,6 +431,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.18  2008/06/16 22:01:36  willuhn
+ * @B Uebernehmen der System-Presets
+ *
  * Revision 1.17  2008/04/02 21:16:30  willuhn
  * @B OutputStream not closed in store()
  *
