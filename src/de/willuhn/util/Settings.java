@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.19 $
- * $Date: 2008/06/16 22:04:20 $
+ * $Revision: 1.20 $
+ * $Date: 2008/06/17 10:51:06 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -84,14 +84,16 @@ public class Settings
     this.properties = new Properties();
 
     // Checken, ob System-Presets existieren
-    // Uebernehmen wir nur, wenn die Datei noch nicht im User-Path existiert
-    if (systemPath != null && !this.file.exists())
+    if (systemPath != null)
     {
       File systemPresets = new File(systemPath + File.separator + clazz.getName() + ".properties");
       if (systemPresets.exists() && systemPresets.canRead())
       {
         try
         {
+          // "this.properties" wird initial mit den System-Vorgaben befuellt.
+          // Wenn der User eigene Werte definiert hat, ersetzen seine Werte anschliessend
+          // in "reload()" die System-Vorgaben
           Logger.debug("loading system presets from " + systemPresets.getAbsolutePath());
           Properties presets = new Properties();
           presets.load(new FileInputStream(systemPresets));
@@ -104,10 +106,8 @@ public class Settings
       }
     }
     
-    // wir erzeugen die Datei, wenn sie noch nicht existiert
-    if (!this.file.exists())
-      store();
-    else
+    // Parameter laden, wenn die Datei existiert
+    if (this.file.exists())
       reload();
   }
 
@@ -432,6 +432,10 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.20  2008/06/17 10:51:06  willuhn
+ * @C User-Parameter ueberschreiben System-Parameter
+ * @C properties-Dateien nicht sofort anlegen - erzeugt sonst eine Fuelle von leeren Config-Dateien
+ *
  * Revision 1.19  2008/06/16 22:04:20  willuhn
  * @N System-Presets nur uebernehmen, wenn noch keine User-Config vorhanden
  *
