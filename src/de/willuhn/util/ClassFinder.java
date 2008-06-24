@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ClassFinder.java,v $
- * $Revision: 1.7 $
- * $Date: 2007/10/25 23:13:22 $
+ * $Revision: 1.8 $
+ * $Date: 2008/06/24 13:47:04 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -75,7 +75,7 @@ public class ClassFinder
     if (found != null && found.length > 0)
       return found;
 
-    // Wenn eines eine Implementierung ist, liefern
+    // Wenn es eine Implementierung ist, liefern
     // wir sie direkt zurueck
     if (isImpl(interphase))
       return new Class[] {interphase};
@@ -122,15 +122,8 @@ public class ClassFinder
 			if (duplicates.get(test) != null)
 				continue;
 
-			// checken, ob die Klasse das Interface irgendwie implementiert
-			if (implementor(test,interphase))
+      if (interphase.isAssignableFrom(test))
 			{
-				// hier, wir haben einen direkten Implementor.
-				// Wenn das der Fall ist, schenken wir uns
-				// die Suche in der Ableitungshierachie dieser
-				// Klasse (macht ja auch keinen Sinn, weil die
-				// Parent-Klassen dann meist abstrakt sind)
-				// und springen gleich zur naechsten.
 				ranking.add(test);
 				duplicates.put(test,test);
 				continue;
@@ -142,14 +135,14 @@ public class ClassFinder
 		if (ranking.size() == 0)
 		{
 			// Mift, ueberhaupt nix gefunden
-			Logger.debug("multipleClassLoader.ClassFinder: ...no implementor found for " + interphase.getName());
+			Logger.debug("...no implementor found for " + interphase.getName());
 			throw new ClassNotFoundException("no implementor found for " + interphase.getName());
 		}
 
 		// ok, wir haben was. Das tun wir in den Cache als Array von Class-Objekten
 		Class[] classes = (Class[]) ranking.toArray(new Class[ranking.size()]);
 		cache.put(interphase,classes);
-		Logger.debug("multipleClassLoader.ClassFinder:   [used time: " + (System.currentTimeMillis() - start) + " millis]");
+		Logger.debug("used time to search for implementors of " + interphase.getName() + ": " + (System.currentTimeMillis() - start) + " millis]");
 		return classes;
 
 	}
@@ -174,69 +167,14 @@ public class ClassFinder
     
     return true;
   }
-  
-	/**
-	 * Checkt, ob die Klasse das Interface implementiert.
-	 * @param test Test-Klasse.
-	 * @param interphase zu pruefendes Interface.
-	 * @return true, wenn sie es <b>direkt</b> implementiert.
-	 */
-	private boolean directImplementor(Class test, Class interphase)
-	{
-		// Im ersten Schritt pruefen wir, ob die Klasse das Interface
-		// direkt implementiert
-		Class[] interfaces = test.getInterfaces();
-		for (int j=0;j<interfaces.length;++j)
-		{
-			if (interfaces[j].equals(interphase))
-				return true;
-
-      // Bevor wir die naechste Iteration durchlaufen muessen wir nun
-			// aber noch pruefen, ob das aktuell getestete Interface vielleicht
-			// vom gewuenschten Interface abgeleitet ist. Also z.Bsp:
-			// interface a;
-			// interface b extends a;
-			// class c implements b;
-			if (implementor(interfaces[j],interphase))
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Checkt rekursiv in der Ableitungshierachie, ob die Klasse das
-	 * Interface irgendwie implementiert.
-	 * @param test Test-Klasse.
-	 * @param interphase zu pruefendes Interface.
-	 * @return true, wenn sie es implementiert.
-	 */
-	private boolean implementor(Class test, Class interphase)
-	{
-		if (directImplementor(test,interphase))
-			return true;
-
-		// jetzt die Iteration
-		Class current = test;
-		Class parent = null;
-		while (true)
-		{
-			parent = current.getSuperclass();
-			if (parent == null)
-				return false;
-
-			if (!parent.isInterface() &&
-					directImplementor(parent,interphase))
-			{
-				return true;
-			}
-			current = parent; // naechste Iteration
-		}
-	}
 }
 
 
 /**********************************************************************
  * $Log: ClassFinder.java,v $
+ * Revision 1.8  2008/06/24 13:47:04  willuhn
+ * @N Suche nach Implementierungen mittels "isAssignableFrom" statt eigener Suche nach Interfaces
+ *
  * Revision 1.7  2007/10/25 23:13:22  willuhn
  * @N Support fuer kaskadierende Classloader und -finder
  * @C Classfinder ignoriert jetzt Inner-Classes
