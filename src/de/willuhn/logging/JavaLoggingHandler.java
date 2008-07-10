@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/JavaLoggingHandler.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/04/11 23:59:22 $
+ * $Revision: 1.2 $
+ * $Date: 2008/07/10 09:08:08 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,7 +16,6 @@ package de.willuhn.logging;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Handler;
@@ -50,21 +49,8 @@ public class JavaLoggingHandler extends Handler
       logMapping.put(java.util.logging.Level.WARNING,Level.WARN);
 
       LogManager lm = LogManager.getLogManager();
-      Enumeration loggers = lm.getLoggerNames();
-      while (loggers.hasMoreElements())
-      {
-        try
-        {
-          String name = (String) loggers.nextElement();
-          Logger.info("attaching to java logger " + name);
-          java.util.logging.Logger logger = lm.getLogger(name);
-          logger.addHandler(singleton);
-        }
-        catch (Exception e)
-        {
-          Logger.error("unable to attach",e);
-        }
-      }
+      java.util.logging.Logger root = lm.getLogger("");
+      root.addHandler(singleton);
     }
     catch (Exception e)
     {
@@ -129,6 +115,9 @@ public class JavaLoggingHandler extends Handler
 
 /**********************************************************************
  * $Log: JavaLoggingHandler.java,v $
+ * Revision 1.2  2008/07/10 09:08:08  willuhn
+ * @JavaLoggingHandler direkt am Java Root-Logger registrieren
+ *
  * Revision 1.1  2007/04/11 23:59:22  willuhn
  * @N Log-Adapter fuer Java-Logging
  *
