@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.32 $
- * $Date: 2007/12/21 16:49:06 $
+ * $Revision: 1.33 $
+ * $Date: 2008/09/12 08:16:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -221,15 +221,21 @@ public class MultipleClassLoader extends ClassLoader
       // den UCL fragen und nicht extra nochmal den System-Classloader
       return findVia(ucl,className);
     }
-    catch (LinkageError r) {
+    catch (LinkageError r)
+    {
       error = r;
+    }
+    catch (ClassNotFoundException e)
+    {
+      // kann passieren - wir suchen im naechsten Classloader
     }
 
     // ok, wir fragen die anderen ClassLoader
     ClassLoader l = null;
     for (int i=0;i<loaders.size();++i)
     {
-      try {
+      try
+      {
         l = (ClassLoader) loaders.get(i);
         return findVia(l,className);
       }
@@ -237,9 +243,17 @@ public class MultipleClassLoader extends ClassLoader
       {
         error = r;
       }
+      catch (ClassNotFoundException e)
+      {
+        // kann passieren - wir suchen im naechsten Classloader
+      }
     }
     if (error != null)
       throw error;
+    
+    // Die oben weggeworfenee ClassNotFoundException muessen
+    // wir nicht aufheben, da in der ohnehin nicht mehr
+    // Informationen stehen als in unserer.
     throw new ClassNotFoundException("class not found: " + className);
   }
 
@@ -305,6 +319,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.33  2008/09/12 08:16:35  willuhn
+ * @B BUGZILLA 627
+ *
  * Revision 1.32  2007/12/21 16:49:06  willuhn
  * @C Classloader wirft jetzt auch ggf. LinkageErrors - wurden vorher vom Classloader verschluckt und lediglich als "ClassNotFoundException" gemeldet
  *
