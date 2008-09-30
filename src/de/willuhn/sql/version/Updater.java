@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.6 $
- * $Date: 2007/12/11 15:19:20 $
+ * $Revision: 1.7 $
+ * $Date: 2008/09/30 08:33:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -87,6 +87,7 @@ public class Updater
     // wir iterieren ueber die Liste, und ueberspringen alle
     // bis zur aktuellen Version.
     ArrayList updates = new ArrayList();
+    int maxNumber = 0;
     for (int i=0;i<files.length;++i)
     {
       File current = files[i];
@@ -108,12 +109,17 @@ public class Updater
         Logger.error("invalid update filename: " + current.getName() + ", skipping");
         continue;
       }
+      if (number > maxNumber)
+        maxNumber = number;
 
       // Wir uebernehmen das Update nur, wenn dessen
       // Versionsnummer hoeher als die aktuelle ist.
       if (number > currentVersion)
         updates.add(current);
     }
+
+    if (currentVersion > maxNumber)
+      throw new ApplicationException("Die Datenbank wurde bereits mit einer neueren Programmversion geöffnet");
 
     // Keine Updates gefunden
     if (updates.size() == 0)
@@ -293,6 +299,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.7  2008/09/30 08:33:20  willuhn
+ * @N Heiners Patch, um beim Update einen Fehler zu werfen, wenn DB-Version aktueller als Programmversion ist
+ *
  * Revision 1.6  2007/12/11 15:19:20  willuhn
  * @N Alles ausser *.class und *.sql ignorieren
  *
