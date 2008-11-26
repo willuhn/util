@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/ScriptExecutor.java,v $
- * $Revision: 1.5 $
- * $Date: 2006/06/12 22:10:48 $
+ * $Revision: 1.6 $
+ * $Date: 2008/11/26 22:11:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,12 +15,15 @@ package de.willuhn.sql;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ConsoleProgessMonitor;
 import de.willuhn.util.ProgressMonitor;
 
 /**
@@ -29,6 +32,40 @@ import de.willuhn.util.ProgressMonitor;
  */
 public class ScriptExecutor
 {
+  /**
+   * Main-Methode zum Starten an der Kommandozeile.
+   * @param args Kommandozeilen-Parameter.
+   * @throws Exception
+   */
+  public static void main(String args[]) throws Exception
+  {
+    if (args == null || args.length != 2)
+      die("usage: java -cp de_willuhn_util.jar [jdbc-driver] [jdbc-url] < [sql-script.sql]");
+    
+    Class.forName(args[0]);
+    Connection conn = null;
+    try
+    {
+      conn = DriverManager.getConnection(args[1]);
+      execute(new InputStreamReader(System.in),conn,new ConsoleProgessMonitor());
+    }
+    finally
+    {
+      if (conn != null)
+        conn.close();
+    }
+  }
+  
+  /**
+   * Zeigt eine Fehlermeldung an und beendet das Programm.
+   * @param msg die Meldung.
+   */
+  private static void die(String msg)
+  {
+    System.err.println(msg);
+    System.exit(1);
+  }
+  
   /**
    * Fuehrt ein SQL-Script auf einer Datenbank-Verbindung aus.
    * Hinweis: Weder die Connection noch der Reader wird geschlossen.
@@ -185,6 +222,10 @@ public class ScriptExecutor
 
 /*********************************************************************
  * $Log: ScriptExecutor.java,v $
+ * Revision 1.6  2008/11/26 22:11:35  willuhn
+ * @N Console-Progressmonitor
+ * @N main()-Funktion fuer ScriptExecutor
+ *
  * Revision 1.5  2006/06/12 22:10:48  willuhn
  * *** empty log message ***
  *
