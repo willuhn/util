@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.7 $
- * $Date: 2008/03/07 00:46:53 $
+ * $Revision: 1.8 $
+ * $Date: 2008/12/16 16:11:30 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ProgressMonitor;
 
 /**
@@ -56,10 +57,11 @@ public class ZipExtractor extends AbstractZipSupport
     monitor.setStatus(ProgressMonitor.STATUS_RUNNING);
     monitor.setStatusText("extracting zip file " + zip.getName() + " to " + targetDirectory.getAbsolutePath());
     monitor.log("extracting zip file " + zip.getName() + " to " + targetDirectory.getAbsolutePath());
+    Logger.info("extracting zip file " + zip.getName() + " to " + targetDirectory.getAbsolutePath());
 
     if (!targetDirectory.exists())
     {
-      monitor.log("  creating directory " + targetDirectory.getAbsolutePath());
+      monitor.log("creating directory " + targetDirectory.getAbsolutePath());
       if (!targetDirectory.mkdirs())
         throw new IOException("unable to create target directory " + targetDirectory.getAbsolutePath());
     }
@@ -70,7 +72,7 @@ public class ZipExtractor extends AbstractZipSupport
     // Ueber die Anzahl der Elemente in der ZIP-Datei haben wir
     // einen Anhaltspunkt fuer die Fortschrittsanzeige.
     int size = zip.size();
-    monitor.log("  uncompressing " + size + " elements");
+    monitor.log("uncompressing " + size + " elements");
 
     String currentName = null;
     File currentFile   = null;
@@ -86,25 +88,24 @@ public class ZipExtractor extends AbstractZipSupport
         ZipEntry entry = (ZipEntry) entries.nextElement();
         currentName = entry.getName();
 
-        monitor.log("  processing " + currentName);
-
         // Fortschritt neu berechnen
         monitor.setPercentComplete(i * 100 / size);
         i++;
 
         currentFile = new File(targetDirectory,currentName);
+        Logger.info(currentName);
 
         // Issn Verzeichnis, legen wir ggf. an.
         if (entry.isDirectory())
         {
           if (!currentFile.exists())
           {
-            monitor.log("    creating directory " + currentFile.getAbsolutePath());
+            Logger.debug("  creating directory");
             currentFile.mkdirs();
           }
           else
           {
-            monitor.log("    directory " + currentFile.getAbsolutePath() + " allready exists, skipping");
+            Logger.info("  directory allready exists, skipping");
           }
           continue;
         }         
@@ -125,7 +126,7 @@ public class ZipExtractor extends AbstractZipSupport
           File f = new File(targetDirectory,path);
           if (!f.exists())
           {
-            monitor.log("    creating directory " + f.getAbsolutePath());
+            Logger.debug("  creating directory");
             if (!f.mkdirs())
               throw new IOException("unable to create directory " + f.getAbsolutePath());
           }
@@ -141,25 +142,25 @@ public class ZipExtractor extends AbstractZipSupport
           long fileTime = currentFile.lastModified();
           if (zipTime > fileTime)
           {
-            monitor.log("    zip entry is newer, replacing");
+            Logger.info("  zip entry is newer, replacing");
             backup = new File(currentFile.getAbsolutePath() + ".bak");
             currentFile.renameTo(backup); // umbenennen
             currentFile = new File(targetDirectory,currentName); // wir erzeugen eine neue Referenz
           }
           else
           {
-            monitor.log("    skipping, allready exists");
+            Logger.info("  skipping, allready exists");
             continue;
           }
         }
 
         // Issne Datei, neu erzeugen.
-        monitor.log("    creating file " + currentFile.getAbsolutePath());
+        Logger.info("    creating file " + currentFile.getAbsolutePath());
+        monitor.log(currentFile.getAbsolutePath());
       
         if (!currentFile.createNewFile())
           throw new IOException("unable to create file " + currentFile.getAbsolutePath());
       
-        monitor.log("    uncompressing");
         InputStream is  = zip.getInputStream(entry);
         OutputStream os = new BufferedOutputStream(new FileOutputStream(currentFile));
         copy(is,os);
@@ -215,6 +216,9 @@ public class ZipExtractor extends AbstractZipSupport
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.8  2008/12/16 16:11:30  willuhn
+ * @N Uebersichtlichere Log-Ausgaben
+ *
  * Revision 1.7  2008/03/07 00:46:53  willuhn
  * @N ZipCreator
  *
