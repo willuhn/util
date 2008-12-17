@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.8 $
- * $Date: 2008/12/16 16:11:30 $
+ * $Revision: 1.9 $
+ * $Date: 2008/12/17 00:47:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -155,7 +155,6 @@ public class ZipExtractor extends AbstractZipSupport
         }
 
         // Issne Datei, neu erzeugen.
-        Logger.info("    creating file " + currentFile.getAbsolutePath());
         monitor.log(currentFile.getAbsolutePath());
       
         if (!currentFile.createNewFile())
@@ -216,6 +215,9 @@ public class ZipExtractor extends AbstractZipSupport
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.9  2008/12/17 00:47:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.8  2008/12/16 16:11:30  willuhn
  * @N Uebersichtlichere Log-Ausgaben
  *
