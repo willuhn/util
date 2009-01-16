@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/CheckSum.java,v $
- * $Revision: 1.2 $
- * $Date: 2009/01/16 16:39:56 $
+ * $Revision: 1.3 $
+ * $Date: 2009/01/16 17:08:58 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -55,7 +55,7 @@ public class CheckSum
         Logger.debug(s);
         sum.append(s + "\n");
       }
-      return Checksum.checksum(sum.toString().getBytes(),Checksum.MD5);
+      return Checksum.md5(sum.toString().getBytes());
     }
     finally
     {
@@ -76,6 +76,9 @@ public class CheckSum
 
 /*********************************************************************
  * $Log: CheckSum.java,v $
+ * Revision 1.3  2009/01/16 17:08:58  willuhn
+ * @C Checksum#checksum fuehrt kein Base64-Encoding durch
+ *
  * Revision 1.2  2009/01/16 16:39:56  willuhn
  * @N Funktion zum Erzeugen von SHA1-Checksummen
  * @N Funktion zum Erzeugen von Checksummen aus InputStreams

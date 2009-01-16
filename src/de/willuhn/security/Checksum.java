@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/security/Checksum.java,v $
- * $Revision: 1.3 $
- * $Date: 2009/01/16 16:39:56 $
+ * $Revision: 1.4 $
+ * $Date: 2009/01/16 17:08:58 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -39,15 +39,14 @@ public class Checksum
   }
 
   /**
-   * Liefert eine MD5-Checksumme der Daten.
+   * Liefert eine MD5-Checksumme der Daten im Base64-Format.
    * @param text
    * @return die Checksumme.
    * @throws NoSuchAlgorithmException
-   * @deprecated Bitte Checksum#checksum(byte[],String) verwenden.
    */
   public final static String md5(byte[] text) throws NoSuchAlgorithmException
 	{
-    return checksum(text,Checksum.MD5);
+    return Base64.encode(checksum(text,Checksum.MD5));
 	}
   
   /**
@@ -56,14 +55,14 @@ public class Checksum
    * @return die Checksumme.
    * @throws NoSuchAlgorithmException
    */
-  public final static String checksum(byte[] text, String alg) throws NoSuchAlgorithmException
+  public final static byte[] checksum(byte[] text, String alg) throws NoSuchAlgorithmException
   {
     MessageDigest md = MessageDigest.getInstance(alg);
-    return Base64.encode(md.digest(text));
+    return md.digest(text);
   }
   
   /**
-   * Liefert eine Checksumme der Daten im Base64-Format.
+   * Liefert eine Checksumme der Daten.
    * @param data InputStream mit den Daten.
    * Hinweis: Die Funktion kuemmert sich NICHT um das Schliessen des Streams.
    * @param alg Algorithmus.
@@ -73,7 +72,7 @@ public class Checksum
    * @throws NoSuchAlgorithmException
    * @throws IOException
    */
-  public static String checksum(InputStream data, String alg) throws NoSuchAlgorithmException, IOException
+  public static byte[] checksum(InputStream data, String alg) throws NoSuchAlgorithmException, IOException
   {
     MessageDigest md = MessageDigest.getInstance(alg);
     byte[] buf = new byte[4096];
@@ -81,13 +80,16 @@ public class Checksum
     while ((read = data.read(buf)) != -1)
       md.update(buf,0,read);
 
-    return Base64.encode(md.digest());
+    return md.digest();
   }
 }
 
 
 /**********************************************************************
  * $Log: Checksum.java,v $
+ * Revision 1.4  2009/01/16 17:08:58  willuhn
+ * @C Checksum#checksum fuehrt kein Base64-Encoding durch
+ *
  * Revision 1.3  2009/01/16 16:39:56  willuhn
  * @N Funktion zum Erzeugen von SHA1-Checksummen
  * @N Funktion zum Erzeugen von Checksummen aus InputStreams
