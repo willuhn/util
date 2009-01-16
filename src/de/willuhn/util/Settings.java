@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.20 $
- * $Date: 2008/06/17 10:51:06 $
+ * $Revision: 1.21 $
+ * $Date: 2009/01/16 16:39:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -47,11 +47,6 @@ public class Settings
   private double lastModified   = 0;
   private Properties properties = null;
 	private boolean storeWhenRead = true;
-
-  private Settings()
-  {
-    // disabled
-  }
 
   /**
    * Erzeugt eine neue Instanz der Settings, die exclusiv
@@ -432,6 +427,10 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.21  2009/01/16 16:39:56  willuhn
+ * @N Funktion zum Erzeugen von SHA1-Checksummen
+ * @N Funktion zum Erzeugen von Checksummen aus InputStreams
+ *
  * Revision 1.20  2008/06/17 10:51:06  willuhn
  * @C User-Parameter ueberschreiben System-Parameter
  * @C properties-Dateien nicht sofort anlegen - erzeugt sonst eine Fuelle von leeren Config-Dateien

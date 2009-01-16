@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/CheckSum.java,v $
- * $Revision: 1.1 $
- * $Date: 2006/01/30 14:54:11 $
- * $Author: web0 $
+ * $Revision: 1.2 $
+ * $Date: 2009/01/16 16:39:56 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -55,7 +55,7 @@ public class CheckSum
         Logger.debug(s);
         sum.append(s + "\n");
       }
-      return Checksum.md5(sum.toString().getBytes());
+      return Checksum.checksum(sum.toString().getBytes(),Checksum.MD5);
     }
     finally
     {
@@ -76,6 +76,10 @@ public class CheckSum
 
 /*********************************************************************
  * $Log: CheckSum.java,v $
+ * Revision 1.2  2009/01/16 16:39:56  willuhn
+ * @N Funktion zum Erzeugen von SHA1-Checksummen
+ * @N Funktion zum Erzeugen von Checksummen aus InputStreams
+ *
  * Revision 1.1  2006/01/30 14:54:11  web0
  * @N de.willuhn.sql
  *
