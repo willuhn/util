@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/security/Checksum.java,v $
- * $Revision: 1.4 $
- * $Date: 2009/01/16 17:08:58 $
+ * $Revision: 1.5 $
+ * $Date: 2009/01/17 00:25:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -44,7 +44,7 @@ public class Checksum
    * @return die Checksumme.
    * @throws NoSuchAlgorithmException
    */
-  public final static String md5(byte[] text) throws NoSuchAlgorithmException
+  public static String md5(byte[] text) throws NoSuchAlgorithmException
 	{
     return Base64.encode(checksum(text,Checksum.MD5));
 	}
@@ -55,7 +55,7 @@ public class Checksum
    * @return die Checksumme.
    * @throws NoSuchAlgorithmException
    */
-  public final static byte[] checksum(byte[] text, String alg) throws NoSuchAlgorithmException
+  public static byte[] checksum(byte[] text, String alg) throws NoSuchAlgorithmException
   {
     MessageDigest md = MessageDigest.getInstance(alg);
     return md.digest(text);
@@ -87,6 +87,10 @@ public class Checksum
 
 /**********************************************************************
  * $Log: Checksum.java,v $
+ * Revision 1.5  2009/01/17 00:25:39  willuhn
+ * @N Programm zum Erstellen/Verifizieren von OpenSSL-kompatiblen Signaturen mit SHA1-Digest
+ * @N Java 1.5 compatibility
+ *
  * Revision 1.4  2009/01/16 17:08:58  willuhn
  * @C Checksum#checksum fuehrt kein Base64-Encoding durch
  *
