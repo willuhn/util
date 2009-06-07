@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/03/26 23:52:08 $
+ * $Revision: 1.6 $
+ * $Date: 2009/06/07 22:05:54 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,6 +41,7 @@ public class LogrotateTarget implements Target
   private File file = null;
   private OutputStream os = null;
   private boolean append = true;
+  private boolean skipRotate = false;
   
   private long maxLength = 1L * 1024L * 1024L;
   private boolean zip = true;
@@ -108,6 +109,9 @@ public class LogrotateTarget implements Target
    */
   private synchronized void checkRotate() throws IOException
   {
+    if (skipRotate)
+      return;
+    
     synchronized(os)
     {
       if (this.file.length() < this.maxLength)
@@ -145,7 +149,8 @@ public class LogrotateTarget implements Target
         }
         catch (Throwable t)
         {
-          Logger.error("error while rotating logfile",t);
+          Logger.error("error while rotating logfile, disable rotating",t);
+          skipRotate = true;
         }
         finally
         {
@@ -157,7 +162,8 @@ public class LogrotateTarget implements Target
             }
             catch (Exception e)
             {
-              Logger.error("error while closing outputstream");
+              Logger.error("error while closing outputstream, disable rotating");
+              skipRotate = true;
             }
           }
           if (is != null)
@@ -168,7 +174,8 @@ public class LogrotateTarget implements Target
             }
             catch (Exception e)
             {
-              Logger.error("error while closing inputstream");
+              Logger.error("error while closing inputstream, disable rotating");
+              skipRotate = true;
             }
           }
         }
@@ -183,7 +190,8 @@ public class LogrotateTarget implements Target
         }
         catch (FileCopy.FileExistsException e)
         {
-          Logger.error("unable to copy log file",e);
+          Logger.error("unable to copy log file, disable rotating",e);
+          skipRotate = true;
         }
       }
  
@@ -195,7 +203,8 @@ public class LogrotateTarget implements Target
       }
       else
       {
-        Logger.error("unable to delete old log file " + name + ", appending");
+        Logger.error("unable to delete old log file " + name + ", disable rotating");
+        skipRotate = true;
       }
       this.os = new FileOutputStream(this.file,this.append);
       Logger.info("logrotation done");
@@ -206,6 +215,9 @@ public class LogrotateTarget implements Target
 
 /*********************************************************************
  * $Log: LogrotateTarget.java,v $
+ * Revision 1.6  2009/06/07 22:05:54  willuhn
+ * @N Logfile-Rotate ausschalten, wenn es fehlschlug - koennte sonst eine Rekursion ausloesen
+ *
  * Revision 1.5  2007/03/26 23:52:08  willuhn
  * @N plattform specific line separator in logfiles
  *
