@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipExtractor.java,v $
- * $Revision: 1.9 $
- * $Date: 2008/12/17 00:47:49 $
+ * $Revision: 1.10 $
+ * $Date: 2009/06/12 11:12:44 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -161,6 +161,11 @@ public class ZipExtractor extends AbstractZipSupport
           throw new IOException("unable to create file " + currentFile.getAbsolutePath());
       
         InputStream is  = zip.getInputStream(entry);
+        if (is == null)
+        {
+          Logger.warn("  entry " + entry.getName() + " not found in archive, skipping");
+          continue;
+        }
         OutputStream os = new BufferedOutputStream(new FileOutputStream(currentFile));
         copy(is,os);
 
@@ -215,6 +220,9 @@ public class ZipExtractor extends AbstractZipSupport
 
 /*********************************************************************
  * $Log: ZipExtractor.java,v $
+ * Revision 1.10  2009/06/12 11:12:44  willuhn
+ * @N Falls ZIP-Entries kaputte Umlaute haben, kann es vorkommen, dass der zugehoerige InputStream nicht gefunden wird. Das warf eine NPE - jetzt werden die Entries (mit Warnung im Log) uebersprungen
+ *
  * Revision 1.9  2008/12/17 00:47:49  willuhn
  * *** empty log message ***
  *
