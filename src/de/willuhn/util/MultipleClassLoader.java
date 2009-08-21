@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.33 $
- * $Date: 2008/09/12 08:16:35 $
+ * $Revision: 1.34 $
+ * $Date: 2009/08/21 09:43:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,11 +14,13 @@
 package de.willuhn.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import de.willuhn.io.FileFinder;
@@ -168,8 +170,30 @@ public class MultipleClassLoader extends ClassLoader
       return is;
     return super.getResourceAsStream(name);
   }
+  
+  /**
+   * @see java.lang.ClassLoader#getResource(java.lang.String)
+   */
+  public URL getResource(String name)
+  {
+    URL url = ucl.getResource(name);
+    if (url != null)
+      return url;
+    return super.getResource(name);
+  }
 
-	/**
+  /**
+   * @see java.lang.ClassLoader#getResources(java.lang.String)
+   */
+  public Enumeration<URL> getResources(String name) throws IOException
+  {
+    Enumeration<URL> urls = ucl.getResources(name);
+    if (urls != null && urls.hasMoreElements())
+      return urls;
+    return super.getResources(name);
+  }
+
+  /**
 	 * @see java.lang.ClassLoader#findClass(java.lang.String)
 	 */
 	protected Class findClass(String name) throws ClassNotFoundException
@@ -319,6 +343,9 @@ public class MultipleClassLoader extends ClassLoader
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
+ * Revision 1.34  2009/08/21 09:43:22  willuhn
+ * @B Im MultipleClassloader waren die Methoden getResource und getResources noch nicht an den UCL delegiert worden. Das fuehrte z.Bsp. dazu, dass eine persistence.xml von JPA nicht gefunden wurde, wenn sie in einem Jameica-Plugin geladen wurde
+ *
  * Revision 1.33  2008/09/12 08:16:35  willuhn
  * @B BUGZILLA 627
  *
