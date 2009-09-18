@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.21 $
- * $Date: 2009/01/16 16:39:56 $
+ * $Revision: 1.22 $
+ * $Date: 2009/09/18 10:37:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -74,29 +74,42 @@ public class Settings
    */
   public Settings(String systemPath, String userPath, Class clazz)
   {
+    this(
+          (systemPath != null ? new File(systemPath + File.separator + clazz.getName() + ".properties") : null),
+          new File(userPath + File.separator + clazz.getName() + ".properties")
+    );
+  }
+
+  /**
+   * Erzeugt eine neue Instanz.
+   * @param systemFile Properties-Datei mit den System-Vorgaben.
+   * @param userFile Properties-Datei des Users, welche die System-Vorgaben ueberschreiben.
+   * @param clazz Klasse, fuer die diese Settings gelten.
+   */
+  public Settings(File systemFile, File userFile)
+  {
     // Filenamen ermitteln
-    this.file = new File(userPath + File.separator + clazz.getName() + ".properties");
+    this.file = userFile;
     this.properties = new Properties();
 
     // Checken, ob System-Presets existieren
-    if (systemPath != null)
+    if (systemFile != null)
     {
-      File systemPresets = new File(systemPath + File.separator + clazz.getName() + ".properties");
-      if (systemPresets.exists() && systemPresets.canRead())
+      if (systemFile.exists() && systemFile.canRead())
       {
         try
         {
           // "this.properties" wird initial mit den System-Vorgaben befuellt.
           // Wenn der User eigene Werte definiert hat, ersetzen seine Werte anschliessend
           // in "reload()" die System-Vorgaben
-          Logger.debug("loading system presets from " + systemPresets.getAbsolutePath());
+          Logger.debug("loading system presets from " + systemFile.getAbsolutePath());
           Properties presets = new Properties();
-          presets.load(new FileInputStream(systemPresets));
+          presets.load(new FileInputStream(systemFile));
           this.properties.putAll(presets);
         }
         catch (Exception e1)
         {
-          Logger.error("unable to load system presets from " + systemPresets.getAbsolutePath(),e1);
+          Logger.error("unable to load system presets from " + systemFile.getAbsolutePath(),e1);
         }
       }
     }
@@ -106,7 +119,7 @@ public class Settings
       reload();
   }
 
-	/**
+  /**
 	 * Legt fest, ob die Einstellungen schon beim Lesen gespeichert werden sollen.
 	 * Hintergrund: Jede Get-Funktion (getString(), getBoolean(),..) besitzt einen
 	 * Parameter mit dem Default-Wert falls der Parameter noch nicht existiert.
@@ -427,6 +440,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.22  2009/09/18 10:37:20  willuhn
+ * @N Neuer Konstruktor, mit dem der Dateiname der Config-Datei nun auch explizit angegeben werden kann.
+ *
  * Revision 1.21  2009/01/16 16:39:56  willuhn
  * @N Funktion zum Erzeugen von SHA1-Checksummen
  * @N Funktion zum Erzeugen von Checksummen aus InputStreams
