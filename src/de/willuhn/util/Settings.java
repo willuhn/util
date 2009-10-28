@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.22 $
- * $Date: 2009/09/18 10:37:20 $
+ * $Revision: 1.23 $
+ * $Date: 2009/10/28 11:23:00 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -205,6 +205,34 @@ public class Settings
 		return i;
 	}
 
+  /**
+   * Liefert den Wert des genannten Attributs als long.
+   * Wird das Attribut nicht gefunden oder hat keinen Wert, wird defaultValue zurueckgegeben.
+   * Hinweis: Die Funktion wirft keine NumberFormat-Exception, wenn der
+   * Wert nicht in eine Zahl gewandelt werden kann. Stattdessen wird der
+   * Default-Wert zurueckgegeben.
+   * @param name Name des Attributs.
+   * @param defaultValue DefaultWert, wenn das Attribut nicht existiert.
+   * @return der Wert des Attributs.
+   */
+  public long getLong(String name, long defaultValue)
+  {
+    reload();
+    String s = getProperty(name,""+defaultValue);
+    if (s != null) s = s.trim(); // BUGZILLA 477
+    long l = defaultValue;
+    try {
+      l = Long.parseLong(s);
+    }
+    catch (NumberFormatException e)
+    {
+      Logger.error("unable to parse value of param \"" + name + "\", value: " + s,e);
+    }
+    if (storeWhenRead)
+      setAttribute(name,l);
+    return l;
+  }
+
 	/**
 	 * Liefert den Wert des genannten Attributs als double.
 	 * Wird das Attribut nicht gefunden oder hat keinen Wert, wird defaultValue zurueckgegeben.
@@ -322,6 +350,16 @@ public class Settings
 	}
 
   /**
+   * Speichert einen Long-Wert.
+   * @param name Name des Attributs.
+   * @param value Wert des Attributs.
+   */
+  public void setAttribute(String name, long value)
+  {
+    setAttribute(name,""+value);
+  }
+
+	/**
    * Speichert das Attribut <name> mit dem zugehoerigen Wert <value>.
    * Wenn ein gleichnamiges Attribut bereits existiert, wird es ueberschrieben.
    * Ist der Wert des Attributes <code>null</code>, wird es entfernt.
@@ -440,6 +478,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.23  2009/10/28 11:23:00  willuhn
+ * @N getLong()
+ *
  * Revision 1.22  2009/09/18 10:37:20  willuhn
  * @N Neuer Konstruktor, mit dem der Dateiname der Config-Datei nun auch explizit angegeben werden kann.
  *
@@ -459,54 +500,4 @@ public class Settings
  *
  * Revision 1.17  2008/04/02 21:16:30  willuhn
  * @B OutputStream not closed in store()
- *
- * Revision 1.16  2007/09/01 21:38:35  willuhn
- * @B Bug 477
- *
- * Revision 1.15  2007/06/21 09:01:49  willuhn
- * @N System-Presets
- *
- * Revision 1.14  2007/05/29 12:55:59  willuhn
- * @C flush properties if settings file has been deleted
- *
- * Revision 1.13  2007/05/10 16:49:52  willuhn
- * @C changed log level
- *
- * Revision 1.12  2007/05/09 09:42:55  willuhn
- * @N Config-Reload without watcher thread
- *
- * Revision 1.11  2007/03/09 18:03:32  willuhn
- * @N classloader updates
- * @N FileWatch
- *
- * Revision 1.10  2006/09/05 22:02:01  willuhn
- * @C Worker-Redesign in Settings und Session
- *
- * Revision 1.9  2006/05/03 13:14:16  web0
- * *** empty log message ***
- *
- * Revision 1.8  2005/07/24 16:59:17  web0
- * @B fix in settings watcher
- *
- * Revision 1.7  2005/06/27 11:52:14  web0
- * *** empty log message ***
- *
- * Revision 1.6  2005/06/23 20:50:30  web0
- * *** empty log message ***
- *
- * Revision 1.5  2005/05/19 21:40:09  web0
- * *** empty log message ***
- *
- * Revision 1.4  2005/05/19 18:13:35  web0
- * *** empty log message ***
- *
- * Revision 1.3  2005/04/21 23:33:37  web0
- * @N auto reloading of config files after changing
- *
- * Revision 1.2  2005/03/09 01:06:20  web0
- * @D javadoc fixes
- *
- * Revision 1.1  2005/01/13 22:58:05  willuhn
- * @N Settings nach willuhn.util verschoben
- *
  **********************************************************************/
