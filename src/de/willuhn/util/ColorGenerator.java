@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ColorGenerator.java,v $
- * $Revision: 1.2 $
- * $Date: 2009/08/24 23:47:41 $
+ * $Revision: 1.3 $
+ * $Date: 2009/11/02 17:43:06 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,6 +14,7 @@
 package de.willuhn.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -144,8 +145,24 @@ public class ColorGenerator
     
     // Wir fuegen die Farbe zum Cache hinzu, damit die Farbe
     // wenigstens innerhalb der JVM-Session konstant bleibt
-    colorCache.add(pos,color);
+    try
+    {
+      colorCache.add(pos,color);
+    }
+    catch (IndexOutOfBoundsException e)
+    {
+      // pueh
+    }
     return color;
+  }
+  
+  public final static void main(String[] args) throws Exception
+  {
+    for (int i=100;i<1000;++i)
+    {
+      int[] values = ColorGenerator.create(i);
+      System.out.println(i + ": " + Arrays.toString(values));
+    }
   }
 
 }
@@ -153,6 +170,9 @@ public class ColorGenerator
 
 /**********************************************************************
  * $Log: ColorGenerator.java,v $
+ * Revision 1.3  2009/11/02 17:43:06  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2009/08/24 23:47:41  willuhn
  * @N Farbkreis erweitert
  *
