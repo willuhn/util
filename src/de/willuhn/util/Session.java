@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Session.java,v $
- * $Revision: 1.12 $
- * $Date: 2007/11/26 15:11:36 $
+ * $Revision: 1.13 $
+ * $Date: 2009/11/24 10:48:18 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -142,6 +142,17 @@ public class Session extends Observable
     {
       SessionObject o = (SessionObject) data.remove(key);
       return o == null ? null : o.value;
+    }
+  }
+  
+  /**
+   * Leert die Session.
+   */
+  public void clear()
+  {
+    synchronized (data)
+    {
+      data.clear();
     }
   }
 
@@ -313,6 +324,9 @@ public class Session extends Observable
 
 /*********************************************************************
  * $Log: Session.java,v $
+ * Revision 1.13  2009/11/24 10:48:18  willuhn
+ * @N Session#clear
+ *
  * Revision 1.12  2007/11/26 15:11:36  willuhn
  * @B Objekte in  Session liefen nicht ab
  *
