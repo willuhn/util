@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/JavaLoggingHandler.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/07/10 09:08:08 $
+ * $Revision: 1.3 $
+ * $Date: 2010/02/02 11:48:26 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -48,6 +48,18 @@ public class JavaLoggingHandler extends Handler
       logMapping.put(java.util.logging.Level.SEVERE,Level.ERROR);
       logMapping.put(java.util.logging.Level.WARNING,Level.WARN);
 
+      // Wir deaktivieren alle Logger von Java
+      java.util.logging.Logger logger = java.util.logging.Logger.getLogger("");
+      Handler[] handlers = logger.getHandlers();
+      if (handlers != null)
+      {
+        for (int i=0;i<handlers.length;++i)
+        {
+          handlers[i].setLevel(java.util.logging.Level.OFF);
+        }
+      }
+
+      // Wir biegen das Logging zu uns um
       LogManager lm = LogManager.getLogManager();
       java.util.logging.Logger root = lm.getLogger("");
       root.addHandler(singleton);
@@ -115,6 +127,9 @@ public class JavaLoggingHandler extends Handler
 
 /**********************************************************************
  * $Log: JavaLoggingHandler.java,v $
+ * Revision 1.3  2010/02/02 11:48:26  willuhn
+ * @N Der Logging-Handler deaktiviert automatisch das Java-Logging damit nur noch das eigene verwendet wird
+ *
  * Revision 1.2  2008/07/10 09:08:08  willuhn
  * @JavaLoggingHandler direkt am Java Root-Logger registrieren
  *
