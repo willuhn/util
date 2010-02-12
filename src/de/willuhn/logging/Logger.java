@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.14 $
- * $Date: 2008/06/13 13:40:47 $
+ * $Revision: 1.15 $
+ * $Date: 2010/02/12 00:57:34 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -96,6 +96,16 @@ public class Logger
 	{
 		return level;
 	}
+  
+  /**
+   * Prueft, ob Meldungen mit dem angegeben Log-Level derzeit geloggt werden.
+   * @param l das zu testende Log-Level.
+   * @return true, wenn Meldungen mit dem angegeben Log-Level derzeit geloggt werden.
+   */
+  public static boolean isLogging(Level l)
+  {
+    return l != null && l.getValue() >= Logger.level.getValue();
+  }
 
   /**
    * Schreibt eine Message vom Typ "debug" ins Log.
@@ -420,121 +430,10 @@ public class Logger
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.15  2010/02/12 00:57:34  willuhn
+ * @N Test-Methode, um herauszufinden, ob ein angebenes Level geloggt wird
+ *
  * Revision 1.14  2008/06/13 13:40:47  willuhn
  * @N Class und Method kann nun explizit angegeben werden
  * @N Hostname kann mitgeloggt werden
- *
- * Revision 1.13  2007/04/11 23:59:22  willuhn
- * @N Log-Adapter fuer Java-Logging
- *
- * Revision 1.12  2007/03/27 17:14:34  willuhn
- * @B wrong method name in logger
- *
- * Revision 1.11  2007/03/15 12:34:18  willuhn
- * @B wrong caller
- *
- * Revision 1.10  2007/03/15 11:52:12  willuhn
- * @N Exceptions bei jedem Level mitloggbar
- *
- * Revision 1.9  2007/03/15 11:32:44  willuhn
- * *** empty log message ***
- *
- * Revision 1.8  2007/03/15 11:29:37  willuhn
- * @N made write(Level,String) public
- *
- * Revision 1.7  2007/03/09 18:03:32  willuhn
- * @N classloader updates
- * @N FileWatch
- *
- * Revision 1.6  2005/08/09 14:09:26  web0
- * @N added logrotate target
- *
- * Revision 1.5  2005/07/14 21:52:11  web0
- * *** empty log message ***
- *
- * Revision 1.4  2005/01/11 19:01:26  willuhn
- * @N added security.Wallet
- *
- * Revision 1.3  2004/12/31 19:34:22  willuhn
- * @C some logging refactoring
- * @N syslog support for logging
- *
- * Revision 1.2  2004/12/15 01:18:13  willuhn
- * @N Logger is now able to log class names to
- *
- * Revision 1.1  2004/11/12 18:18:19  willuhn
- * @C Logging refactoring
- *
- * Revision 1.19  2004/11/10 17:48:49  willuhn
- * *** empty log message ***
- *
- * Revision 1.18  2004/07/04 17:07:03  willuhn
- * *** empty log message ***
- *
- * Revision 1.17  2004/06/30 20:58:52  willuhn
- * @C some refactoring
- *
- * Revision 1.16  2004/06/15 21:11:30  willuhn
- * @N added LoggerOutputStream
- *
- * Revision 1.15  2004/06/10 20:57:34  willuhn
- * @D javadoc comments fixed
- *
- * Revision 1.14  2004/06/03 22:11:49  willuhn
- * *** empty log message ***
- *
- * Revision 1.13  2004/05/25 23:24:03  willuhn
- * *** empty log message ***
- *
- * Revision 1.12  2004/05/11 21:19:23  willuhn
- * *** empty log message ***
- *
- * Revision 1.11  2004/03/18 01:24:56  willuhn
- * @C refactoring
- *
- * Revision 1.10  2004/03/06 18:24:47  willuhn
- * @D javadoc
- *
- * Revision 1.9  2004/02/12 00:49:12  willuhn
- * *** empty log message ***
- *
- * Revision 1.8  2004/01/25 18:40:05  willuhn
- * *** empty log message ***
- *
- * Revision 1.7  2004/01/24 17:40:52  willuhn
- * *** empty log message ***
- *
- * Revision 1.6  2004/01/08 21:38:39  willuhn
- * *** empty log message ***
- *
- * Revision 1.5  2004/01/06 19:58:29  willuhn
- * @N ArrayEnumeration
- *
- * Revision 1.4  2004/01/06 18:07:07  willuhn
- * *** empty log message ***
- *
- * Revision 1.3  2004/01/05 23:08:04  willuhn
- * *** empty log message ***
- *
- * Revision 1.2  2004/01/05 21:46:29  willuhn
- * @N added queue
- * @N logger writes now in separate thread
- *
- * Revision 1.1  2004/01/03 19:33:59  willuhn
- * *** empty log message ***
- *
- * Revision 1.4  2004/01/03 18:08:05  willuhn
- * @N Exception logging
- * @C replaced bb.util xml parser with nanoxml
- *
- * Revision 1.3  2003/12/10 00:47:12  willuhn
- * @N SearchDialog done
- * @N ErrorView
- *
- * Revision 1.2  2003/11/13 00:37:35  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2003/10/23 21:49:46  willuhn
- * initial checkin
- *
  **********************************************************************/
