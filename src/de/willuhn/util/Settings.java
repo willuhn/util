@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.23 $
- * $Date: 2009/10/28 11:23:00 $
+ * $Revision: 1.24 $
+ * $Date: 2010/03/11 07:46:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -417,11 +417,16 @@ public class Settings
    */
   private synchronized void store()
   {
+    // Die Datei existiert noch nicht und wir haben noch keine Werte.
+    // Dann muessen wir die Datei auch nicht sinnlos anlegen
+    if (!this.file.exists() && this.properties.size() == 0)
+      return;
+    
     OutputStream os = null;
     try
     {
       os = new BufferedOutputStream(new FileOutputStream(this.file));
-      properties.store(os,null);
+      this.properties.store(os,null);
     }
     catch (Exception e1)
     {
@@ -478,6 +483,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.24  2010/03/11 07:46:35  willuhn
+ * @N Properties-Datei nur anlegen, wenn tatsaechlich Werte vorliegen
+ *
  * Revision 1.23  2009/10/28 11:23:00  willuhn
  * @N getLong()
  *
