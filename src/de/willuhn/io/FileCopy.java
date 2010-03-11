@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/FileCopy.java,v $
- * $Revision: 1.1 $
- * $Date: 2004/10/07 18:06:10 $
+ * $Revision: 1.2 $
+ * $Date: 2010/03/11 10:20:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -67,10 +67,12 @@ public class FileCopy
 		finally
 		{
 			try {
-				srcChannel.close();
+			  if (srcChannel != null)
+  				srcChannel.close();
 			}	catch (IOException e) { /* useless */ }
 			try {
-				dstChannel.close();
+			  if (dstChannel != null)
+  				dstChannel.close();
 			}	catch (IOException e) { /* useless */ }
 		}
 	}
@@ -94,6 +96,9 @@ public class FileCopy
 
 /**********************************************************************
  * $Log: FileCopy.java,v $
+ * Revision 1.2  2010/03/11 10:20:22  willuhn
+ * @B NPE
+ *
  * Revision 1.1  2004/10/07 18:06:10  willuhn
  * @N ZipExtractor
  *
