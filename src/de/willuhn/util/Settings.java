@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.24 $
- * $Date: 2010/03/11 07:46:35 $
+ * $Revision: 1.25 $
+ * $Date: 2010/04/06 11:27:05 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,9 +35,6 @@ import de.willuhn.logging.Logger;
  * sondern sie bereits mit Default-Werten in den Dateien vorfindet.
  * Wird die Properties-Datei von aussen (z.Bsp. mit einem Texteditor)
  * geaendert, wird das automatisch erkannt und die Datei intern neu geladen.
- * TODO: Sollte man mal gegen java.util.prefs.Preferences ersetzen.
- * Allerdings muesste man hier noch klaeren, wie man den Pfad vorgeben
- * kann, ohne das System-Property java.util.prefs.userRoot aendern zu muessen.
  * @author willuhn
  */
 public class Settings
@@ -84,7 +81,6 @@ public class Settings
    * Erzeugt eine neue Instanz.
    * @param systemFile Properties-Datei mit den System-Vorgaben.
    * @param userFile Properties-Datei des Users, welche die System-Vorgaben ueberschreiben.
-   * @param clazz Klasse, fuer die diese Settings gelten.
    */
   public Settings(File systemFile, File userFile)
   {
@@ -483,6 +479,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.25  2010/04/06 11:27:05  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.24  2010/03/11 07:46:35  willuhn
  * @N Properties-Datei nur anlegen, wenn tatsaechlich Werte vorliegen
  *
