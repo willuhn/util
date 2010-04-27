@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.7 $
- * $Date: 2008/09/30 08:33:20 $
+ * $Revision: 1.8 $
+ * $Date: 2010/04/27 10:55:13 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -71,7 +71,7 @@ public class Updater
       {
         if (name == null)
           return false;
-        return name.endsWith(".sql") || name.endsWith(".class");
+        return name.endsWith(".sql") || (name.endsWith(".class") && name.indexOf("$") == -1); // inner classes ignorieren
       }
     });
     
@@ -299,6 +299,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.8  2010/04/27 10:55:13  willuhn
+ * @B Inner-Classes bei der Suche nach Updates ignorieren
+ *
  * Revision 1.7  2008/09/30 08:33:20  willuhn
  * @N Heiners Patch, um beim Update einen Fehler zu werfen, wenn DB-Version aktueller als Programmversion ist
  *
