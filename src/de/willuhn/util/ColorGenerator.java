@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/ColorGenerator.java,v $
- * $Revision: 1.3 $
- * $Date: 2009/11/02 17:43:06 $
+ * $Revision: 1.4 $
+ * $Date: 2010/05/19 14:47:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -156,6 +156,11 @@ public class ColorGenerator
     return color;
   }
   
+  /**
+   * Main-Methode, falls man den mal von der Konsole aus nutzen will.
+   * @param args
+   * @throws Exception
+   */
   public final static void main(String[] args) throws Exception
   {
     for (int i=100;i<1000;++i)
@@ -170,6 +175,9 @@ public class ColorGenerator
 
 /**********************************************************************
  * $Log: ColorGenerator.java,v $
+ * Revision 1.4  2010/05/19 14:47:38  willuhn
+ * @N Ausfall von STDOUT tolerieren
+ *
  * Revision 1.3  2009/11/02 17:43:06  willuhn
  * *** empty log message ***
  *

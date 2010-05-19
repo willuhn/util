@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootStrap.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/07/17 08:52:00 $
+ * $Revision: 1.2 $
+ * $Date: 2010/05/19 14:47:37 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -59,7 +59,6 @@ public class BootStrap
     {
       params = new String[args.length - 2];
       System.arraycopy(args,2,params,0,args.length-2);
-      System.out.println(m);
       for (int i=0;i<params.length;++i)
       {
         Logger.info("forwarding argument: " + params[i]);
@@ -129,6 +128,9 @@ public class BootStrap
 
 /*********************************************************************
  * $Log: BootStrap.java,v $
+ * Revision 1.2  2010/05/19 14:47:37  willuhn
+ * @N Ausfall von STDOUT tolerieren
+ *
  * Revision 1.1  2007/07/17 08:52:00  willuhn
  * @N Ein Bootstrapper zum dynamischen Laden des Classpath
  *

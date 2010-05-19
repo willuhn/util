@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.15 $
- * $Date: 2010/02/12 00:57:34 $
+ * $Revision: 1.16 $
+ * $Date: 2010/05/19 14:47:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -336,8 +336,8 @@ public class Logger
 			{
 				if (count++ >= retryCount)
 				{
-					System.out.println("***** [WARN] Logger queue full, writing to STDOUT *****");
-					System.out.println(msg.toString());
+					println("***** [WARN] Logger queue full, writing to STDOUT *****");
+					println(msg.toString());
 					return;
 				}
 
@@ -369,6 +369,22 @@ public class Logger
 		{
 			return finished;
 		}
+    
+    /**
+     * Gibt den Text auf STDOUT aus.
+     * @param text auszugebender Text.
+     */
+    private void println(String text)
+    {
+      try
+      {
+        System.out.println(text);
+      }
+      catch (Exception e)
+      {
+        // ignore - wenn STDOUT kaputt ist, koennen wir uns eh nicht mehr artikulieren ;)
+      }
+    }
 
     /**
      * @see java.lang.Runnable#run()
@@ -404,7 +420,7 @@ public class Logger
 				{
 					if (targets.size() == 0)
 					{
-						System.out.println(msg.toString());
+						println(msg.toString());
 						continue;
 					}
 
@@ -417,19 +433,21 @@ public class Logger
 						}
 						catch (Exception e)
 						{
-							System.out.println("alert: error while logging the following message: " + msg.toString());
+							println("alert: error while logging the following message: " + msg.toString());
 						}
 					}
 				}
 			}
     }
-
   }
 
 }
 
 /*********************************************************************
  * $Log: Logger.java,v $
+ * Revision 1.16  2010/05/19 14:47:38  willuhn
+ * @N Ausfall von STDOUT tolerieren
+ *
  * Revision 1.15  2010/02/12 00:57:34  willuhn
  * @N Test-Methode, um herauszufinden, ob ein angebenes Level geloggt wird
  *
