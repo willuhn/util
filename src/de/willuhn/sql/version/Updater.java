@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.8 $
- * $Date: 2010/04/27 10:55:13 $
+ * $Revision: 1.9 $
+ * $Date: 2010/06/02 14:15:08 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -53,6 +53,20 @@ public class Updater
    */
   public void execute() throws ApplicationException
   {
+    execute((String) null);
+  }
+
+  /**
+   * Fuehrt das Update durch.
+   * Hierbei werden jedoch nur genau die Updates ausgefuehrt, deren
+   * Dateinamen dem filepattern entsprechen.
+   * @param filepattern Angabe eines Dateinamen-Patterns. Ist eines
+   * angegeben, werden nur genau die Updates ausgefuehrt, deren Dateinamen
+   * dem filepattern entsprechen.
+   * @throws ApplicationException wenn ein Fehler beim Update auftrat.
+   */
+  public void execute(final String filepattern) throws ApplicationException
+  {
     int currentVersion = provider.getCurrentVersion();
     Logger.info("current version: " + currentVersion);
 
@@ -70,6 +84,8 @@ public class Updater
       public boolean accept(File dir, String name)
       {
         if (name == null)
+          return false;
+        if (filepattern != null && !name.matches(filepattern))
           return false;
         return name.endsWith(".sql") || (name.endsWith(".class") && name.indexOf("$") == -1); // inner classes ignorieren
       }
@@ -299,6 +315,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.9  2010/06/02 14:15:08  willuhn
+ * @N Dem Updater kann nun ein Dateinamens-Pattern uebergeben werden, wenn er nur Updates mit einem bestimmten Dateinamens-Muster ausfuehren soll
+ *
  * Revision 1.8  2010/04/27 10:55:13  willuhn
  * @B Inner-Classes bei der Suche nach Updates ignorieren
  *
