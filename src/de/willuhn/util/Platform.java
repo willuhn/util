@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Platform.java,v $
- * $Revision: 1.1 $
- * $Date: 2010/09/29 10:44:35 $
+ * $Revision: 1.2 $
+ * $Date: 2010/09/29 10:47:39 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -92,7 +92,7 @@ public class Platform
     }
     catch (URISyntaxException e)
     {
-      throw new IOException("unable to determine dir for class " + c,e);
+      throw new IOException("unable to determine dir for class " + c + ": " + e.getMessage());
     }
   }
   
@@ -125,7 +125,10 @@ public class Platform
 
 /**********************************************************************
  * $Log: Platform.java,v $
- * Revision 1.1  2010/09/29 10:44:35  willuhn
+ * Revision 1.2  2010/09/29 10:47:39  willuhn
+ * @B den Konstruktor gibts erst in Java 1.6
+ *
+ * Revision 1.1  2010-09-29 10:44:35  willuhn
  * @N Ein Jar-Loader und ein Platform-Util
  *
  * Revision 1.1  2010/09/28 16:40:38  willuhn
