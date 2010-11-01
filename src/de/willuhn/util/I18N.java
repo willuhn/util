@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/I18N.java,v $
- * $Revision: 1.13 $
- * $Date: 2008/05/19 22:29:49 $
+ * $Revision: 1.14 $
+ * $Date: 2010/11/01 13:26:08 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -160,12 +160,12 @@ public class I18N
    * <br><b>Hinweis:</b>. Die Textmarken fuer die Ersetzungen sind mit <code>{n}</code> zu definieren
    * wobei n von 0 beginnend hochgezaehlt wird und genauso oft vorkommen darf wie das String-Array
    * Elemente besitzt.<br>
-   * Bsp: i18n.tr("Das ist eine {0} nuetzliche {1}", new String[] {"besonders","Funktion"});
+   * Bsp: i18n.tr("Das ist eine {0} nuetzliche {1}", "besonders","Funktion");
    * @param key zu uebersetzender String.
    * @param replacements String-Array mit den einzusetzenden Werten.
    * @return uebersetzter String.
    */
-  public String tr(String key, String[] replacements)
+  public String tr(String key, String... replacements)
   {
     return MessageFormat.format(tr(key),(Object[])replacements);
   }
@@ -199,6 +199,9 @@ public class I18N
 
 /*********************************************************************
  * $Log: I18N.java,v $
+ * Revision 1.14  2010/11/01 13:26:08  willuhn
+ * @N Support fuer varargs in tr
+ *
  * Revision 1.13  2008/05/19 22:29:49  willuhn
  * @B NPE
  *
