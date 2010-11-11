@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/Bootable.java,v $
- * $Revision: 1.3 $
- * $Date: 2006/04/26 09:37:07 $
- * $Author: web0 $
+ * $Revision: 1.4 $
+ * $Date: 2010/11/11 16:24:08 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -42,7 +42,7 @@ public interface Bootable {
    * @return Abhaengigkeiten.
    * Die Class-Objekte muessen alle diese Interface <code>Bootable</code> implementieren.
    */
-  public Class[] depends();
+  public Class<Bootable>[] depends();
   
   /**
    * Wird aufgerufen, wenn die Anwendung beendet wird.
@@ -54,22 +54,9 @@ public interface Bootable {
 
 /**********************************************************************
  * $Log: Bootable.java,v $
+ * Revision 1.4  2010/11/11 16:24:08  willuhn
+ * @N Bootloader ist jetzt getypt
+ *
  * Revision 1.3  2006/04/26 09:37:07  web0
  * @N bootloader redesign
- *
- * Revision 1.2  2005/02/27 15:25:32  web0
- * *** empty log message ***
- *
- * Revision 1.1  2005/02/27 15:11:42  web0
- * @C some renaming
- *
- * Revision 1.3  2004/06/30 20:58:52  willuhn
- * @C some refactoring
- *
- * Revision 1.2  2004/06/03 22:11:49  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2004/06/03 00:24:33  willuhn
- * *** empty log message ***
- *
  **********************************************************************/

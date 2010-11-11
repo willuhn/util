@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.15 $
- * $Date: 2008/03/07 16:29:16 $
+ * $Revision: 1.16 $
+ * $Date: 2010/11/11 16:24:08 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 package de.willuhn.boot;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import de.willuhn.logging.Logger;
@@ -27,12 +28,12 @@ public class BootLoader {
 	/**
 	 * Lookup der initialisierten Services.
 	 */
-	private HashMap services = new HashMap();
+	private Map<Class,Bootable> services = new HashMap<Class,Bootable>();
   
   /**
    * Reihenfolge, in der die Services gebootet wurden.
    */
-  private Stack order = new Stack();
+  private Stack<Bootable> order = new Stack<Bootable>();
 
 	private int indent = 0;
 
@@ -66,7 +67,7 @@ public class BootLoader {
 	 * entsprechend <code>depends</code> angegebenen Services starten.
 	 * @return der instanziierte Dienst.
 	 */
-	public final Bootable getBootable(Class target)
+	public final <T extends Bootable> T getBootable(Class<? extends Bootable> target)
 	{
 		return resolve(target,null);
 	}
@@ -78,11 +79,11 @@ public class BootLoader {
 	 * @return der instanziierte Dienst.
 	 * @throws Exception
 	 */
-	private final Bootable resolve(Class target,Bootable caller)
+	private final <T extends Bootable> T resolve(Class<? extends Bootable> target,Bootable caller)
 	{
 
 		// Target schon gebootet
-    Bootable s = (Bootable) services.get(target);
+    T s = (T) services.get(target);
 		if (s != null)
 			return s;
 
@@ -93,7 +94,7 @@ public class BootLoader {
 		// Instanziieren
     try
     {
-      s = (Bootable) target.newInstance();
+      s = (T) target.newInstance();
     }
     catch (Exception e)
     {
@@ -101,21 +102,21 @@ public class BootLoader {
     }
 
 		Logger.debug(indent() + "checking dependencies for " + target.getName());
-		Class[] deps = s.depends();
-		if (deps != null)
+		Class<Bootable>[] deps = s.depends();
+		if (deps != null && deps.length > 0)
 		{
       // Alle Abhaengigkeiten booten
       Logger.debug(indent() + "booting dependencies for " + target.getName());
 
-      for (int j=0;j<deps.length;++j)
+      for (Class<Bootable> dep:deps)
       {
-        if (deps[j].equals(target))
+        if (dep.equals(target))
         {
-          Logger.info(indent() + deps[j].getName() + " cannot have itself as dependency, skipping");
+          Logger.info(indent() + dep.getName() + " cannot have itself as dependency, skipping");
           indent--;
           continue;
         }
-        resolve(deps[j],s);
+        resolve(dep,s);
       }
 		}
     else
@@ -241,6 +242,9 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
+ * Revision 1.16  2010/11/11 16:24:08  willuhn
+ * @N Bootloader ist jetzt getypt
+ *
  * Revision 1.15  2008/03/07 16:29:16  willuhn
  * @N ProgressMonitor auch beim Shutdown verwenden
  *
@@ -255,35 +259,4 @@ public class BootLoader {
  *
  * Revision 1.11  2008/02/13 00:27:17  willuhn
  * @N Service bereits nach Erstellung verfuegbar machen
- *
- * Revision 1.10  2006/04/26 15:04:13  web0
- * *** empty log message ***
- *
- * Revision 1.9  2006/04/26 09:37:07  web0
- * @N bootloader redesign
- *
- * Revision 1.8  2005/02/27 15:25:32  web0
- * *** empty log message ***
- *
- * Revision 1.7  2005/02/27 15:11:42  web0
- * @C some renaming
- *
- * Revision 1.6  2004/11/12 18:18:19  willuhn
- * @C Logging refactoring
- *
- * Revision 1.5  2004/06/30 20:58:52  willuhn
- * @C some refactoring
- *
- * Revision 1.4  2004/06/10 20:57:34  willuhn
- * @D javadoc comments fixed
- *
- * Revision 1.3  2004/06/03 22:11:49  willuhn
- * *** empty log message ***
- *
- * Revision 1.2  2004/06/03 00:45:11  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2004/06/03 00:24:33  willuhn
- * *** empty log message ***
- *
  **********************************************************************/

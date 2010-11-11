@@ -1,8 +1,8 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/SkipServiceException.java,v $
- * $Revision: 1.3 $
- * $Date: 2005/03/09 01:06:21 $
- * $Author: web0 $
+ * $Revision: 1.4 $
+ * $Date: 2010/11/11 16:24:08 $
+ * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
  *
@@ -56,13 +56,9 @@ public class SkipServiceException extends Exception {
 
 /**********************************************************************
  * $Log: SkipServiceException.java,v $
+ * Revision 1.4  2010/11/11 16:24:08  willuhn
+ * @N Bootloader ist jetzt getypt
+ *
  * Revision 1.3  2005/03/09 01:06:21  web0
  * @D javadoc fixes
- *
- * Revision 1.2  2005/02/27 15:11:42  web0
- * @C some renaming
- *
- * Revision 1.1  2004/06/03 22:11:49  willuhn
- * *** empty log message ***
- *
  **********************************************************************/
