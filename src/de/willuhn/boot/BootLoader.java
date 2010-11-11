@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.16 $
- * $Date: 2010/11/11 16:24:08 $
+ * $Revision: 1.17 $
+ * $Date: 2010/11/11 16:25:12 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -69,7 +69,7 @@ public class BootLoader {
 	 */
 	public final <T extends Bootable> T getBootable(Class<? extends Bootable> target)
 	{
-		return resolve(target,null);
+		return (T) resolve(target,null);
 	}
 
 	/**
@@ -242,7 +242,10 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
- * Revision 1.16  2010/11/11 16:24:08  willuhn
+ * Revision 1.17  2010/11/11 16:25:12  willuhn
+ * @B da fehlte noch ein Cast
+ *
+ * Revision 1.16  2010-11-11 16:24:08  willuhn
  * @N Bootloader ist jetzt getypt
  *
  * Revision 1.15  2008/03/07 16:29:16  willuhn
