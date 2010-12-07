@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/AbstractZipSupport.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/03/07 00:46:53 $
+ * $Revision: 1.2 $
+ * $Date: 2010/12/07 16:01:53 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -11,10 +11,6 @@
  *
  **********************************************************************/
 package de.willuhn.io;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import de.willuhn.util.ProgressMonitor;
 
@@ -37,23 +33,6 @@ public class AbstractZipSupport
       this.monitor = monitor;
   }
   
-  /**
-   * Hilfsfunktion zum Kopieren der Daten von einem Stream zum andern.
-   * @param is Quell-Stream.
-   * @param os Ziel-Stream.
-   * @throws IOException
-   */
-  protected void copy(InputStream is, OutputStream os) throws IOException
-  {
-    byte b[] = new byte[4096];
-    int read = 0;
-    while ((read = is.read(b)) >= 0)
-    {
-      if (read > 0) // Nur schreiben, wenn wirklich was gelesen wurde
-        os.write(b,0,read);
-    }
-  }
-
   /**
    * Dummy-Implementierung.
    */
@@ -88,6 +67,9 @@ public class AbstractZipSupport
 
 /*********************************************************************
  * $Log: AbstractZipSupport.java,v $
+ * Revision 1.2  2010/12/07 16:01:53  willuhn
+ * @N IOUtil
+ *
  * Revision 1.1  2008/03/07 00:46:53  willuhn
  * @N ZipCreator
  *

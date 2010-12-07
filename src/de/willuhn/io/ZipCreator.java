@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/ZipCreator.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/03/07 00:46:53 $
+ * $Revision: 1.2 $
+ * $Date: 2010/12/07 16:01:53 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -131,7 +131,7 @@ public class ZipCreator extends AbstractZipSupport
       monitor.log("    adding file " + zipPath);
       this.target.putNextEntry(new ZipEntry(zipPath));
       InputStream is  = new BufferedInputStream(new FileInputStream(handle));
-      copy(is,this.target);
+      IOUtil.copy(is,this.target);
       this.target.closeEntry();
 
       is.close();
@@ -148,6 +148,9 @@ public class ZipCreator extends AbstractZipSupport
 
 /**********************************************************************
  * $Log: ZipCreator.java,v $
+ * Revision 1.2  2010/12/07 16:01:53  willuhn
+ * @N IOUtil
+ *
  * Revision 1.1  2008/03/07 00:46:53  willuhn
  * @N ZipCreator
  *
