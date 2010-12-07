@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/io/IOUtil.java,v $
- * $Revision: 1.2 $
- * $Date: 2010/12/07 16:07:10 $
+ * $Revision: 1.3 $
+ * $Date: 2010/12/07 16:09:43 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -49,18 +49,22 @@ public class IOUtil
   /**
    * Schliesst Streams.
    * Ggf. auftretende Exceptions werden nicht weitergeworfen sondern nur geloggt.
-   * @param closeables Liste zu schliessender Streams.
+   * @param closeables Liste zu schliessender Streams. NULL wird toleriert.
    * @return true, wenn das Schliessen erfolgreich war, sonst false.
    */
   public static boolean close(Closeable... closeables)
   {
     boolean ok = true;
+    
+    if (closeables == null || closeables.length == 0)
+      return ok;
 
     for (Closeable c:closeables)
     {
       try
       {
-        c.close();
+        if (c != null)
+          c.close();
       }
       catch (Throwable t)
       {
@@ -76,7 +80,10 @@ public class IOUtil
 
 /**********************************************************************
  * $Log: IOUtil.java,v $
- * Revision 1.2  2010/12/07 16:07:10  willuhn
+ * Revision 1.3  2010/12/07 16:09:43  willuhn
+ * @N NULL tolerieren
+ *
+ * Revision 1.2  2010-12-07 16:07:10  willuhn
  * @N Mehrere Streams schliessen
  *
  * Revision 1.1  2010-12-07 16:01:53  willuhn
