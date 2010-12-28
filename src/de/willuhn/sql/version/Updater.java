@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.9 $
- * $Date: 2010/06/02 14:15:08 $
+ * $Revision: 1.10 $
+ * $Date: 2010/12/28 17:15:41 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -44,7 +44,7 @@ public class Updater
   public Updater(UpdateProvider provider)
   {
     this.provider = provider;
-    this.loader   = new MyClassloader(provider.getClass().getClassLoader());
+    this.loader   = new MyClassloader(provider);
   }
   
   /**
@@ -237,7 +237,7 @@ public class Updater
     {
       try
       {
-        Class clazz = this.loader.findClass(update.getAbsolutePath());
+        Class clazz = this.loader.findClass(update.getName());
         Update u = (Update) clazz.newInstance();
         Logger.info("  executing " + u.getClass().getName() + ": " + u.getName());
         u.execute(this.provider);
@@ -262,13 +262,16 @@ public class Updater
    */
   private class MyClassloader extends ClassLoader
   {
+    private UpdateProvider provider = null;
+    
     /**
      * ct
-     * @param parent
+     * @param provider der Update-Provider.
      */
-    public MyClassloader(ClassLoader parent)
+    public MyClassloader(UpdateProvider provider)
     {
-      super(parent);
+      super(provider.getClass().getClassLoader());
+      this.provider = provider;
     }
     
     /**
@@ -279,8 +282,14 @@ public class Updater
       InputStream is = null;
       try
       {
+        if (!name.endsWith(".class"))
+          name = name += ".class";
+        
         // Datei in Byte-Array laden
-        File f = new File(name);
+        File f = new File(provider.getUpdatePath(),name);
+        if (!f.exists() || !f.canRead())
+          throw new Exception("unable to read " + f);
+        
         is = new FileInputStream(f);
         byte[] data = new byte[(int)f.length()];
         is.read(data);
@@ -315,6 +324,9 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
+ * Revision 1.10  2010/12/28 17:15:41  willuhn
+ * @B Inner-Classes wurden nicht korrekt geladen
+ *
  * Revision 1.9  2010/06/02 14:15:08  willuhn
  * @N Dem Updater kann nun ein Dateinamens-Pattern uebergeben werden, wenn er nur Updates mit einem bestimmten Dateinamens-Muster ausfuehren soll
  *
