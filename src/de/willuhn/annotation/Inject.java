@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.2 $
- * $Date: 2011/03/30 11:54:53 $
+ * $Revision: 1.3 $
+ * $Date: 2011/03/30 12:23:21 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -30,9 +30,9 @@ public class Inject
   public static void inject(Object bean, Class<? extends Annotation> a, final Object value) throws Exception
   {
     inject(bean,new Injector() {
-      public Object get(Object bean, Annotation a) throws Exception
+      public void inject(Object bean, Field field, Annotation a) throws Exception
       {
-        return value;
+        field.set(bean,value);
       }
     },a);
   }
@@ -72,7 +72,7 @@ public class Inject
             if (applicable(annotations,at))
             {
               f.setAccessible(true);
-              f.set(bean,injector.get(bean,at));
+              injector.inject(bean,f,at);
               break; // Eigentlich macht es keinen Sinn, einen Wert mehrfach zu setzen
             }
           }
@@ -112,7 +112,10 @@ public class Inject
 
 /**********************************************************************
  * $Log: Inject.java,v $
- * Revision 1.2  2011/03/30 11:54:53  willuhn
+ * Revision 1.3  2011/03/30 12:23:21  willuhn
+ * @N Das Injizieren kann der Injector jetzt selbst machen
+ *
+ * Revision 1.2  2011-03-30 11:54:53  willuhn
  * @N setAccessible fuer private Member
  *
  * Revision 1.1  2011-03-30 11:51:22  willuhn
