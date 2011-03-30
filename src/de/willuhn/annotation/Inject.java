@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.1 $
- * $Date: 2011/03/30 11:51:22 $
+ * $Revision: 1.2 $
+ * $Date: 2011/03/30 11:54:53 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -71,6 +71,7 @@ public class Inject
           {
             if (applicable(annotations,at))
             {
+              f.setAccessible(true);
               f.set(bean,injector.get(bean,at));
               break; // Eigentlich macht es keinen Sinn, einen Wert mehrfach zu setzen
             }
@@ -111,7 +112,10 @@ public class Inject
 
 /**********************************************************************
  * $Log: Inject.java,v $
- * Revision 1.1  2011/03/30 11:51:22  willuhn
+ * Revision 1.2  2011/03/30 11:54:53  willuhn
+ * @N setAccessible fuer private Member
+ *
+ * Revision 1.1  2011-03-30 11:51:22  willuhn
  * @N Injector
  *
  **********************************************************************/
