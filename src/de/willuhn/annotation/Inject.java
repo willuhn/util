@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.3 $
- * $Date: 2011/03/30 12:23:21 $
+ * $Revision: 1.4 $
+ * $Date: 2011/04/15 17:28:41 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -37,6 +37,17 @@ public class Inject
     },a);
   }
   
+  /**
+   * Injiziert ein oder mehrere Werte in der Bean "bean" ueber den angegebenen Injector.
+   * @param bean die Bean, deren Attribute injiziert werden sollen.
+   * @param injector der Injector, der das Injizieren uebernehmen soll.
+   * @throws Exception
+   */
+  public static void inject(Object bean, Injector injector) throws Exception
+  {
+    inject(bean,injector,new Class[]{});
+  }
+
   /**
    * Injiziert ein oder mehrere Werte in der Bean "bean" ueber den angegebenen Injector.
    * @param bean die Bean, deren Attribute injiziert werden sollen.
@@ -96,11 +107,15 @@ public class Inject
    */
   private static boolean applicable(Class<? extends Annotation>[] list, Annotation a)
   {
-    if (list == null || list.length == 0)
+    // die 3. Bedingung tritt bei "inject(bean,value,(Class)null)" ein
+    if (list == null || list.length == 0 || (list.length == 1 && list[0] == null))
       return true;
     
     for (Class test:list)
     {
+      if (test == null)
+        continue;
+      
       if (a.annotationType().isAssignableFrom(test))
         return true;
     }
@@ -112,7 +127,11 @@ public class Inject
 
 /**********************************************************************
  * $Log: Inject.java,v $
- * Revision 1.3  2011/03/30 12:23:21  willuhn
+ * Revision 1.4  2011/04/15 17:28:41  willuhn
+ * @N Neue Funktion ohne Annotation-Parameter
+ * @N die Liste der Annotationen konnte ein Null-Element enthalten, wurde nicht beachtet
+ *
+ * Revision 1.3  2011-03-30 12:23:21  willuhn
  * @N Das Injizieren kann der Injector jetzt selbst machen
  *
  * Revision 1.2  2011-03-30 11:54:53  willuhn
