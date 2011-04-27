@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/security/Checksum.java,v $
- * $Revision: 1.5 $
- * $Date: 2009/01/17 00:25:39 $
+ * $Revision: 1.6 $
+ * $Date: 2011/04/27 08:38:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,6 +30,11 @@ public class Checksum
   public final static String SHA1 = "SHA1";
 
   /**
+   * Konstante fuer SHA-256-Checksumme.
+   */
+  public final static String SHA256 = "SHA-256";
+
+  /**
    * Konstante fuer MD5-Checksumme.
    */
   public final static String MD5 = "MD5";
@@ -50,8 +55,9 @@ public class Checksum
 	}
   
   /**
-   * Liefert eine SHA1-Checksumme der Daten.
+   * Liefert eine Checksumme der Daten mit dem angegebenen Algorithmus.
    * @param text
+   * @param alg der Algorithmus.
    * @return die Checksumme.
    * @throws NoSuchAlgorithmException
    */
@@ -87,6 +93,9 @@ public class Checksum
 
 /**********************************************************************
  * $Log: Checksum.java,v $
+ * Revision 1.6  2011/04/27 08:38:29  willuhn
+ * @N SHA256 als Konstante hinzugefuegt
+ *
  * Revision 1.5  2009/01/17 00:25:39  willuhn
  * @N Programm zum Erstellen/Verifizieren von OpenSSL-kompatiblen Signaturen mit SHA1-Digest
  * @N Java 1.5 compatibility
