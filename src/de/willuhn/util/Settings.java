@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.25 $
- * $Date: 2010/04/06 11:27:05 $
+ * $Revision: 1.26 $
+ * $Date: 2011/05/27 15:18:13 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,7 +19,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import de.willuhn.logging.Logger;
@@ -43,7 +45,7 @@ public class Settings
   private File file             = null;
   private double lastModified   = 0;
   private Properties properties = null;
-	private boolean storeWhenRead = true;
+	private boolean storeWhenRead = false;
 
   /**
    * Erzeugt eine neue Instanz der Settings, die exclusiv
@@ -128,6 +130,7 @@ public class Settings
 	 * Parameter auf true gesetzt werden. Alle abgefragten Parameter, werden
 	 * dann nach der Abfrage mit dem aktuellen Wert (ggf. dem Default-Wert)
 	 * sofort gespeichert.
+	 * Der Default-Wert ist "false". Per Default wird beim Lesen also nicht geschrieben.
    * @param b true, wenn sofort geschrieben werden soll.
    */
   public void setStoreWhenRead(boolean b)
@@ -295,7 +298,7 @@ public class Settings
   public String[] getList(String name, String[] defaultValues)
   {
     reload();
-    ArrayList l = new ArrayList();
+    List<String> l = new ArrayList<String>();
     String s = null;
     for (int i=0;i<255;++i)
     {
@@ -309,7 +312,7 @@ public class Settings
         setAttribute(name,defaultValues);
       return defaultValues;
     }
-    String[] result = (String[]) l.toArray(new String[l.size()]);
+    String[] result = l.toArray(new String[l.size()]);
     if (storeWhenRead)
       setAttribute(name,result);
     return result;
@@ -364,11 +367,23 @@ public class Settings
    */
   public void setAttribute(String name, String value)
   {
-  	if (value == null)
-  		properties.remove(name);
+    // Wir speichern nur, wenn etwas geaendert wurde
+    if (value == null)
+  	{
+      String prev = (String) properties.remove(name);
+      
+      // Wir haben wirklich was geloescht oder sollen immer speichern.
+      if (prev != null || this.storeWhenRead)
+        store();
+  	}
   	else
-	    properties.setProperty(name,value);
-    store();
+  	{
+      String prev = (String) properties.setProperty(name,value);
+      
+      // vorher existierte der Parameter nicht, oder er war anders oder wir sollen immer speichern
+      if (prev == null || !value.equals(prev) || this.storeWhenRead)
+        store();
+  	}
   }
 
   /**
@@ -382,6 +397,21 @@ public class Settings
    */
   public void setAttribute(String name, String[] values)
   {
+    // Aktuelle Werte laden, um zu checken, ob sich was geaendert hat
+    // Aber nur, wenn wir nicht immer speichern sollen
+    if (!this.storeWhenRead)
+    {
+      String[] prev = this.getList(name,null);
+
+      // Diese Funktion macht den kompletten Vergleich selbst
+      // Vor dem Vergleich der Elemente prueft sie auch, ob eines
+      // von beiden NULL ist und ob beide die gleiche Groesse haben
+      // Der Inhaltsvergleich findet da drin nur statt, wenn beide
+      // nicht NULL sind und die gleiche Groesse haben.
+      if (Arrays.equals(prev,values))
+        return;
+    }
+    
     // Wir entfernen immer erst alle Werte. Denn wenn vorher
     // ein laengeres Array drin steht, als wir jetzt reinschreiben,
     // wuerden die alten Werte am Ende des grossen Arrays nicht mehr
@@ -401,6 +431,8 @@ public class Settings
     {
       if (i >= 255)
         break; // Schluss jetzt. Das waren genug Werte ;)
+      if (values[i] == null)
+        continue; // NULL-Werte ueberspringen
       properties.setProperty(name + "." + i,values[i]);
     }
     store();
@@ -479,6 +511,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.26  2011/05/27 15:18:13  willuhn
+ * @N Aenderungen nur speichern, wenn wirklich was geaendert wurde oder das Speichern forciert wird
+ *
  * Revision 1.25  2010/04/06 11:27:05  willuhn
  * *** empty log message ***
  *
