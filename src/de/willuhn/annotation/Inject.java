@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.4 $
- * $Date: 2011/04/15 17:28:41 $
+ * $Revision: 1.5 $
+ * $Date: 2011/06/28 11:03:25 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -12,7 +12,11 @@
 package de.willuhn.annotation;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.AccessibleObject;
 
 /**
  * Util-Klasse zum Setzen von Annotations.
@@ -30,9 +34,14 @@ public class Inject
   public static void inject(Object bean, Class<? extends Annotation> a, final Object value) throws Exception
   {
     inject(bean,new Injector() {
-      public void inject(Object bean, Field field, Annotation a) throws Exception
+      public void inject(Object bean, AccessibleObject field, Annotation a) throws Exception
       {
-        field.set(bean,value);
+        if (field instanceof Field)
+          ((Field)field).set(bean,value);
+        else if (field instanceof Method)
+          ((Method)field).invoke(bean,value);
+        else
+          throw new Exception("unable to inject into " + field.getClass().getSimpleName());
       }
     },a);
   }
@@ -69,6 +78,8 @@ public class Inject
     Class current = bean.getClass();
     for (int i=0;i<100;++i)
     {
+      //////////////////////////////////////////////////////////////////////////
+      // Member-Variablen
       Field[] fields = current.getDeclaredFields(); // getFields() liefert nur die public-Member
       if (fields != null && fields.length > 0)
       {
@@ -80,7 +91,7 @@ public class Inject
           
           for (Annotation at:al)
           {
-            if (applicable(annotations,at))
+            if (matchTarget(at,ElementType.FIELD) && applicable(annotations,at))
             {
               f.setAccessible(true);
               injector.inject(bean,f,at);
@@ -89,6 +100,33 @@ public class Inject
           }
         }
       }
+      //
+      //////////////////////////////////////////////////////////////////////////
+      
+      //////////////////////////////////////////////////////////////////////////
+      // Methoden
+      Method[] methods = current.getDeclaredMethods();
+      if (methods != null && methods.length > 0)
+      {
+        for (Method m:methods)
+        {
+          Annotation[] al = m.getAnnotations();
+          if (al == null || al.length == 0)
+            continue;
+          
+          for (Annotation at:al)
+          {
+            if (matchTarget(at,ElementType.METHOD) && applicable(annotations,at))
+            {
+              m.setAccessible(true);
+              injector.inject(bean,m,at);
+              break;
+            }
+          }
+        }
+      }
+      //
+      //////////////////////////////////////////////////////////////////////////
       
       Class superClass = current.getSuperclass();
       if (superClass == null)
@@ -97,6 +135,30 @@ public class Inject
       // Ansonsten mit der Super-Klasse weitermachen
       current = superClass;
     }
+  }
+  
+  /**
+   * Prueft, ob die Annotation auf den angegebenen Typ passt.
+   * @param a die zu pruefende Annotation.
+   * @param type der zu pruefende Typ.
+   * @return true, wenn entweder kein Target angegeben ist oder der Wert passt.
+   */
+  private static boolean matchTarget(Annotation a, ElementType type)
+  {
+    Target target = a.getClass().getAnnotation(Target.class);
+    if (target == null)
+      return true; // Kein Target angegeben
+    
+    ElementType[] types = target.value();
+    if (types == null || types.length == 0)
+      return true;
+    
+    for (ElementType t:types)
+    {
+      if (t.equals(type))
+        return true;
+    }
+    return false;
   }
   
   /**
@@ -127,7 +189,10 @@ public class Inject
 
 /**********************************************************************
  * $Log: Inject.java,v $
- * Revision 1.4  2011/04/15 17:28:41  willuhn
+ * Revision 1.5  2011/06/28 11:03:25  willuhn
+ * @N Inject unterstuetzt jetzt auch Methoden - nicht nur Member-Variablen
+ *
+ * Revision 1.4  2011-04-15 17:28:41  willuhn
  * @N Neue Funktion ohne Annotation-Parameter
  * @N die Liste der Annotationen konnte ein Null-Element enthalten, wurde nicht beachtet
  *
