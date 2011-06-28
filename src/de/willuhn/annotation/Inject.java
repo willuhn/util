@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.5 $
- * $Date: 2011/06/28 11:03:25 $
+ * $Revision: 1.6 $
+ * $Date: 2011/06/28 11:36:33 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -36,6 +36,7 @@ public class Inject
     inject(bean,new Injector() {
       public void inject(Object bean, AccessibleObject field, Annotation a) throws Exception
       {
+        field.setAccessible(true);
         if (field instanceof Field)
           ((Field)field).set(bean,value);
         else if (field instanceof Method)
@@ -189,7 +190,10 @@ public class Inject
 
 /**********************************************************************
  * $Log: Inject.java,v $
- * Revision 1.5  2011/06/28 11:03:25  willuhn
+ * Revision 1.6  2011/06/28 11:36:33  willuhn
+ * *** empty log message ***
+ *
+ * Revision 1.5  2011-06-28 11:03:25  willuhn
  * @N Inject unterstuetzt jetzt auch Methoden - nicht nur Member-Variablen
  *
  * Revision 1.4  2011-04-15 17:28:41  willuhn
