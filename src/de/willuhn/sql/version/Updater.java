@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.10 $
- * $Date: 2010/12/28 17:15:41 $
+ * $Revision: 1.11 $
+ * $Date: 2011/07/11 16:01:21 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -313,7 +313,7 @@ public class Updater
         {
           try {
             is.close();
-          } catch (Exception e) {/* useless */};
+          } catch (Exception e) {/* useless */}
         }
       }
     }
@@ -324,7 +324,10 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
- * Revision 1.10  2010/12/28 17:15:41  willuhn
+ * Revision 1.11  2011/07/11 16:01:21  willuhn
+ * *** empty log message ***
+ *
+ * Revision 1.10  2010-12-28 17:15:41  willuhn
  * @B Inner-Classes wurden nicht korrekt geladen
  *
  * Revision 1.9  2010/06/02 14:15:08  willuhn
