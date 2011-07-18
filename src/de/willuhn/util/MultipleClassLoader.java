@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/MultipleClassLoader.java,v $
- * $Revision: 1.34 $
- * $Date: 2009/08/21 09:43:22 $
+ * $Revision: 1.35 $
+ * $Date: 2011/07/18 15:43:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -28,11 +28,10 @@ import de.willuhn.logging.Logger;
 
 /**
  * ClassLoader der sich beliebiger anderer ClassLoader bedient.
- * @author willuhn
- * 05.01.2004
  */
 public class MultipleClassLoader extends ClassLoader
 {
+  private String name           = null;
   private ArrayList loaders   	= new ArrayList();
   private Hashtable cache     	= new Hashtable();
   private ClassFinder finder   	= new ClassFinder();
@@ -45,6 +44,26 @@ public class MultipleClassLoader extends ClassLoader
 	{
 		super();
 	}
+	
+	/**
+	 * Vergibt einen Namen fuer den Classloader.
+	 * @param name Name fuer den Classloader.
+	 */
+	public void setName(String name)
+	{
+	  this.name = name;
+	}
+	
+	/**
+	 * Liefert den Namen des Classloaders.
+	 * @return der Name des Classloaders.
+	 */
+	public String getName()
+	{
+	  if (this.name == null)
+	    return "multipleClassLoader";
+	  return this.name;
+	}
 
   /**
    * Fuegt einen weiteren ClassLoader hinzu,
@@ -54,7 +73,7 @@ public class MultipleClassLoader extends ClassLoader
   {
     if (loader == null)
       return;
-    Logger.debug("multipleClassLoader: adding class loader " + loader.getClass().getName());
+    Logger.debug(this.getName() + ": adding class loader " + loader.getClass().getName());
     loaders.add(loader);
     if (loader instanceof MultipleClassLoader)
     {
@@ -143,7 +162,7 @@ public class MultipleClassLoader extends ClassLoader
 
     for(int i=0;i<jars.length;++i)
     {
-			Logger.debug("multipleClassLoader: adding file " + jars[i].getAbsolutePath());
+			Logger.debug(this.getName() + ": adding file " + jars[i].getAbsolutePath());
       add(jars[i].toURI().toURL()); // ungueltige Zeichen werden escaped wenn wir vorher eine URI draus machen (zB. Spaces).
     }
     return jars;
@@ -278,7 +297,7 @@ public class MultipleClassLoader extends ClassLoader
     // Die oben weggeworfenee ClassNotFoundException muessen
     // wir nicht aufheben, da in der ohnehin nicht mehr
     // Informationen stehen als in unserer.
-    throw new ClassNotFoundException("class not found: " + className);
+    throw new ClassNotFoundException(this.getName() + ": class not found: " + className);
   }
 
   /**
@@ -338,117 +357,20 @@ public class MultipleClassLoader extends ClassLoader
     }
 
   }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  public String toString()
+  {
+    return this.getName();
+  }
 }
 
 
 /*********************************************************************
  * $Log: MultipleClassLoader.java,v $
- * Revision 1.34  2009/08/21 09:43:22  willuhn
- * @B Im MultipleClassloader waren die Methoden getResource und getResources noch nicht an den UCL delegiert worden. Das fuehrte z.Bsp. dazu, dass eine persistence.xml von JPA nicht gefunden wurde, wenn sie in einem Jameica-Plugin geladen wurde
- *
- * Revision 1.33  2008/09/12 08:16:35  willuhn
- * @B BUGZILLA 627
- *
- * Revision 1.32  2007/12/21 16:49:06  willuhn
- * @C Classloader wirft jetzt auch ggf. LinkageErrors - wurden vorher vom Classloader verschluckt und lediglich als "ClassNotFoundException" gemeldet
- *
- * Revision 1.31  2007/10/25 23:13:22  willuhn
- * @N Support fuer kaskadierende Classloader und -finder
- * @C Classfinder ignoriert jetzt Inner-Classes
- *
- * Revision 1.30  2007/03/09 18:03:32  willuhn
- * @N classloader updates
- * @N FileWatch
- *
- * Revision 1.29  2005/07/24 16:59:17  web0
- * @B fix in settings watcher
- *
- * Revision 1.28  2005/05/19 17:43:58  web0
- * @B Uralt-Fehler im URLClassloader gefixt
- *
- * Revision 1.27  2005/05/02 11:23:20  web0
- * *** empty log message ***
- *
- * Revision 1.26  2004/11/12 18:18:19  willuhn
- * @C Logging refactoring
- *
- * Revision 1.25  2004/10/07 18:06:10  willuhn
- * @N ZipExtractor
- *
- * Revision 1.24  2004/08/18 23:14:28  willuhn
- * @D Javadoc
- *
- * Revision 1.23  2004/07/25 17:15:33  willuhn
- * *** empty log message ***
- *
- * Revision 1.22  2004/06/30 20:58:53  willuhn
- * @C some refactoring
- *
- * Revision 1.21  2004/06/15 21:11:30  willuhn
- * @N added LoggerOutputStream
- *
- * Revision 1.20  2004/05/25 23:24:03  willuhn
- * *** empty log message ***
- *
- * Revision 1.19  2004/05/11 21:07:20  willuhn
- * *** empty log message ***
- *
- * Revision 1.18  2004/05/04 23:10:24  willuhn
- * *** empty log message ***
- *
- * Revision 1.17  2004/05/04 23:05:01  willuhn
- * *** empty log message ***
- *
- * Revision 1.16  2004/05/02 17:04:58  willuhn
- * *** empty log message ***
- *
- * Revision 1.15  2004/04/01 19:02:02  willuhn
- * @N added getResourceAsStream
- *
- * Revision 1.14  2004/04/01 00:23:49  willuhn
- * *** empty log message ***
- *
- * Revision 1.13  2004/03/31 22:50:51  willuhn
- * @B bugfixes in CLassLoader
- * @N massive performance speedup! ;)
- *
- * Revision 1.12  2004/03/30 22:07:19  willuhn
- * *** empty log message ***
- *
- * Revision 1.11  2004/03/29 19:56:56  willuhn
- * @D javadoc
- *
- * Revision 1.10  2004/03/18 01:24:56  willuhn
- * @C refactoring
- *
- * Revision 1.9  2004/03/06 18:24:47  willuhn
- * @D javadoc
- *
- * Revision 1.8  2004/02/27 01:09:42  willuhn
- * *** empty log message ***
- *
- * Revision 1.7  2004/02/26 18:47:11  willuhn
- * *** empty log message ***
- *
- * Revision 1.6  2004/02/25 23:12:07  willuhn
- * *** empty log message ***
- *
- * Revision 1.5  2004/02/09 13:06:51  willuhn
- * @C misc
- *
- * Revision 1.4  2004/01/29 00:45:50  willuhn
- * *** empty log message ***
- *
- * Revision 1.3  2004/01/25 18:40:05  willuhn
- * *** empty log message ***
- *
- * Revision 1.2  2004/01/23 00:24:17  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2004/01/08 21:38:39  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2004/01/05 18:04:46  willuhn
- * @N added MultipleClassLoader
+ * Revision 1.35  2011/07/18 15:43:35  willuhn
+ * @N Name fuer den Classloader vergebbar
  *
  *********************************************************************/
