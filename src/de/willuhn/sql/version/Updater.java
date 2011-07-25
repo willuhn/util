@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/sql/version/Updater.java,v $
- * $Revision: 1.11 $
- * $Date: 2011/07/11 16:01:21 $
+ * $Revision: 1.12 $
+ * $Date: 2011/07/25 09:58:43 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,11 +13,12 @@
 
 package de.willuhn.sql.version;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ public class Updater
 {
   private UpdateProvider provider = null;
   private MyClassloader loader    = null;
+  private String encoding         = System.getProperty("file.encoding","iso-8859-1");
 
   /**
    * ct.
@@ -43,10 +45,22 @@ public class Updater
    */
   public Updater(UpdateProvider provider)
   {
-    this.provider = provider;
-    this.loader   = new MyClassloader(provider);
+    this(provider,null);
   }
   
+  /**
+   * ct.
+   * @param provider der zu verwendende Provider.
+   * @param encoding das Datei-Encoding, welches fuer das Lesen der SQL-Scripts verwendet werden soll. 
+   */
+  public Updater(UpdateProvider provider, String encoding)
+  {
+    this.provider = provider;
+    this.loader   = new MyClassloader(provider);
+    if (encoding != null)
+      this.encoding = encoding;
+  }
+
   /**
    * Fuehrt das Update durch.
    * @throws ApplicationException wenn ein Fehler beim Update auftrat.
@@ -146,6 +160,7 @@ public class Updater
 
     // Wir fuehren die Updates aus.
     Logger.info("found " + updates.size() + " update files");
+    Logger.info("encoding: " + this.encoding);
     for (int i=0;i<updates.size();++i)
     {
       
@@ -211,8 +226,8 @@ public class Updater
       Reader reader = null;
       try
       {
-        reader = new FileReader(update);
         Logger.info("  executing " + filename);
+        reader = new InputStreamReader(new BufferedInputStream(new FileInputStream(update)),this.encoding);
         ScriptExecutor.execute(reader,provider.getConnection(),provider.getProgressMonitor());
         return;
       }
@@ -324,7 +339,10 @@ public class Updater
 
 /**********************************************************************
  * $Log: Updater.java,v $
- * Revision 1.11  2011/07/11 16:01:21  willuhn
+ * Revision 1.12  2011/07/25 09:58:43  willuhn
+ * @N Fuer die SQL-Scripts kann jetzt explizit ein Encoding angegeben werden
+ *
+ * Revision 1.11  2011-07-11 16:01:21  willuhn
  * *** empty log message ***
  *
  * Revision 1.10  2010-12-28 17:15:41  willuhn
