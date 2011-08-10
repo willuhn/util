@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.26 $
- * $Date: 2011/05/27 15:18:13 $
+ * $Revision: 1.27 $
+ * $Date: 2011/08/10 09:43:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -44,7 +44,7 @@ public class Settings
 
   private File file             = null;
   private double lastModified   = 0;
-  private Properties properties = null;
+  private Properties properties = null; // Bei Gelegenheit mal auf TypedProperties umstellen
 	private boolean storeWhenRead = false;
 
   /**
@@ -511,7 +511,10 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
- * Revision 1.26  2011/05/27 15:18:13  willuhn
+ * Revision 1.27  2011/08/10 09:43:39  willuhn
+ * @N TypedProperties
+ *
+ * Revision 1.26  2011-05-27 15:18:13  willuhn
  * @N Aenderungen nur speichern, wenn wirklich was geaendert wurde oder das Speichern forciert wird
  *
  * Revision 1.25  2010/04/06 11:27:05  willuhn
