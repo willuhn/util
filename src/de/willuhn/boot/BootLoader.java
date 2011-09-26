@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.17 $
- * $Date: 2010/11/11 16:25:12 $
+ * $Revision: 1.18 $
+ * $Date: 2011/09/26 11:41:36 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -139,7 +139,7 @@ public class BootLoader {
       s.init(this,caller);
       this.order.add(s);
       long used = System.currentTimeMillis() - start;
-      Logger.info("used time to init " + target.getName() + ": " + used + " millis");
+      Logger.debug("used time to init " + target.getName() + ": " + used + " millis");
     }
     catch (SkipServiceException e)
     {
@@ -242,7 +242,10 @@ public class BootLoader {
 
 /**********************************************************************
  * $Log: BootLoader.java,v $
- * Revision 1.17  2010/11/11 16:25:12  willuhn
+ * Revision 1.18  2011/09/26 11:41:36  willuhn
+ * @C changed log level
+ *
+ * Revision 1.17  2010-11-11 16:25:12  willuhn
  * @B da fehlte noch ein Cast
  *
  * Revision 1.16  2010-11-11 16:24:08  willuhn
