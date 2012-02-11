@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Platform.java,v $
- * $Revision: 1.2 $
- * $Date: 2010/09/29 10:47:39 $
+ * $Revision: 1.3 $
+ * $Date: 2012/02/11 13:50:56 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -74,6 +74,7 @@ public class Platform
 
   /**
    * Liefert das Verzeichnis, in dem sich die uebergebene Klasse befindet.
+   * @param c die Klasse, zu der das Verzeichnis gesucht wird.
    * @return Verzeichnis, in dem sich die Klasse befindet.
    * @throws IOException
    */
@@ -125,7 +126,10 @@ public class Platform
 
 /**********************************************************************
  * $Log: Platform.java,v $
- * Revision 1.2  2010/09/29 10:47:39  willuhn
+ * Revision 1.3  2012/02/11 13:50:56  willuhn
+ * *** empty log message ***
+ *
+ * Revision 1.2  2010-09-29 10:47:39  willuhn
  * @B den Konstruktor gibts erst in Java 1.6
  *
  * Revision 1.1  2010-09-29 10:44:35  willuhn
