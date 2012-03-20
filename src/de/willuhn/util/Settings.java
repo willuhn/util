@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.27 $
- * $Date: 2011/08/10 09:43:39 $
+ * $Revision: 1.28 $
+ * $Date: 2012/03/20 23:26:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -113,7 +113,7 @@ public class Settings
     }
     
     // Parameter laden, wenn die Datei existiert
-    if (this.file.exists())
+    if (this.file != null && this.file.exists())
       reload();
   }
 
@@ -447,7 +447,7 @@ public class Settings
   {
     // Die Datei existiert noch nicht und wir haben noch keine Werte.
     // Dann muessen wir die Datei auch nicht sinnlos anlegen
-    if (!this.file.exists() && this.properties.size() == 0)
+    if (this.file == null || !this.file.exists() && this.properties.size() == 0)
       return;
     
     OutputStream os = null;
@@ -482,6 +482,9 @@ public class Settings
    */
   private synchronized void reload()
   {
+    if (this.file == null)
+      return;
+    
     long modified = this.file.lastModified();
 
     if (this.lastModified == modified)
@@ -511,7 +514,10 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
- * Revision 1.27  2011/08/10 09:43:39  willuhn
+ * Revision 1.28  2012/03/20 23:26:19  willuhn
+ * @N Support fuer "readonly" Settings, die nur aus User-Presets bestehen (BUGZILLA 1209)
+ *
+ * Revision 1.27  2011-08-10 09:43:39  willuhn
  * @N TypedProperties
  *
  * Revision 1.26  2011-05-27 15:18:13  willuhn
