@@ -12,11 +12,13 @@
  **********************************************************************/
 package de.willuhn.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import de.willuhn.io.IOUtil;
 import de.willuhn.logging.Logger;
 
 /**
@@ -95,6 +98,7 @@ public class Settings
     {
       if (systemFile.exists() && systemFile.canRead())
       {
+        InputStream is = null;
         try
         {
           // "this.properties" wird initial mit den System-Vorgaben befuellt.
@@ -102,12 +106,17 @@ public class Settings
           // in "reload()" die System-Vorgaben
           Logger.debug("loading system presets from " + systemFile.getAbsolutePath());
           Properties presets = new Properties();
-          presets.load(new FileInputStream(systemFile));
+          is = new BufferedInputStream(new FileInputStream(systemFile));
+          presets.load(is);
           this.properties.putAll(presets);
         }
         catch (Exception e1)
         {
           Logger.error("unable to load system presets from " + systemFile.getAbsolutePath(),e1);
+        }
+        finally
+        {
+          IOUtil.close(is);
         }
       }
     }
@@ -490,11 +499,14 @@ public class Settings
     if (this.lastModified == modified)
       return; // Kein Reload noetig
 
+    InputStream is = null;
     try
     {
       if (this.lastModified > 0) // wenn lastModified 0 ist, wurde die Datei noch gar nicht geladen
         Logger.debug(this.file.getAbsolutePath() + " has changed, reloading");
-      this.properties.load(new FileInputStream(this.file));
+      
+      is = new BufferedInputStream(new FileInputStream(this.file));
+      this.properties.load(is);
     }
     catch (FileNotFoundException nfe)
     {
@@ -508,6 +520,7 @@ public class Settings
     finally
     {
       this.lastModified = modified;
+      IOUtil.close(is);
     }
   }
 }
