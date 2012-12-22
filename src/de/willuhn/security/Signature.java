@@ -29,6 +29,7 @@ import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.willuhn.io.IOUtil;
 import de.willuhn.util.Queue;
 
 /**
@@ -224,22 +225,7 @@ public class Signature
     }
     finally
     {
-      if (is1 != null)
-      {
-        try { is1.close(); } catch (Exception e) {/*useless*/}
-      }
-      if (is2 != null)
-      {
-        try { is2.close(); } catch (Exception e) {/*useless*/}
-      }
-      if (is3 != null)
-      {
-        try { is3.close(); } catch (Exception e) {/*useless*/}
-      }
-      if (os != null)
-      {
-        try { os.close(); } catch (Exception e) {/*useless*/}
-      }
+      IOUtil.close(is1,is2,is3,os);
     }
   }
   
