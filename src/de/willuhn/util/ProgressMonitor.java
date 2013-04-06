@@ -12,6 +12,9 @@
  **********************************************************************/
 package de.willuhn.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Ein Interface, welches (implementiert) verwendet werden kann, wenn
  * eine Funktion Ausgaben ueber den aktuellen Bearbeitungsstand ausgeben
@@ -45,6 +48,18 @@ public interface ProgressMonitor
    * Konstante fuer Status "Durch Benutzer abgebrochen".
    */
   public final static int STATUS_CANCEL   = 5;
+  
+  /**
+   * Map, die Status-Codes auf lesbaren Text mappt.
+   */
+  public final static Map<Integer,String> STATUS_MAP = new HashMap<Integer,String>()
+  {{
+    put(STATUS_CANCEL, "CANCEL");
+    put(STATUS_DONE,   "DONE");
+    put(STATUS_ERROR,  "ERROR");
+    put(STATUS_NONE,   "NONE");
+    put(STATUS_RUNNING,"RUNNING");
+  }};
 
 	/**
 	 * Teilt dem Monitor mit, wieviel Prozent der Aufgabe bereits abgearbeitet sind.
