@@ -128,7 +128,7 @@ public class BootLoader {
 		// Abhaengigkeiten sind alle gebootet, jetzt koennen wir uns selbst initialisieren
     try
     {
-      Logger.info(indent() + "init service " + target.getName());
+      Logger.debug(indent() + "init service " + target.getName());
 
       // Muss vor dem Initialisieren passieren,
       // damit der Service schon bekannt ist, wenn in Init jemand
@@ -196,7 +196,7 @@ public class BootLoader {
           monitor.addPercentComplete(1);
         }
         
-        Logger.info("shutting down service " + service.getClass().getName());
+        Logger.debug("shutting down service " + service.getClass().getName());
         service.shutdown();
       }
     }

@@ -25,6 +25,12 @@ public class Level
 
 	private static Hashtable registry = new Hashtable();
 
+  /**
+   * Vordefinierter Log-Level fuer Trace-Meldungen.
+   * Sie liegen noch unterhalb von DEBUG.
+   */
+  public final static Level TRACE  = new Level("TRACE",0);
+
 	/**
 	 * Vordefinierter Log-Level fuer Debug-Meldungen.
 	 */

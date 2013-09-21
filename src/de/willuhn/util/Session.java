@@ -61,7 +61,7 @@ public class Session extends Observable
    */
   public Session(long timeout)
   {
-    Logger.info("creating new session. default timeout: " + timeout + " millis");
+    Logger.debug("creating new session. default timeout: " + timeout + " millis");
     this.timeout = timeout;
     getWorker().register(this);
   }
@@ -191,14 +191,14 @@ public class Session extends Observable
       this.hardTimeout = hardTimeout;
       if (this.hardTimeout)
       {
-        Logger.debug("added object \"" + value + "\" to session. hard timeout: " + new Date(t).toString());
+        Logger.trace("added object \"" + value + "\" to session. hard timeout: " + new Date(t).toString());
         this.timestamp = t;
         this.myTimeout = 0;
       }
       else
       {
         this.myTimeout = t;
-        Logger.debug("added object \"" + value + "\" to session. timeout: " + t + " millis");
+        Logger.trace("added object \"" + value + "\" to session. timeout: " + t + " millis");
       }
     }
     
@@ -229,7 +229,7 @@ public class Session extends Observable
     public Worker()
     {
       super("Session Worker Thread");
-      Logger.info("Starting Session Worker Thread");
+      Logger.debug("Starting Session Worker Thread");
     }
     
     /**
@@ -259,7 +259,7 @@ public class Session extends Observable
           // wir haben keine Sessions mehr. Dann koennen wir uns beenden.
           try
           {
-            Logger.info("session worker thread no longer needed, shutting down");
+            Logger.debug("session worker thread no longer needed, shutting down");
             interrupt();
           }
           catch (Exception e)
@@ -301,7 +301,7 @@ public class Session extends Observable
                   SessionObject value = (SessionObject) data.get(key);
                   if (current > (value.timestamp + value.myTimeout))
                   {
-                    Logger.debug("removing object " + key + " from session");
+                    Logger.trace("removing object " + key + " from session");
                     data.remove(key);
                     s.setChanged();
                     s.notifyObservers(value.value);
@@ -315,7 +315,7 @@ public class Session extends Observable
       }
       catch (InterruptedException e)
       {
-        Logger.info("session worker thread interrupted");
+        Logger.debug("session worker thread interrupted");
       }
     }
 

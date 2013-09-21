@@ -13,7 +13,8 @@
 
 package de.willuhn.logging;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -105,6 +106,15 @@ public class Logger
   public static boolean isLogging(Level l)
   {
     return l != null && l.getValue() >= Logger.level.getValue();
+  }
+
+  /**
+   * Schreibt eine Message vom Typ "trace" ins Log.
+   * @param message zu loggende Nachricht.
+   */
+  public static void trace(String message)
+  {
+    write(Level.TRACE,message);
   }
 
   /**

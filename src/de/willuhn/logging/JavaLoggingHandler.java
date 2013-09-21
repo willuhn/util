@@ -43,7 +43,7 @@ public class JavaLoggingHandler extends Handler
       logMapping.put(java.util.logging.Level.CONFIG,Level.INFO);
       logMapping.put(java.util.logging.Level.FINE,Level.DEBUG);
       logMapping.put(java.util.logging.Level.FINER,Level.DEBUG);
-      logMapping.put(java.util.logging.Level.FINEST,Level.DEBUG);
+      logMapping.put(java.util.logging.Level.FINEST,Level.TRACE);
       logMapping.put(java.util.logging.Level.INFO,Level.INFO);
       logMapping.put(java.util.logging.Level.SEVERE,Level.ERROR);
       logMapping.put(java.util.logging.Level.WARNING,Level.WARN);
