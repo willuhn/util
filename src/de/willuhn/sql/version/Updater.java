@@ -28,6 +28,7 @@ import java.util.List;
 import de.willuhn.logging.Logger;
 import de.willuhn.sql.ScriptExecutor;
 import de.willuhn.util.ApplicationException;
+import de.willuhn.util.ProgressMonitor;
 
 
 /**
@@ -149,7 +150,21 @@ public class Updater
     }
 
     if (currentVersion > maxNumber)
+    {
+      // Wenn wir einen Progress-Monitor haben, dann melden wir diesen Zustand lediglich
+      // als Fehler. Damit ueberlassen wir es dem Aufrufer, ob der das toleriert oder nicht.
+      // Denn falls die Datenbank-Updates abwaertskompatibel waren, funktioniert die
+      // aeltere Version ja unter Umstaenden auch problemlos auf der neueren Datenbank.
+      Logger.error("database version too new. actual version: " + currentVersion + ", maximum expected version: " + maxNumber);
+      ProgressMonitor monitor = this.provider.getProgressMonitor();
+      if (monitor != null)
+      {
+        monitor.setStatus(ProgressMonitor.STATUS_ERROR);
+        monitor.setStatusText("Die Datenbank wurde bereits mit einer neueren Programmversion geöffnet");
+        return;
+      }
       throw new ApplicationException("Die Datenbank wurde bereits mit einer neueren Programmversion geöffnet");
+    }
 
     // Keine Updates gefunden
     if (updates.size() == 0)
