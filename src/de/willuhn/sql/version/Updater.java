@@ -13,6 +13,11 @@
 
 package de.willuhn.sql.version;
 
+import de.willuhn.logging.Logger;
+import de.willuhn.sql.ScriptExecutor;
+import de.willuhn.util.ApplicationException;
+import de.willuhn.util.ProgressMonitor;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,11 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import de.willuhn.logging.Logger;
-import de.willuhn.sql.ScriptExecutor;
-import de.willuhn.util.ApplicationException;
-import de.willuhn.util.ProgressMonitor;
 
 
 /**
@@ -48,11 +48,14 @@ public class Updater
   {
     this(provider,null);
   }
-  
+
   /**
    * ct.
-   * @param provider der zu verwendende Provider.
-   * @param encoding das Datei-Encoding, welches fuer das Lesen der SQL-Scripts verwendet werden soll. 
+   *
+   * @param provider
+   *          der zu verwendende Provider.
+   * @param encoding
+   *          das Datei-Encoding, welches fuer das Lesen der SQL-Scripts verwendet werden soll.
    */
   public Updater(UpdateProvider provider, String encoding)
   {
@@ -86,7 +89,7 @@ public class Updater
     Logger.info("current version: " + currentVersion);
 
     Logger.info("searching for available updates");
-    
+
     // Wir ermitteln eine Liste aller Dateien im Update-Verzeichnis.
     File baseDir = provider.getUpdatePath();
     if (baseDir == null || !baseDir.exists() || !baseDir.canRead() || !baseDir.isDirectory())
@@ -94,7 +97,7 @@ public class Updater
       Logger.warn("no update dir given or not readable");
       return;
     }
-    
+
     File[] files = baseDir.listFiles(new FilenameFilter() {
       public boolean accept(File dir, String name)
       {
@@ -105,16 +108,15 @@ public class Updater
         return name.endsWith(".sql") || (name.endsWith(".class") && name.indexOf("$") == -1); // inner classes ignorieren
       }
     });
-    
+
     // Jetzt sortieren wir die Dateien und holen uns anschliessend
     // nur die, welche sich hinter der aktuellen Versionsnummer
     // befinden.
     List l = Arrays.asList(files);
     Collections.sort(l);
-    
+
     files = (File[]) l.toArray(new File[l.size()]);
-    
-    
+
     // wir iterieren ueber die Liste, und ueberspringen alle
     // bis zur aktuellen Version.
     ArrayList updates = new ArrayList();
@@ -122,7 +124,7 @@ public class Updater
     for (int i=0;i<files.length;++i)
     {
       File current = files[i];
-      
+
       // Unterverzeichnisse (z.Bsp. "CVS") ignorieren wir.
       if (current.isDirectory())
         continue;
@@ -133,7 +135,7 @@ public class Updater
         Logger.warn("update file " + current + " not readable, skipping");
         continue;
       }
-      
+
       int number = toNumber(current.getName());
       if (number < 0)
       {
@@ -160,10 +162,10 @@ public class Updater
       if (monitor != null)
       {
         monitor.setStatus(ProgressMonitor.STATUS_ERROR);
-        monitor.setStatusText("Die Datenbank wurde bereits mit einer neueren Programmversion geöffnet");
+        monitor.setStatusText("Die Datenbank wurde bereits mit einer neueren Programmversion geoeffnet");
         return;
       }
-      throw new ApplicationException("Die Datenbank wurde bereits mit einer neueren Programmversion geöffnet");
+      throw new ApplicationException("Die Datenbank wurde bereits mit einer neueren Programmversion geoeffnet");
     }
 
     // Keine Updates gefunden
@@ -178,7 +180,7 @@ public class Updater
     Logger.info("encoding: " + this.encoding);
     for (int i=0;i<updates.size();++i)
     {
-      
+
       File f = (File) updates.get(i);
       execute(f); // Update ausfuehren
 
@@ -198,7 +200,7 @@ public class Updater
     }
     Logger.info("update completed");
   }
-  
+
   /**
    * Macht eine Versionsnummer aus dem Dateinamen.
    * @param filename Dateiname.
@@ -225,7 +227,7 @@ public class Updater
     }
     return -1;
   }
-  
+
   /**
    * Fuehrt ein einzelnes Update durch.
    * @param update das auszufuehrende Update.
@@ -234,7 +236,7 @@ public class Updater
   private void execute(File update) throws ApplicationException
   {
     String filename = update.getName();
-    
+
     // SQL-Script direkt ausfuehren.
     if (filename.endsWith(".sql"))
     {
@@ -285,7 +287,7 @@ public class Updater
 
     Logger.warn("unknown update file format: " + filename + ", skipping");
   }
-  
+
   /**
    * Ein eigener Classloader, um aus einer .class-Datei
    * die Klasse zu laden.
@@ -293,7 +295,7 @@ public class Updater
   private class MyClassloader extends ClassLoader
   {
     private UpdateProvider provider = null;
-    
+
     /**
      * ct
      * @param provider der Update-Provider.
@@ -303,10 +305,11 @@ public class Updater
       super(provider.getClass().getClassLoader());
       this.provider = provider;
     }
-    
+
     /**
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
+    @Override
     public Class findClass(String name)
     {
       InputStream is = null;
@@ -314,12 +317,12 @@ public class Updater
       {
         if (!name.endsWith(".class"))
           name = name += ".class";
-        
+
         // Datei in Byte-Array laden
         File f = new File(provider.getUpdatePath(),name);
         if (!f.exists() || !f.canRead())
           throw new Exception("unable to read " + f);
-        
+
         is = new FileInputStream(f);
         byte[] data = new byte[(int)f.length()];
         is.read(data);
@@ -329,7 +332,7 @@ public class Updater
 
         // ".class" abschneiden
         name = name.substring(0,name.lastIndexOf("."));
-        
+
         // Byte-Array von Parent-Classloader laden
         return defineClass(name, data, 0, data.length);
       }

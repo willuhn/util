@@ -3,7 +3,8 @@ apply plugin: 'maven'
 
 group = 'de.willuhn.jameica'
 version = '2.6.7-SNAPSHOT'
-compileJava.options.encoding = 'ISO-8859-1'
+compileJava.options.encoding = 'windows-1251'
+javadoc.options.charSet = 'windows-1251'
 
 description = """Jameica Utility classes"""
 
@@ -17,6 +18,7 @@ sourceSets {
         }
     }
 }
+
 
 
 repositories {

@@ -12,33 +12,32 @@
  **********************************************************************/
 package de.willuhn.boot;
 
+import de.willuhn.logging.Logger;
+import de.willuhn.util.ProgressMonitor;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import de.willuhn.logging.Logger;
-import de.willuhn.util.ProgressMonitor;
-
 /**
- * Der BootLoader.
- * Über diese Klasse kann ein kaskadierender Boot-Prozess gestartet werden.
+ * Der BootLoader. Ueber diese Klasse kann ein kaskadierender Boot-Prozess gestartet werden.
  */
 public class BootLoader {
 
-	/**
-	 * Lookup der initialisierten Services.
-	 */
-	private Map<Class,Bootable> services = new HashMap<Class,Bootable>();
-  
+  /**
+   * Lookup der initialisierten Services.
+   */
+  private Map<Class,Bootable> services = new HashMap<Class,Bootable>();
+
   /**
    * Reihenfolge, in der die Services gebootet wurden.
    */
   private Stack<Bootable> order = new Stack<Bootable>();
 
-	private int indent = 0;
+  private int indent = 0;
 
   private ProgressMonitor dummy   = new DummyMonitor();
-	private ProgressMonitor monitor = null;
+  private ProgressMonitor monitor = null;
 
   /**
    * Liefert den Progress-Monitor.
@@ -61,37 +60,37 @@ public class BootLoader {
   /**
    * Liefert den gewuenschten Dienst und bootet das System
    * bei Bedarf bis genau zu diesem.
-	 * @param target das gweuenschte (ung ggf zu bootende) Ziel.
-	 * Bevor der Loader die Klasse <code>target</code> via <code>init()</code>
-	 * initialisiert, wird er alle Abhaengigkeiten aufloesen und zuvor alle
-	 * entsprechend <code>depends</code> angegebenen Services starten.
-	 * @return der instanziierte Dienst.
-	 */
-	public final <T extends Bootable> T getBootable(Class<? extends Bootable> target)
-	{
-		return (T) resolve(target,null);
-	}
+   * @param target das gweuenschte (ung ggf zu bootende) Ziel.
+   * Bevor der Loader die Klasse <code>target</code> via <code>init()</code>
+   * initialisiert, wird er alle Abhaengigkeiten aufloesen und zuvor alle
+   * entsprechend <code>depends</code> angegebenen Services starten.
+   * @return der instanziierte Dienst.
+   */
+  public final <T extends Bootable> T getBootable(Class<? extends Bootable> target)
+  {
+    return (T) resolve(target,null);
+  }
 
-	/**
+  /**
    * Loest die Abhnaegigkeiten fuer einen Dienst auf.
-	 * @param target der gewuenschte Dienst.
-	 * @param caller der Aufrufer. Kann <code>null</code> sein.
-	 * @return der instanziierte Dienst.
-	 * @throws Exception
-	 */
-	private final <T extends Bootable> T resolve(Class<? extends Bootable> target,Bootable caller)
-	{
+   * @param target der gewuenschte Dienst.
+   * @param caller der Aufrufer. Kann <code>null</code> sein.
+   * @return der instanziierte Dienst.
+   * @throws Exception
+   */
+  private final <T extends Bootable> T resolve(Class<? extends Bootable> target,Bootable caller)
+  {
 
-		// Target schon gebootet
+    // Target schon gebootet
     T s = (T) services.get(target);
-		if (s != null)
-			return s;
+    if (s != null)
+      return s;
 
-		Logger.debug(indent() + "booting service " + target.getName());
+    Logger.debug(indent() + "booting service " + target.getName());
 
-		indent++;
+    indent++;
 
-		// Instanziieren
+    // Instanziieren
     try
     {
       s = (T) target.newInstance();
@@ -101,10 +100,10 @@ public class BootLoader {
       throw new RuntimeException("unable to create instance of " + target.getName(),e);
     }
 
-		Logger.debug(indent() + "checking dependencies for " + target.getName());
-		Class<Bootable>[] deps = s.depends();
-		if (deps != null && deps.length > 0)
-		{
+    Logger.debug(indent() + "checking dependencies for " + target.getName());
+    Class<Bootable>[] deps = s.depends();
+    if (deps != null && deps.length > 0)
+    {
       // Alle Abhaengigkeiten booten
       Logger.debug(indent() + "booting dependencies for " + target.getName());
 
@@ -118,14 +117,14 @@ public class BootLoader {
         }
         resolve(dep,s);
       }
-		}
+    }
     else
     {
       Logger.debug(indent() + "no dependencies found for " + target.getName());
     }
 
 
-		// Abhaengigkeiten sind alle gebootet, jetzt koennen wir uns selbst initialisieren
+    // Abhaengigkeiten sind alle gebootet, jetzt koennen wir uns selbst initialisieren
     try
     {
       Logger.debug(indent() + "init service " + target.getName());
@@ -134,7 +133,7 @@ public class BootLoader {
       // damit der Service schon bekannt ist, wenn in Init jemand
       // den Service braucht -> wuerde sonst eine Rekursion ausloesen
       this.services.put(s.getClass(),s);
-      
+
       long start = System.currentTimeMillis();
       s.init(this,caller);
       this.order.add(s);
@@ -148,25 +147,26 @@ public class BootLoader {
     }
     indent--;
     return s;
-	}
+  }
 
-	/**
-	 * Liefert abhaengig von der Iterationstiefe eine definierte Anzahl von Leerzeichen.
+  /**
+   * Liefert abhaengig von der Iterationstiefe eine definierte Anzahl von Leerzeichen.
    * @return Leerzeichen.
    */
   private String indent()
-	{
-		String s = "";
-		for (int i=0;i<indent;++i)
-		{
-			s += "  ";
-		}
-		return s;
-	}
+  {
+    String s = "";
+    for (int i=0;i<indent;++i)
+    {
+      s += "  ";
+    }
+    return s;
+  }
 
   /**
    * @see java.lang.Object#finalize()
    */
+  @Override
   protected void finalize() throws Throwable
   {
     try
@@ -178,7 +178,7 @@ public class BootLoader {
       super.finalize();
     }
   }
-  
+
   /**
    * Faehrt alle Services in genau umgekehrter Reihenfolge wieder herunter, in der sie gebootet wurden.
    */
@@ -189,13 +189,13 @@ public class BootLoader {
       Bootable service = null;
       while (!this.order.empty())
       {
-        service = (Bootable) this.order.pop();
+        service = this.order.pop();
         if (monitor != null)
         {
           monitor.setStatusText("shutting down service " + service.getClass().getName());
           monitor.addPercentComplete(1);
         }
-        
+
         Logger.debug("shutting down service " + service.getClass().getName());
         service.shutdown();
       }
