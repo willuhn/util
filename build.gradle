@@ -1,0 +1,25 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'de.willuhn.jameica'
+version = '2.6.7-SNAPSHOT'
+compileJava.options.encoding = 'ISO-8859-1'
+
+description = """Jameica Utility classes"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+
+repositories {
+
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
