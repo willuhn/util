@@ -1,13 +1,7 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/Logger.java,v $
- * $Revision: 1.16 $
- * $Date: 2010/05/19 14:47:38 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn.webdesign
- * All rights reserved
+ * Copyright (c) by Olaf Willuhn
+ * GPLv2
  *
  **********************************************************************/
 
@@ -294,7 +288,7 @@ public class Logger
       }
     }
 
-    write(new Message(new Date(),level,host,clazz,method,message));
+    write(new Message(new Date(),level,host,clazz,method,message,Thread.currentThread().getName()));
   }
 
   /**
@@ -452,16 +446,3 @@ public class Logger
   }
 
 }
-
-/*********************************************************************
- * $Log: Logger.java,v $
- * Revision 1.16  2010/05/19 14:47:38  willuhn
- * @N Ausfall von STDOUT tolerieren
- *
- * Revision 1.15  2010/02/12 00:57:34  willuhn
- * @N Test-Methode, um herauszufinden, ob ein angebenes Level geloggt wird
- *
- * Revision 1.14  2008/06/13 13:40:47  willuhn
- * @N Class und Method kann nun explizit angegeben werden
- * @N Hostname kann mitgeloggt werden
- **********************************************************************/

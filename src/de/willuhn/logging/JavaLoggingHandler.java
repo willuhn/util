@@ -1,13 +1,7 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/JavaLoggingHandler.java,v $
- * $Revision: 1.3 $
- * $Date: 2010/02/02 11:48:26 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
- * All rights reserved
+ * Copyright (c) by Olaf Willuhn
+ * GPLv2
  *
  **********************************************************************/
 
@@ -103,7 +97,7 @@ public class JavaLoggingHandler extends Handler
       }
     }
     
-    Message msg = new Message(new Date(record.getMillis()),level,record.getSourceClassName(),record.getSourceMethodName(),message);
+    Message msg = new Message(new Date(record.getMillis()),level,null,record.getSourceClassName(),record.getSourceMethodName(),message,Thread.currentThread().getName());
     Logger.write(msg);
   }
 
@@ -120,20 +114,4 @@ public class JavaLoggingHandler extends Handler
   public void flush()
   {
   }
-  
-  
 }
-
-
-/**********************************************************************
- * $Log: JavaLoggingHandler.java,v $
- * Revision 1.3  2010/02/02 11:48:26  willuhn
- * @N Der Logging-Handler deaktiviert automatisch das Java-Logging damit nur noch das eigene verwendet wird
- *
- * Revision 1.2  2008/07/10 09:08:08  willuhn
- * @JavaLoggingHandler direkt am Java Root-Logger registrieren
- *
- * Revision 1.1  2007/04/11 23:59:22  willuhn
- * @N Log-Adapter fuer Java-Logging
- *
- **********************************************************************/

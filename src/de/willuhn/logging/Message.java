@@ -25,20 +25,8 @@ public class Message
 	private String text   = null;
 	private String clazz  = null;
 	private String method = null;
+	private String thread = null;
 
-  /**
-   * ct.
-   * @param d
-   * @param l
-   * @param clazz
-   * @param method
-   * @param text
-   */
-  Message(Date d, Level l, String clazz, String method, String text)
-  {
-    this(d,l,null,clazz,method,text);
-  }
-  
 	/**
 	 * ct.
    * @param d
@@ -47,8 +35,9 @@ public class Message
    * @param clazz
    * @param method
    * @param text
+   * @param thread
    */
-  Message(Date d, Level l, String host, String clazz, String method, String text)
+  Message(Date d, Level l, String host, String clazz, String method, String text, String thread)
 	{
 		this.date = d;
 		this.level = l;
@@ -56,6 +45,7 @@ public class Message
 		this.clazz = clazz;
 		this.method = method;
 		this.text = text;
+		this.thread = thread;
 	}
 	
 	/**
@@ -93,6 +83,15 @@ public class Message
 	{
 		return text;
 	}
+  
+  /**
+   * Liefert den Namen des Threads.
+   * @return thread der Name des Threads.
+   */
+  public String getThread()
+  {
+    return thread;
+  }
 
 	/**
 	 * Liefert den Namen der loggenden Klasse.
@@ -111,6 +110,7 @@ public class Message
 	{
 		return method;
 	}
+  
   /**
    * @see java.lang.Object#toString()
    */
@@ -137,7 +137,14 @@ public class Message
       sb.append(this.level.getName());
       sb.append("]");
     }
-    
+
+    if (this.thread != null)
+    {
+      sb.append("[");
+      sb.append(this.thread);
+      sb.append("]");
+    }
+
 		if (clazz != null && method != null)
     {
       sb.append("[");
