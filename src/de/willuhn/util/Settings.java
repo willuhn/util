@@ -1,13 +1,7 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Settings.java,v $
- * $Revision: 1.28 $
- * $Date: 2012/03/20 23:26:19 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn.webdesign
- * All rights reserved
+ * Copyright (c) by Olaf Willuhn
+ * GPLv2
  *
  **********************************************************************/
 package de.willuhn.util;
@@ -177,11 +171,11 @@ public class Settings
   public boolean getBoolean(String name, boolean defaultValue)
 	{
     reload();
-		String s = getProperty(name,defaultValue ? "true" : "false");
+    String def = Boolean.toString(defaultValue);
+		String s = this.properties.getProperty(name, def);
     if (s != null) s = s.trim(); // BUGZILLA 477
 		boolean b = "true".equalsIgnoreCase(s);
-		if (storeWhenRead)
-			setAttribute(name,b);
+  	storeConditional(name,Boolean.toString(b));
 		return b;
 	}
 
@@ -198,7 +192,8 @@ public class Settings
 	public int getInt(String name, int defaultValue)
 	{
     reload();
-		String s = getProperty(name,""+defaultValue);
+    String def = Integer.toString(defaultValue);
+		String s = this.properties.getProperty(name,def);
     if (s != null) s = s.trim(); // BUGZILLA 477
 		int i = defaultValue;
 		try {
@@ -208,8 +203,7 @@ public class Settings
 		{
 			Logger.error("unable to parse value of param \"" + name + "\", value: " + s,e);
 		}
-		if (storeWhenRead)
-			setAttribute(name,i);
+		storeConditional(name,Integer.toString(i));
 		return i;
 	}
 
@@ -226,7 +220,8 @@ public class Settings
   public long getLong(String name, long defaultValue)
   {
     reload();
-    String s = getProperty(name,""+defaultValue);
+    String def = Long.toString(defaultValue);
+    String s = this.properties.getProperty(name,def);
     if (s != null) s = s.trim(); // BUGZILLA 477
     long l = defaultValue;
     try {
@@ -236,8 +231,7 @@ public class Settings
     {
       Logger.error("unable to parse value of param \"" + name + "\", value: " + s,e);
     }
-    if (storeWhenRead)
-      setAttribute(name,l);
+    storeConditional(name,Long.toString(l));
     return l;
   }
 
@@ -254,7 +248,8 @@ public class Settings
 	public double getDouble(String name, double defaultValue)
 	{
     reload();
-		String s = getProperty(name,""+defaultValue);
+    String def = "" + defaultValue;
+		String s = this.properties.getProperty(name,def);
     if (s != null) s = s.trim(); // BUGZILLA 477
 		double d = defaultValue;
 		try {
@@ -264,20 +259,8 @@ public class Settings
 		{
 			Logger.error("unable to parse value of param \"" + name + "\", value: " + s,e);
 		}
-		if (storeWhenRead)
-			setAttribute(name,d);
+    storeConditional(name,"" + d);
 		return d;
-	}
-
-  /**
-   * Liefert den Wert des Attributes.
-   * @param name
-   * @param defaultValue
-   * @return der Wert des Attributes.
-   */
-  private String getProperty(String name, String defaultValue)
-	{
-    return properties.getProperty(name, defaultValue);
 	}
 
 	/**
@@ -290,9 +273,8 @@ public class Settings
 	public String getString(String name, String defaultValue)
 	{
     reload();
-		String s = getProperty(name,defaultValue);
-		if (storeWhenRead)
-			setAttribute(name,s);
+		String s = this.properties.getProperty(name,defaultValue);
+    storeConditional(name,s);
 		return s;
 	}
 
@@ -307,24 +289,35 @@ public class Settings
   public String[] getList(String name, String[] defaultValues)
   {
     reload();
+    
+    String[] result = this.getList(name);
+
+    if (result.length == 0)
+    {
+      storeConditional(name,defaultValues);
+      return defaultValues;
+    }
+
+    storeConditional(name,result);
+    return result;
+  }
+  
+  /**
+   * Liefert das Array mit den Werten.
+   * @param name Name des Attributs.
+   * @return Werte des Attributs.
+   */
+  private String[] getList(String name)
+  {
     List<String> l = new ArrayList<String>();
     String s = null;
     for (int i=0;i<255;++i)
     {
-      s = getProperty(name + "." + i,null);
+      s = this.properties.getProperty(name + "." + i,null);
       if (s == null) continue;
       l.add(s);
     }
-    if (l.size() == 0)
-    {
-      if (storeWhenRead)
-        setAttribute(name,defaultValues);
-      return defaultValues;
-    }
-    String[] result = l.toArray(new String[l.size()]);
-    if (storeWhenRead)
-      setAttribute(name,result);
-    return result;
+    return l.toArray(new String[l.size()]);
   }
 
 	/**
@@ -334,7 +327,7 @@ public class Settings
    */
   public void setAttribute(String name, boolean value)
 	{
-		setAttribute(name, value ? "true" : "false");
+		setAttribute(name, Boolean.toString(value));
 	}
 	
 	/**
@@ -344,7 +337,7 @@ public class Settings
    */
   public void setAttribute(String name, int value)
 	{
-		setAttribute(name,""+value);
+		setAttribute(name,Integer.toString(value));
 	}
 
 	/**
@@ -364,7 +357,7 @@ public class Settings
    */
   public void setAttribute(String name, long value)
   {
-    setAttribute(name,""+value);
+    setAttribute(name,Long.toString(value));
   }
 
 	/**
@@ -381,16 +374,16 @@ public class Settings
   	{
       String prev = (String) properties.remove(name);
       
-      // Wir haben wirklich was geloescht oder sollen immer speichern.
-      if (prev != null || this.storeWhenRead)
+      // Wir haben wirklich was geloescht
+      if (prev != null)
         store();
   	}
   	else
   	{
       String prev = (String) properties.setProperty(name,value);
       
-      // vorher existierte der Parameter nicht, oder er war anders oder wir sollen immer speichern
-      if (prev == null || !value.equals(prev) || this.storeWhenRead)
+      // vorher existierte der Parameter nicht, oder er war anders
+      if (prev == null || !value.equals(prev))
         store();
   	}
   }
@@ -406,30 +399,15 @@ public class Settings
    */
   public void setAttribute(String name, String[] values)
   {
-    // Aktuelle Werte laden, um zu checken, ob sich was geaendert hat
-    // Aber nur, wenn wir nicht immer speichern sollen
-    if (!this.storeWhenRead)
-    {
-      String[] prev = this.getList(name,null);
-
-      // Diese Funktion macht den kompletten Vergleich selbst
-      // Vor dem Vergleich der Elemente prueft sie auch, ob eines
-      // von beiden NULL ist und ob beide die gleiche Groesse haben
-      // Der Inhaltsvergleich findet da drin nur statt, wenn beide
-      // nicht NULL sind und die gleiche Groesse haben.
-      if (Arrays.equals(prev,values))
-        return;
-    }
-    
     // Wir entfernen immer erst alle Werte. Denn wenn vorher
     // ein laengeres Array drin steht, als wir jetzt reinschreiben,
     // wuerden die alten Werte am Ende des grossen Arrays nicht mehr
     // entfernt.
     for (int i=0;i<255;++i)
     {
-      properties.remove(name + "." + i);
+      this.properties.remove(name + "." + i);
     }
-    
+
     if (values == null || values.length == 0)
     {
       store();
@@ -448,6 +426,56 @@ public class Settings
   }
   
   /**
+   * Speichert die Datei mit dem geaenderten Parameter nur dann,
+   * wenn sich zum aktuellen Inhalt tatsaechlich etwas geaendert hat.
+   * @param name der Name des Parameters.
+   * @param value der aktuelle Wert.
+   */
+  private void storeConditional(String name, String value)
+  {
+    // koennen wir uns komplett schenken
+    if (!this.storeWhenRead)
+      return;
+    
+    // Wir muessen nur speichern, wenn sie aktueller und hinterlegter Wert unterscheiden
+    String old = this.properties.getProperty(name);
+
+    // Es hat sich nichts geaendert
+    if (value == null ? old == null : value.equals(old))
+      return;
+
+    // Aenderung speichern
+    this.setAttribute(name,value);
+  }
+
+  /**
+   * Speichert die Datei mit dem geaenderten Parameter nur dann,
+   * wenn sich zum aktuellen Inhalt tatsaechlich etwas geaendert hat.
+   * @param name der Name des Parameters.
+   * @param value der aktuelle Wert.
+   */
+  private void storeConditional(String name, String[] values)
+  {
+    // koennen wir uns komplett schenken
+    if (!this.storeWhenRead)
+      return;
+    
+    // Wir muessen nur speichern, wenn sie aktueller und hinterlegter Wert unterscheiden
+    String[] old = this.getList(name);
+
+    // Diese Funktion macht den kompletten Vergleich selbst
+    // Vor dem Vergleich der Elemente prueft sie auch, ob eines
+    // von beiden NULL ist und ob beide die gleiche Groesse haben
+    // Der Inhaltsvergleich findet da drin nur statt, wenn beide
+    // nicht NULL sind und die gleiche Groesse haben.
+    if (Arrays.equals(values,old))
+      return;
+
+    // Aenderung speichern
+    this.setAttribute(name,values);
+  }
+
+  /**
    * Schreibt die Properties in die Datei.
    * Hinweis: Die Funktion wirft keine IOException, wenn die Datei nicht
    * gespeichert werden kann. Stattdessen wird der Fehler lediglich geloggt.
@@ -463,6 +491,7 @@ public class Settings
     try
     {
       os = new BufferedOutputStream(new FileOutputStream(this.file));
+      Logger.debug("saving " + this.file.getAbsolutePath());
       this.properties.store(os,null);
     }
     catch (Exception e1)
@@ -524,44 +553,3 @@ public class Settings
     }
   }
 }
-
-/*********************************************************************
- * $Log: Settings.java,v $
- * Revision 1.28  2012/03/20 23:26:19  willuhn
- * @N Support fuer "readonly" Settings, die nur aus User-Presets bestehen (BUGZILLA 1209)
- *
- * Revision 1.27  2011-08-10 09:43:39  willuhn
- * @N TypedProperties
- *
- * Revision 1.26  2011-05-27 15:18:13  willuhn
- * @N Aenderungen nur speichern, wenn wirklich was geaendert wurde oder das Speichern forciert wird
- *
- * Revision 1.25  2010/04/06 11:27:05  willuhn
- * *** empty log message ***
- *
- * Revision 1.24  2010/03/11 07:46:35  willuhn
- * @N Properties-Datei nur anlegen, wenn tatsaechlich Werte vorliegen
- *
- * Revision 1.23  2009/10/28 11:23:00  willuhn
- * @N getLong()
- *
- * Revision 1.22  2009/09/18 10:37:20  willuhn
- * @N Neuer Konstruktor, mit dem der Dateiname der Config-Datei nun auch explizit angegeben werden kann.
- *
- * Revision 1.21  2009/01/16 16:39:56  willuhn
- * @N Funktion zum Erzeugen von SHA1-Checksummen
- * @N Funktion zum Erzeugen von Checksummen aus InputStreams
- *
- * Revision 1.20  2008/06/17 10:51:06  willuhn
- * @C User-Parameter ueberschreiben System-Parameter
- * @C properties-Dateien nicht sofort anlegen - erzeugt sonst eine Fuelle von leeren Config-Dateien
- *
- * Revision 1.19  2008/06/16 22:04:20  willuhn
- * @N System-Presets nur uebernehmen, wenn noch keine User-Config vorhanden
- *
- * Revision 1.18  2008/06/16 22:01:36  willuhn
- * @B Uebernehmen der System-Presets
- *
- * Revision 1.17  2008/04/02 21:16:30  willuhn
- * @B OutputStream not closed in store()
- **********************************************************************/
