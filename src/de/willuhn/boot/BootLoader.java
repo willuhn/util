@@ -1,13 +1,8 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/boot/BootLoader.java,v $
- * $Revision: 1.18 $
- * $Date: 2011/09/26 11:41:36 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn.webdesign
+ * Copyright (c) by Olaf Willuhn
  * All rights reserved
+ * LGPLv2
  *
  **********************************************************************/
 package de.willuhn.boot;
@@ -87,7 +82,9 @@ public class BootLoader {
 		if (s != null)
 			return s;
 
-		Logger.debug(indent() + "booting service " + target.getName());
+		final String name = target.getSimpleName();
+		
+		Logger.debug(indent() + "booting service " + name);
 
 		indent++;
 
@@ -98,21 +95,21 @@ public class BootLoader {
     }
     catch (Exception e)
     {
-      throw new RuntimeException("unable to create instance of " + target.getName(),e);
+      throw new RuntimeException("unable to create instance of " + name,e);
     }
 
-		Logger.debug(indent() + "checking dependencies for " + target.getName());
+		Logger.debug(indent() + "checking dependencies for " + name);
 		Class<Bootable>[] deps = s.depends();
 		if (deps != null && deps.length > 0)
 		{
       // Alle Abhaengigkeiten booten
-      Logger.debug(indent() + "booting dependencies for " + target.getName());
+      Logger.debug(indent() + "booting dependencies for " + name);
 
       for (Class<Bootable> dep:deps)
       {
         if (dep.equals(target))
         {
-          Logger.info(indent() + dep.getName() + " cannot have itself as dependency, skipping");
+          Logger.info(indent() + name + " cannot have itself as dependency, skipping");
           indent--;
           continue;
         }
@@ -121,14 +118,14 @@ public class BootLoader {
 		}
     else
     {
-      Logger.debug(indent() + "no dependencies found for " + target.getName());
+      Logger.debug(indent() + "no dependencies found for " + name);
     }
 
 
 		// Abhaengigkeiten sind alle gebootet, jetzt koennen wir uns selbst initialisieren
     try
     {
-      Logger.debug(indent() + "init service " + target.getName());
+      Logger.debug(indent() + "init service " + name);
 
       // Muss vor dem Initialisieren passieren,
       // damit der Service schon bekannt ist, wenn in Init jemand
@@ -139,12 +136,12 @@ public class BootLoader {
       s.init(this,caller);
       this.order.add(s);
       long used = System.currentTimeMillis() - start;
-      Logger.debug("used time to init " + target.getName() + ": " + used + " millis");
+      Logger.debug("used time to init " + name + ": " + used + " millis");
     }
     catch (SkipServiceException e)
     {
       this.services.remove(s.getClass());
-      Logger.warn(indent() + "skipping service " + target.getName() + ". message: " + e.getMessage());
+      Logger.warn(indent() + "skipping service " + name + ". message: " + e.getMessage());
     }
     indent--;
     return s;
@@ -189,14 +186,16 @@ public class BootLoader {
       Bootable service = null;
       while (!this.order.empty())
       {
-        service = (Bootable) this.order.pop();
+        service = this.order.pop();
+        
+        final String name = service.getClass().getSimpleName();
         if (monitor != null)
         {
-          monitor.setStatusText("shutting down service " + service.getClass().getName());
+          monitor.setStatusText("shutting down service " + name);
           monitor.addPercentComplete(1);
         }
         
-        Logger.debug("shutting down service " + service.getClass().getName());
+        Logger.debug("shutting down service " + name);
         service.shutdown();
       }
     }
@@ -238,31 +237,3 @@ public class BootLoader {
     public void log(String msg) {}
   }
 }
-
-
-/**********************************************************************
- * $Log: BootLoader.java,v $
- * Revision 1.18  2011/09/26 11:41:36  willuhn
- * @C changed log level
- *
- * Revision 1.17  2010-11-11 16:25:12  willuhn
- * @B da fehlte noch ein Cast
- *
- * Revision 1.16  2010-11-11 16:24:08  willuhn
- * @N Bootloader ist jetzt getypt
- *
- * Revision 1.15  2008/03/07 16:29:16  willuhn
- * @N ProgressMonitor auch beim Shutdown verwenden
- *
- * Revision 1.14  2008/03/07 11:32:26  willuhn
- * *** empty log message ***
- *
- * Revision 1.13  2008/02/13 13:33:46  willuhn
- * @N timing information
- *
- * Revision 1.12  2008/02/13 00:29:18  willuhn
- * @C Log-Ausgaben
- *
- * Revision 1.11  2008/02/13 00:27:17  willuhn
- * @N Service bereits nach Erstellung verfuegbar machen
- **********************************************************************/
