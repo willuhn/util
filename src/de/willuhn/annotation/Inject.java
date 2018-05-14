@@ -1,11 +1,11 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/annotation/Inject.java,v $
- * $Revision: 1.6 $
- * $Date: 2011/06/28 11:36:33 $
- * $Author: willuhn $
  *
- * Copyright (c) by willuhn - software & services
- * All rights reserved
+ * Copyright (c) 2004 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * GNU LESSER GENERAL PUBLIC LICENSE 2.1.
+ * Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 

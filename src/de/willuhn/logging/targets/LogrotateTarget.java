@@ -1,13 +1,11 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/logging/targets/LogrotateTarget.java,v $
- * $Revision: 1.6 $
- * $Date: 2009/06/07 22:05:54 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by  bbv AG
- * All rights reserved
+ * Copyright (c) 2004 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * GNU LESSER GENERAL PUBLIC LICENSE 2.1.
+ * Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 

@@ -1,13 +1,11 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/util/src/de/willuhn/util/Queue.java,v $
- * $Revision: 1.5 $
- * $Date: 2006/10/10 17:31:03 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn.webdesign
- * All rights reserved
+ * Copyright (c) 2004 Olaf Willuhn
+ * All rights reserved.
+ * 
+ * This software is copyrighted work licensed under the terms of the
+ * GNU LESSER GENERAL PUBLIC LICENSE 2.1.
+ * Please consult the file "LICENSE" for details. 
  *
  **********************************************************************/
 
