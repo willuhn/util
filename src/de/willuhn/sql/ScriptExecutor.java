@@ -192,7 +192,7 @@ public class ScriptExecutor
       }
 
       Logger.error("error while executing sql script. Current statement: " + currentStatement,e);
-      throw new SQLException("exception while executing sql script: " + e.getMessage() + ". Current statement: " + currentStatement);
+      throw new SQLException("exception while executing sql script: " + e.getMessage() + ". Current statement: " + currentStatement,currentStatement,e.getErrorCode(),e);
     }
     finally {
       try
@@ -216,27 +216,3 @@ public class ScriptExecutor
     }
   }
 }
-
-
-/*********************************************************************
- * $Log: ScriptExecutor.java,v $
- * Revision 1.6  2008/11/26 22:11:35  willuhn
- * @N Console-Progressmonitor
- * @N main()-Funktion fuer ScriptExecutor
- *
- * Revision 1.5  2006/06/12 22:10:48  willuhn
- * *** empty log message ***
- *
- * Revision 1.4  2006/06/08 22:41:42  willuhn
- * *** empty log message ***
- *
- * Revision 1.3  2006/05/11 20:31:32  web0
- * *** empty log message ***
- *
- * Revision 1.2  2006/05/09 23:17:44  web0
- * *** empty log message ***
- *
- * Revision 1.1  2006/01/30 14:54:11  web0
- * @N de.willuhn.sql
- *
- **********************************************************************/
