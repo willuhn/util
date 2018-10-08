@@ -42,9 +42,12 @@ import de.willuhn.logging.Logger;
  */
 public class Settings
 {
+  // Datei nicht haeufiger als 1 mal pro Sekunde neu laden - auch dann, wenn sie sich eventuell veraendert hat
+  private final static long RELOAD_INTERVAL = 1000L;
 
   private File file             = null;
-  private double lastModified   = 0;
+  private long lastModified     = 0L;
+  private long lastReload       = 0L;
   private Properties properties = null; // Bei Gelegenheit mal auf TypedProperties umstellen
 	private boolean storeWhenRead = false;
 
@@ -526,6 +529,15 @@ public class Settings
   {
     if (this.file == null)
       return;
+    
+    // Datei nicht haeufiger neu laden, als im Reload-Intervall hinterlegt.
+    // Grund: Werden Settings sehr oft hintereinander abgefragt, wuerde sonst
+    // dauernd "File#lastModified" aufgerufen werden, was IO-intensiv ist
+    long now = System.currentTimeMillis();
+    if (now - this.lastReload < RELOAD_INTERVAL)
+      return;
+    
+    this.lastReload = now;
     
     long modified = this.file.lastModified();
 
