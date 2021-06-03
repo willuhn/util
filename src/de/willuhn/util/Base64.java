@@ -19,7 +19,7 @@ import de.willuhn.logging.Logger;
 /**
  * Kleine Hilfe-Klasse zum Encoden und Decoden von Base64.
  * Der Zugriff auf die Encoder/Decoder von Java geschieht per Reflection, damit die Klasse sowohl
- * unter Java < 8 lauffaehig ist (dort existiert java.util.Base64 noch nicht) als auch unter Java >= 9
+ * unter Java &lt; 8 lauffaehig ist (dort existiert java.util.Base64 noch nicht) als auch unter Java &ge; 9
  * (dort existiert "sun.misc.BASE64*" nicht mehr).
  */
 public class Base64

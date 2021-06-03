@@ -368,7 +368,7 @@ public class Settings
   }
 
 	/**
-   * Speichert das Attribut <name> mit dem zugehoerigen Wert <value>.
+   * Speichert das Attribut <tt>name</tt> mit dem zugehoerigen Wert <tt>value</tt>.
    * Wenn ein gleichnamiges Attribut bereits existiert, wird es ueberschrieben.
    * Ist der Wert des Attributes <code>null</code>, wird es entfernt.
    * @param name Name des Attributs.
@@ -396,7 +396,7 @@ public class Settings
   }
 
   /**
-   * Speichert das Attribut <name> mit der zugehoerigen Liste von Werten <value>.
+   * Speichert das Attribut <tt>name</tt> mit der zugehoerigen Liste von Werten <tt>value</tt>.
    * Wenn ein gleichnamiges Attribut bereits existiert, werden dessen Werte ueberschrieben.
    * Ist der Wert des Attributes <code>null</code>, wird es entfernt.
    * Von dem Array werden die ersten maximal 256 Elemente gespeichert.
