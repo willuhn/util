@@ -1,7 +1,7 @@
 plugins {
-    id 'java-library'
-    id 'eclipse'
-    id 'idea'
+    id 'my.java-library-conventions'
+    id 'my.java-oldschool-project-structure'
+    id 'my.encoding.8859-1'
 }
 
 group 'de.willuhn.jameica'
@@ -13,40 +13,6 @@ java {
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'ISO-8859-1'
-}
-tasks.withType(Javadoc) {
-    options.encoding = 'ISO-8859-1'
-}
-
 jar {
     baseName "de_willuhn_${project.name}"
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-    }
-
-    test {
-        java {
-            srcDirs = ['test']
-        }
-    }
-}
-
-eclipse {
-    classpath {
-        downloadJavadoc = true
-        downloadSources = false
-    }
-}
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = false
-    }
 }
