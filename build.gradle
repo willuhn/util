@@ -13,6 +13,9 @@ java {
     }
 }
 
+// solange noch die Logik des ANT-Builds benötigt wird, nutze einen Unterordner
+buildDir = file("./build/gradle/")
+
 jar {
     baseName "de_willuhn_${project.name}"
 }
