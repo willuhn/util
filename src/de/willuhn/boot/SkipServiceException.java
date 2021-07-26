@@ -15,7 +15,8 @@ package de.willuhn.boot;
  * geworfen werden kann, wenn diese zwar fehlschlug, sie jedoch
  * nicht dazu fuehren soll, dass der gesamte Boot-Prozess abgebrochen wird.
  */
-public class SkipServiceException extends Exception {
+public class SkipServiceException extends Exception
+{
 
 	private Bootable bootable = null;
 
@@ -24,7 +25,8 @@ public class SkipServiceException extends Exception {
    * @param bootable Dienst, der die Exception ausgeloest hat.
    * @param message Text.
    */
-  public SkipServiceException(Bootable bootable,String message) {
+  public SkipServiceException(Bootable bootable, String message)
+  {
 		super(message);
 		this.bootable = bootable;
   }
@@ -35,7 +37,8 @@ public class SkipServiceException extends Exception {
 	 * @param message Text.
 	 * @param cause
 	 */
-	public SkipServiceException(Bootable bootable,String message, Throwable cause) {
+  public SkipServiceException(Bootable bootable, String message, Throwable cause)
+  {
 		super(message,cause);
 		this.bootable = bootable;
 	}

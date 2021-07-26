@@ -141,8 +141,7 @@ public class LogrotateTarget implements Target
             read = is.read(buf);
             if (read > 0)
               os.write(buf,0,read);
-          }
-          while(read != -1);
+          } while (read != -1);
           Logger.info("old log file compressed");
         }
         catch (Throwable t)
