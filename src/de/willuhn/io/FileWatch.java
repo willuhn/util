@@ -19,7 +19,6 @@ import java.util.Vector;
 
 /**
  * Diese Klasse kann Dateien ueberwachen und bei Aenderung ein Event ausloesen.
- * @author willuhn
  */
 public class FileWatch
 {

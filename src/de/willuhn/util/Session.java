@@ -20,7 +20,6 @@ import de.willuhn.logging.Logger;
 
 /**
  * Implementierung eines Session-Containers.
- * @author willuhn
  */
 public class Session extends Observable
 {
@@ -215,7 +214,6 @@ public class Session extends Observable
   
   /**
    * Der Worker-Thread.
-   * @author willuhn
    */
   private final static class Worker extends Thread
   {
