@@ -25,7 +25,6 @@ import de.willuhn.util.ProgressMonitor;
 
 /**
  * Hilfklasse zum Entpacken von ZIP-Archiven.
- * @author willuhn
  */
 public class ZipExtractor extends AbstractZipSupport
 {

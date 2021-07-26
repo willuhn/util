@@ -14,7 +14,6 @@ import de.willuhn.util.ProgressMonitor;
 
 /**
  * Abstrakte Basisklasse fuer ZIP-Support.
- * @author willuhn
  */
 public class AbstractZipSupport
 {

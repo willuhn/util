@@ -27,7 +27,6 @@ import de.willuhn.logging.*;
  * Sie uebersetzt nicht nur alle Strings sondern speichert auch alle
  * nicht uebersetzbaren Strings waehrend der aktuellen Sitzung und
  * speichert diese beim Beenden der Anwendung im Temp-Verzeichnis ab.
- * @author willuhn
  */
 public class I18N
 {

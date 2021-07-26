@@ -31,7 +31,6 @@ import de.willuhn.logging.Logger;
  * [1]    Vollstaendiger Name der zu ladenden Klasse.
  * [2]    Basis-Verzeichnis, in dem rekursiv nach Jars und Klassen gesucht werden soll.
  * [3]... Liste von Parametern, die an die eigentlich Anwendung durchgereicht werden sollen.
- * @author willuhn
  */
 public class BootStrap
 {
