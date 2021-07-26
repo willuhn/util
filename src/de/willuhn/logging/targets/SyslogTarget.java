@@ -68,7 +68,7 @@ public class SyslogTarget implements Target
   {
   	if (message == null)
   		return;
-		String s = "[" + message.getLevel().getName() + "] " + message.getText();
+		String s = "[" + message.getLevel().name() + "] " + message.getText();
   	byte[] data = s.getBytes();
 
 		DatagramPacket packet = new DatagramPacket(data, data.length, targetHost, port);

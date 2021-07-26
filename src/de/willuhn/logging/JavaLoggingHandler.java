@@ -33,7 +33,7 @@ public class JavaLoggingHandler extends Handler
 {
   private final static Handler singleton = new JavaLoggingHandler();
   
-  private static Map logMapping = new HashMap();
+  private static Map<java.util.logging.Level, Level> logMapping = new HashMap();
   static
   {
     try
@@ -78,9 +78,9 @@ public class JavaLoggingHandler extends Handler
     if (record == null)
       return;
     
-    Level level = (Level) logMapping.get(record.getLevel());
+    Level level = logMapping.get(record.getLevel());
     if (level == null)
-      level = Level.DEFAULT;
+      level = Logger.DEFAULT;
         
     String message = record.getMessage();
     Throwable t    = record.getThrown();

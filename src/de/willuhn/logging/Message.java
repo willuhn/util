@@ -132,7 +132,7 @@ public class Message
     if (this.level != null)
     {
       sb.append("[");
-      sb.append(this.level.getName());
+      sb.append(this.level.name());
       sb.append("]");
     }
 

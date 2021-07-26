@@ -38,7 +38,10 @@ public class Logger
   // wenn man irgendwo in der Anwendung mal die letzten Zeilen des Logs ansehen will.
   private static History lastLines = new History(BUFFER_SIZE);
 
-	private static Level level = Level.DEFAULT;
+	public static final Level DEFAULT = Level.INFO;
+
+	/** hält den aktuellen Wert vom Loglevel */
+	private static Level level = DEFAULT;
 
 	private static LoggerThread lt = null;
 	
@@ -103,7 +106,7 @@ public class Logger
    */
   public static boolean isLogging(Level l)
   {
-    return l != null && l.getValue() >= Logger.level.getValue();
+    return Logger.level.includes(l);
   }
 
   /**
@@ -256,7 +259,7 @@ public class Logger
   {
     // Wir checken, ob der uebergebene Level mindestens genauso wertig ist,
     // wie unser aktueller
-    if (level.getValue() < Logger.level.getValue())
+    if (!Logger.level.includes(level))
       return;
 
     if (t != null)
