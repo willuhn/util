@@ -394,9 +394,7 @@ public class Logger
       }
     }
 
-    /**
-     * @see java.lang.Runnable#run()
-     */
+    @Override
     public void run()
     {
     	Message msg = null;

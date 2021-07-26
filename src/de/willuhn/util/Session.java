@@ -166,9 +166,7 @@ public class Session extends Observable
     }
   }
 
-  /**
-   * @see java.lang.Object#finalize()
-   */
+  @Override
   protected void finalize() throws Throwable
   {
     getWorker().unregister(this);
@@ -272,9 +270,7 @@ public class Session extends Observable
       }
     }
 
-    /**
-     * @see java.lang.Runnable#run()
-     */
+    @Override
     public void run()
     {
       try

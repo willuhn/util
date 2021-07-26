@@ -81,9 +81,7 @@ public class LogrotateTarget implements Target
     this.zip = zip;
   }
   
-  /**
-   * @see de.willuhn.logging.targets.Target#write(de.willuhn.logging.Message)
-   */
+  @Override
   public void write(Message message) throws Exception
   {
     if (message == null)
@@ -93,9 +91,7 @@ public class LogrotateTarget implements Target
     os.write((message.toString() + lineSep).getBytes());
   }
 
-  /**
-   * @see de.willuhn.logging.targets.Target#close()
-   */
+  @Override
   public void close() throws Exception
   {
     os.close();
