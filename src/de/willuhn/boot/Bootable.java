@@ -18,7 +18,8 @@ package de.willuhn.boot;
  * <br>Sie muessen ausserdem einen parameterlosen Konstruktor
  * mit dem Modifier <code>public</code> besitzen (siehe JavaBean-Spec.). 
  */
-public interface Bootable {
+public interface Bootable
+{
 
   /**
 	 * Wird vom BootLoader aufgerufen, wenn der Dienst initialisiert werden soll.

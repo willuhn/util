@@ -57,21 +57,32 @@ public class FileCopy
 
 		FileChannel srcChannel = null;
 		FileChannel dstChannel = null;
-		try {
+		try
+		{
 			srcChannel = new FileInputStream(from).getChannel();
 			dstChannel = new FileOutputStream(to).getChannel();
 			dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
 		}
 		finally
 		{
-			try {
+			try
+			{
 			  if (srcChannel != null)
   				srcChannel.close();
-			}	catch (IOException e) { /* useless */ }
-			try {
+			}
+			catch (IOException e)
+			{
+			  /* useless */
+			}
+			try
+			{
 			  if (dstChannel != null)
   				dstChannel.close();
-			}	catch (IOException e) { /* useless */ }
+			}
+			catch (IOException e)
+			{
+			  /* useless */
+			}
 		}
 	}
 	

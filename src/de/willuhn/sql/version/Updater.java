@@ -93,7 +93,8 @@ public class Updater
       return;
     }
     
-    File[] files = baseDir.listFiles(new FilenameFilter() {
+    File[] files = baseDir.listFiles(new FilenameFilter()
+    {
       public boolean accept(File dir, String name)
       {
         if (name == null)
@@ -252,9 +253,14 @@ public class Updater
       {
         if (reader != null)
         {
-          try {
+          try
+          {
             reader.close();
-          } catch (Exception e) {/*useless*/}
+          }
+          catch (Exception e)
+          {
+            /* useless */
+          }
         }
       }
     }
@@ -339,9 +345,14 @@ public class Updater
       {
         if (is != null)
         {
-          try {
+          try
+          {
             is.close();
-          } catch (Exception e) {/* useless */}
+          }
+          catch (Exception e)
+          {
+            /* useless */
+          }
         }
       }
     }

@@ -231,7 +231,8 @@ public class Settings
     String s = this.properties.getProperty(name,def);
     if (s != null) s = s.trim(); // BUGZILLA 477
     long l = defaultValue;
-    try {
+    try
+    {
       l = Long.parseLong(s);
     }
     catch (NumberFormatException e)
@@ -259,7 +260,8 @@ public class Settings
 		String s = this.properties.getProperty(name,def);
     if (s != null) s = s.trim(); // BUGZILLA 477
 		double d = defaultValue;
-		try {
+		try
+		{
 			d = Double.parseDouble(s);
 		}
 		catch (NumberFormatException e)

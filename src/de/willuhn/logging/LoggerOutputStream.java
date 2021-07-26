@@ -15,7 +15,8 @@ import de.willuhn.io.LineOutputStream;
 /**
  * Ein OutputStream, der alle Ausgaben in den Logger schreibt.
  */
-public class LoggerOutputStream extends LineOutputStream {
+public class LoggerOutputStream extends LineOutputStream
+{
 
 	private Level level;
 

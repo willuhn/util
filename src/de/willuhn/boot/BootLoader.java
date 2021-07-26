@@ -21,7 +21,8 @@ import de.willuhn.util.ProgressMonitor;
  * Der BootLoader.
  * Über diese Klasse kann ein kaskadierender Boot-Prozess gestartet werden.
  */
-public class BootLoader {
+public class BootLoader
+{
 
 	/**
 	 * Lookup der initialisierten Services.
@@ -225,7 +226,11 @@ public class BootLoader {
     /**
      * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
      */
-    public int getPercentComplete() {return 0;}
+    public int getPercentComplete()
+    {
+      return 0;
+    }
+
     /**
      * @see de.willuhn.util.ProgressMonitor#setStatus(int)
      */
