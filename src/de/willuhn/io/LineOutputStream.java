@@ -50,9 +50,7 @@ public abstract class LineOutputStream extends OutputStream {
     buffer = new char[bufferSize];
   }
 
-  /**
-   * @see java.io.OutputStream#write(int)
-   */
+  @Override
   public final void write(int b) throws IOException {
 
 		// Wenn ein Linebreak kommt, schreiben wir raus

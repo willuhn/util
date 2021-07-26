@@ -71,8 +71,8 @@ public class JavaLoggingHandler extends Handler
 
   /**
    * Ueberschrieben, um die Ausgaben in unseren Logger umzuleiten.
-   * @see java.util.logging.Handler#publish(java.util.logging.LogRecord)
    */
+  @Override
   public synchronized void publish(LogRecord record)
   {
     if (record == null)
@@ -105,16 +105,12 @@ public class JavaLoggingHandler extends Handler
     Logger.write(msg);
   }
 
-  /**
-   * @see java.util.logging.Handler#close()
-   */
+  @Override
   public void close() throws SecurityException
   {
   }
 
-  /**
-   * @see java.util.logging.Handler#flush()
-   */
+  @Override
   public void flush()
   {
   }

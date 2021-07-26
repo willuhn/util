@@ -138,9 +138,7 @@ public class MulticastClient
       }
     }
     
-    /**
-     * @see java.lang.Thread#run()
-     */
+    @Override
     public void run()
     {
       try
@@ -174,9 +172,7 @@ public class MulticastClient
       }
     }
     
-    /**
-     * @see java.lang.Thread#toString()
-     */
+    @Override
     public String toString()
     {
       return "multicast-client " + address.getHostAddress() + ":" + port;      

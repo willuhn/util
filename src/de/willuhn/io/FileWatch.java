@@ -129,9 +129,7 @@ public class FileWatch
    */
   private static class Worker extends TimerTask
   {
-    /**
-     * @see java.util.TimerTask#run()
-     */
+    @Override
     public void run()
     {
       for (int i=0;i<files.size();++i)
