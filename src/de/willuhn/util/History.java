@@ -27,9 +27,7 @@ public class History extends Queue
     super(capacity);
   }
 
-  /**
-   * @see de.willuhn.util.Queue#push(java.lang.Object)
-   */
+  @Override
   public synchronized void push(Object o)
   {
   	if (full())

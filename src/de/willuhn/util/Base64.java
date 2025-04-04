@@ -136,17 +136,13 @@ public class Base64
       }
     }
 
-    /**
-     * @see de.willuhn.util.Base64.Encoder#exists()
-     */
+    @Override
     public boolean exists()
     {
       return decoder != null && encoder != null;
     }
     
-    /**
-     * @see de.willuhn.util.Base64.Encoder#decode(java.lang.String)
-     */
+    @Override
     public byte[] decode(String base64) throws IOException
     {
       if (this.decoder == null)
@@ -168,9 +164,7 @@ public class Base64
       }
     }
     
-    /**
-     * @see de.willuhn.util.Base64.Encoder#encode(byte[])
-     */
+    @Override
     public String encode(byte[] text)
     {
       if (this.encoder == null)
@@ -235,17 +229,13 @@ public class Base64
       }
     }
     
-    /**
-     * @see de.willuhn.util.Base64.Encoder#exists()
-     */
+    @Override
     public boolean exists()
     {
       return decoder != null && encoder != null;
     }
     
-    /**
-     * @see de.willuhn.util.Base64.Encoder#decode(java.lang.String)
-     */
+    @Override
     public byte[] decode(String base64) throws IOException
     {
       if (this.decoder == null)
@@ -267,9 +257,7 @@ public class Base64
       }
     }
     
-    /**
-     * @see de.willuhn.util.Base64.Encoder#encode(byte[])
-     */
+    @Override
     public String encode(byte[] text)
     {
       if (this.encoder == null)

@@ -29,9 +29,7 @@ public class LoggerOutputStream extends LineOutputStream {
     this.level = logLevel;
   }
 
-  /**
-   * @see de.willuhn.io.LineOutputStream#writeLine(java.lang.String)
-   */
+  @Override
   public void writeLine(String s)
   {
     Logger.write(level,s);

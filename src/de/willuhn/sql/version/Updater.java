@@ -302,9 +302,7 @@ public class Updater
       this.provider = provider;
     }
     
-    /**
-     * @see java.lang.ClassLoader#findClass(java.lang.String)
-     */
+    @Override
     public Class findClass(String name)
     {
       InputStream is = null;

@@ -96,17 +96,14 @@ public class Level
 	{
 		return (Level) registry.get(name);
 	}
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
+
+  @Override
   public boolean equals(Object obj)
   {
   	return ((Level)obj).value == this.value;
   }
 
-  /**
-   * @see java.lang.Object#toString()
-   */
+  @Override
   public String toString()
   {
     return "Name: " + name + ", Level: " + value;

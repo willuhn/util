@@ -36,29 +36,17 @@ public class AbstractZipSupport
    */
   private class DummyMonitor implements ProgressMonitor
   {
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setPercentComplete(int)
-     */
+    @Override
     public void setPercentComplete(int percent) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#addPercentComplete(int)
-     */
+    @Override
     public void addPercentComplete(int percent) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
-     */
+    @Override
     public int getPercentComplete() {return 0;}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatus(int)
-     */
+    @Override
     public void setStatus(int status) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#setStatusText(java.lang.String)
-     */
+    @Override
     public void setStatusText(String text) {}
-    /**
-     * @see de.willuhn.util.ProgressMonitor#log(java.lang.String)
-     */
+    @Override
     public void log(String msg) {}
   }
 }

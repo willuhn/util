@@ -61,9 +61,7 @@ public class SyslogTarget implements Target
 		this.socket = new DatagramSocket();
   }
 
-  /**
-   * @see de.willuhn.logging.targets.Target#write(de.willuhn.logging.Message)
-   */
+  @Override
   public void write(Message message) throws Exception
   {
   	if (message == null)
@@ -75,9 +73,7 @@ public class SyslogTarget implements Target
 		socket.send(packet);
 	}
 
-  /**
-   * @see de.willuhn.logging.targets.Target#close()
-   */
+  @Override
   public void close() throws Exception
   {
   	socket.close();

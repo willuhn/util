@@ -178,9 +178,7 @@ public class MultipleClassLoader extends ClassLoader
     return addJars(directory, new String[] {"jar","zip"});
   }
 
-  /**
-   * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
-   */
+  @Override
   public InputStream getResourceAsStream(String name) {
     InputStream is = ucl.getResourceAsStream(name);
     if (is != null)
@@ -188,9 +186,7 @@ public class MultipleClassLoader extends ClassLoader
     return super.getResourceAsStream(name);
   }
   
-  /**
-   * @see java.lang.ClassLoader#getResource(java.lang.String)
-   */
+  @Override
   public URL getResource(String name)
   {
     URL url = ucl.getResource(name);
@@ -199,9 +195,7 @@ public class MultipleClassLoader extends ClassLoader
     return super.getResource(name);
   }
 
-  /**
-   * @see java.lang.ClassLoader#getResources(java.lang.String)
-   */
+  @Override
   public Enumeration<URL> getResources(String name) throws IOException
   {
     Enumeration<URL> urls = ucl.getResources(name);
@@ -210,24 +204,18 @@ public class MultipleClassLoader extends ClassLoader
     return super.getResources(name);
   }
 
-  /**
-	 * @see java.lang.ClassLoader#findClass(java.lang.String)
-	 */
+  @Override
 	protected Class findClass(String name) throws ClassNotFoundException
 	{
 		return load(name);
 	}
 
-  /**
-   * @see java.lang.ClassLoader#loadClass(java.lang.String)
-   */
+  @Override
   public Class loadClass(String name) throws ClassNotFoundException {
     return load(name);
   }
 
-  /**
-   * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)
-   */
+  @Override
   protected synchronized Class loadClass(String name, boolean resolve)
     throws ClassNotFoundException {
     Class c = load(name);
@@ -346,9 +334,7 @@ public class MultipleClassLoader extends ClassLoader
       super(new URL[]{},MultipleClassLoader.this.getParent());
     }
 
-    /**
-     * @see java.net.URLClassLoader#addURL(java.net.URL)
-     */
+    @Override
     protected void addURL(URL url)
     {
       super.addURL(url);
@@ -356,9 +342,7 @@ public class MultipleClassLoader extends ClassLoader
 
   }
 
-  /**
-   * @see java.lang.Object#toString()
-   */
+  @Override
   public String toString()
   {
     return this.getName();
