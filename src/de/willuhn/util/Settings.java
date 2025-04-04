@@ -38,7 +38,6 @@ import de.willuhn.logging.Logger;
  * sondern sie bereits mit Default-Werten in den Dateien vorfindet.
  * Wird die Properties-Datei von aussen (z.Bsp. mit einem Texteditor)
  * geaendert, wird das automatisch erkannt und die Datei intern neu geladen.
- * @author willuhn
  */
 public class Settings
 {

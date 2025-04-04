@@ -23,7 +23,6 @@ import de.willuhn.util.Queue.QueueFullException;
 
 /**
  * Kleiner System-Logger.
- * @author willuhn
  */
 public class Logger
 {

@@ -20,7 +20,6 @@ package de.willuhn.util;
  * zeigt ihn in der Oberflaeche an.
  * Konsequenz: Fehlertexte in dieser Exception muessen fuer den
  * End-Benutzer! verstaendlich formuliert sein.
- * @author willuhn
  */
 public class ApplicationException extends Exception
 {

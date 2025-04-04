@@ -31,7 +31,6 @@ import de.willuhn.logging.Message;
 /**
  * Implementierung eines Targets, welches nach einer definierten Dateigroesse
  * das Log-File rotiert und optional zippt.
- * @author willuhn
  */
 public class LogrotateTarget implements Target
 {
