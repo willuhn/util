@@ -2,16 +2,11 @@
 
 <project basedir=".." default="all" name="All">
 
-
-
 	<target name="init" description="inits the build">
 
 		<property environment="env" />
 
 		<property name="build.dir" value="build" />
-
-		<!-- read build number -->
-		<buildnumber file="${build.dir}/BUILD" />
 
 		<!-- read version number -->
 		<loadfile property="appversion" srcFile="${build.dir}/RELEASE">
@@ -20,27 +15,14 @@
 			</filterchain>
 		</loadfile>
 
-		<!-- prepare scm tag -->
-		<copy file="${build.dir}/RELEASE" tofile="${build.dir}/TAG" />
-		<replaceregexp flags="g" file="${build.dir}/TAG" match="\." replace="_" />
-		<loadfile property="mytag" srcFile="${build.dir}/TAG">
-			<filterchain>
-				<striplinebreaks />
-			</filterchain>
-		</loadfile>
-		<delete file="${build.dir}/TAG" />
-		<property name="tag" value="V_${mytag}_BUILD_${build.number}" />
-
 		<echo message="VERSION: ${appversion}" />
-		<echo message="Tag    : ${tag}" />
-		<echo message="BUILD  : ${build.number}" />
 		<echo message="JVM    : ${java.version} ${java.vendor}" />
 
 		<property name="define.jarfilename" value="de_willuhn_util.jar" />
 		<property name="define.srcfilename" value="de_willuhn_util.src.zip" />
 		<property name="define.package" value="de.willuhn" />
 
-		<property name="project.release" value="releases/${appversion}-${build.number}" />
+		<property name="project.release" value="releases/${appversion}" />
 		<property name="project.src" value="${project.release}/src/classes" />
 		<property name="project.tmp" value="${project.release}/tmp" />
 		<property name="project.javadoc" value="${project.release}/javadoc" />
@@ -57,19 +39,6 @@
 	</target>
 
 
-
-	<target depends="compile" name="tag" description="tags the source in the scm">
-		<exec executable="git" failonerror="true" dir="${basedir}">
-			<arg line="tag -m ${tag} ${tag}" />
-		</exec>
-    <exec executable="git" failonerror="true" dir="${basedir}">
-      <arg line="push origin ${tag}" />
-    </exec>
-	  
-	</target>
-
-
-
 	<target depends="compile" name="jar" description="generates the jar file">
 
 		<mkdir dir="${project.release}" />
@@ -79,7 +48,6 @@
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Implementation-Title" value="${define.jarfilename}" />
 				<attribute name="Implementation-Version" value="${appversion}" />
-				<attribute name="Implementation-Buildnumber" value="${build.number}" />
 			</manifest>
 			<fileset dir="${class.dir}" />
 		</jar>
@@ -111,7 +79,6 @@
 				<include name=".classpath" />
 				<include name="${src.dir}/**" />
 				<include name="${build.dir}/**" />
-				<exclude name="${build.dir}/BUILD" />
 			</fileset>
 		</zip>
 	</target>
@@ -138,7 +105,7 @@
 	</target>
 
 
-	<target depends="init,compile,tag,jar,javadoc,src,sign,signsrc,clean" description="build an official release" name="all" />
+	<target depends="init,compile,jar,javadoc,src,sign,signsrc,clean" description="build an official release" name="all" />
 
 
 
