@@ -181,7 +181,8 @@ public class MultipleClassLoader extends ClassLoader
   /**
    * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
    */
-  public InputStream getResourceAsStream(String name) {
+  public InputStream getResourceAsStream(String name)
+  {
     InputStream is = ucl.getResourceAsStream(name);
     if (is != null)
       return is;
@@ -221,15 +222,16 @@ public class MultipleClassLoader extends ClassLoader
   /**
    * @see java.lang.ClassLoader#loadClass(java.lang.String)
    */
-  public Class loadClass(String name) throws ClassNotFoundException {
+  public Class loadClass(String name) throws ClassNotFoundException
+  {
     return load(name);
   }
 
   /**
    * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)
    */
-  protected synchronized Class loadClass(String name, boolean resolve)
-    throws ClassNotFoundException {
+  protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException
+  {
     Class c = load(name);
     if (resolve)
       resolveClass(c);
@@ -252,7 +254,8 @@ public class MultipleClassLoader extends ClassLoader
       return c;
 
     LinkageError error = null;
-    try {
+    try
+    {
       // Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
       // Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
       // ist, dass dieser eine alle Plugins und deren Jars kennt.

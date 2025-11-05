@@ -135,13 +135,15 @@ public class I18N
   public String tr(String key)
   {
     String translated = null;
-    try {
+    try
+    {
       if (bundle != null)
         translated = bundle.getString(key);
       else if (fallbackBundle != null)
       	translated = fallbackBundle.getProperty(key);
     }
-    catch(MissingResourceException e) {
+    catch (MissingResourceException e)
+    {
     }
 
     if (translated != null)

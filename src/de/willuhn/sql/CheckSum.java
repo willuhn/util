@@ -43,7 +43,8 @@ public class CheckSum
     Logger.info("calculating md5 checksum for database " + schema);
     StringBuffer sum = new StringBuffer();
     ResultSet rs = null;
-    try {
+    try
+    {
       DatabaseMetaData dmd = conn.getMetaData();
       rs = dmd.getColumns(catalog,schema,null,null);
       String s = null;
@@ -57,7 +58,8 @@ public class CheckSum
     }
     finally
     {
-      try {
+      try
+      {
         if (rs != null)
           rs.close();
       }

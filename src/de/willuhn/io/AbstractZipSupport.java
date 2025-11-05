@@ -47,7 +47,11 @@ public class AbstractZipSupport
     /**
      * @see de.willuhn.util.ProgressMonitor#getPercentComplete()
      */
-    public int getPercentComplete() {return 0;}
+    public int getPercentComplete()
+    {
+      return 0;
+    }
+
     /**
      * @see de.willuhn.util.ProgressMonitor#setStatus(int)
      */

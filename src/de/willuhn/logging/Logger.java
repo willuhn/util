@@ -184,7 +184,8 @@ public class Logger
 
 		// Wir muessen noch etwas warten, bis der Thread alle Eintraege
 		// aus der Queue geschrieben hat.
-		try {
+		try
+		{
 			while (!lt.finished())
 			{
 				Thread.sleep(50);
@@ -202,7 +203,8 @@ public class Logger
 			for (int i=0;i<targets.size();++i)
 			{
 				target = (Target) targets.get(i);
-				try {
+				try
+				{
 					target.close();
 				}
 				catch (Exception io)
@@ -262,16 +264,21 @@ public class Logger
     if (t != null)
     {
       ByteArrayOutputStream bos = null;
-      try {
+      try
+      {
         bos = new ByteArrayOutputStream();
         t.printStackTrace(new PrintStream(bos));
         message += "\n" + bos.toString();
       }
-      finally {
-        try {
+      finally
+      {
+        try
+        {
           bos.close();
         }
-        catch (Exception npe) {}
+        catch (Exception npe)
+        {
+        }
       }
     }
 

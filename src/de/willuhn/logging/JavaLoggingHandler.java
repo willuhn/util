@@ -88,16 +88,21 @@ public class JavaLoggingHandler extends Handler
     if (t != null)
     {
       ByteArrayOutputStream bos = null;
-      try {
+      try
+      {
         bos = new ByteArrayOutputStream();
         t.printStackTrace(new PrintStream(bos));
         message += "\n" + bos.toString();
       }
-      finally {
-        try {
+      finally
+      {
+        try
+        {
           bos.close();
         }
-        catch (Exception npe) {}
+        catch (Exception npe)
+        {
+        }
       }
     }
     

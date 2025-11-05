@@ -92,14 +92,16 @@ public class ScriptExecutor
     String currentStatement = null;
 
     boolean commitState = false;
-    try {
+    try
+    {
 
       BufferedReader br = null;
       String thisLine = null;
       StringBuffer all = new StringBuffer();
 
       int lines = 0;
-      try {
+      try
+      {
 
         if (monitor != null) monitor.setStatusText("reading sql script");
         Logger.debug("reading sql script");
@@ -124,11 +126,13 @@ public class ScriptExecutor
       }
       finally
       {
-        try {
+        try
+        {
           if (br != null)
             br.close();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
           Logger.error("error while closing file reader",e);
         }
       }
@@ -194,7 +198,8 @@ public class ScriptExecutor
       Logger.error("error while executing sql script. Current statement: " + currentStatement,e);
       throw new SQLException("exception while executing sql script: " + e.getMessage() + ". Current statement: " + currentStatement,currentStatement,e.getErrorCode(),e);
     }
-    finally {
+    finally
+    {
       try
       {
         if (stmt != null)

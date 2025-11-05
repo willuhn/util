@@ -18,7 +18,8 @@ import java.util.jar.Manifest;
  * Hilfs-Klasse, um Meta-Informationen aus JARs zu lesen.
  * Dabei werden die INFOs aus dem Manifest verwendet.
  */
-public class JarInfo {
+public class JarInfo
+{
 
   private Manifest manifest = null;
 
@@ -47,7 +48,8 @@ public class JarInfo {
    * @param jar das Jar-File, aus dem die Infos gelesen werden sollen.
    * @throws IOException
    */
-  public JarInfo(JarFile jar) throws IOException {
+  public JarInfo(JarFile jar) throws IOException
+  {
     this.manifest = jar.getManifest();
   }
 
@@ -69,7 +71,8 @@ public class JarInfo {
    */
   public double getVersion()
   {
-    try {
+    try
+    {
       return Double.parseDouble(getAttribute(ATTRIBUTE_VERSION));
     }
     catch (Exception e)
@@ -85,7 +88,8 @@ public class JarInfo {
    */
   public int getBuildnumber()
   {
-    try {
+    try
+    {
       return Integer.parseInt(getAttribute(ATTRIBUTE_BUILDNUMBER));
     }
     catch (Exception e)
@@ -101,7 +105,8 @@ public class JarInfo {
    */
   public String getBuildDate()
   {
-    try {
+    try
+    {
       return getAttribute(ATTRIBUTE_BUILDDATE);
     }
     catch (Exception e)

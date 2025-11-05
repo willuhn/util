@@ -33,7 +33,8 @@ public class Inject
    */
   public static void inject(Object bean, Class<? extends Annotation> a, final Object value) throws Exception
   {
-    inject(bean,new Injector() {
+    inject(bean, new Injector()
+    {
       public void inject(Object bean, AccessibleObject field, Annotation a) throws Exception
       {
         field.setAccessible(true);

@@ -22,7 +22,8 @@ import java.io.OutputStream;
  * Hinweis: Ist die Zeile laenger als der angegebene Buffer, wird bei Erreichen
  * der Buffer-Groesse auch schon vor dem Zeilenende geschrieben.  
  */
-public abstract class LineOutputStream extends OutputStream {
+public abstract class LineOutputStream extends OutputStream
+{
 
 	private int bufferSize = 1024;
 

@@ -190,7 +190,8 @@ public class MulticastClient
    */
   public final static void main(String[] args) throws Exception
   {
-    final MulticastClient client = new MulticastClient() {
+    final MulticastClient client = new MulticastClient()
+    {
     
       public void received(DatagramPacket packet) throws IOException
       {

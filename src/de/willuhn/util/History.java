@@ -38,7 +38,9 @@ public class History extends Queue
     {
       super.push(o);
     }
-    catch (QueueFullException e){}
+    catch (QueueFullException e)
+    {
+    }
   }
 
 }
