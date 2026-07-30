@@ -19,7 +19,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import de.willuhn.io.FileFinder;
 import de.willuhn.logging.Logger;
@@ -29,11 +31,12 @@ import de.willuhn.logging.Logger;
  */
 public class MultipleClassLoader extends ClassLoader
 {
-  private String name           = null;
-  private ArrayList loaders   	= new ArrayList();
-  private Hashtable cache     	= new Hashtable();
-  private ClassFinder finder   	= new ClassFinder();
-  private URLLoader ucl       	= new URLLoader();
+  private String name               = null;
+  private List<ClassLoader> loaders = new ArrayList<>();
+  private Map<String,Class> cache   = new HashMap<>();
+  private ClassFinder finder   	    = new ClassFinder();
+  private ClassLoader myParent      = null;
+  private URLLoader ucl       	    = null;
 
 	/**
 	 * Erzeugt eine neue Instanz des Classloaders.
@@ -41,6 +44,15 @@ public class MultipleClassLoader extends ClassLoader
 	public MultipleClassLoader()
 	{
 		super();
+	}
+	
+	/**
+	 * Optionale Angabe des Parent-Classloaders.
+	 * @param parent der Parent-Classloader.
+	 */
+	public void setParent(ClassLoader parent)
+	{
+	  this.myParent = parent;
 	}
 	
 	/**
@@ -53,8 +65,7 @@ public class MultipleClassLoader extends ClassLoader
 	}
 	
 	/**
-	 * Liefert den Namen des Classloaders.
-	 * @return der Name des Classloaders.
+	 * @see java.lang.ClassLoader#getName()
 	 */
 	public String getName()
 	{
@@ -62,7 +73,7 @@ public class MultipleClassLoader extends ClassLoader
 	    return "multipleClassLoader";
 	  return this.name;
 	}
-
+	
   /**
    * Fuegt einen weiteren ClassLoader hinzu,
    * @param loader der hinzuzufuegende Classloader.
@@ -80,12 +91,25 @@ public class MultipleClassLoader extends ClassLoader
   }
   
   /**
+   * Liefert den internen URL-basierten Classloader.
+   * Erzeugen wir erst on-demand, damit myparent zu dem Zeitpunkt schon gesetzt sein kann.
+   * @return der interne URL-basierte Classloader.
+   */
+  private URLLoader getURLLoader()
+  {
+    if (this.ucl == null)
+      this.ucl = new URLLoader();
+    
+    return this.ucl;
+  }
+  
+  /**
    * Fuegt die uebergebene URL dem Class-Loader hinzu.
    * @param url die URL.
    */
   public void add(URL url)
   {
-    this.ucl.addURL(url);
+    this.getURLLoader().addURL(url);
   }
   
   /**
@@ -95,7 +119,7 @@ public class MultipleClassLoader extends ClassLoader
    */
   public URL[] getURLs()
   {
-    return this.ucl.getURLs();
+    return this.getURLLoader().getURLs();
   }
   
   /**
@@ -182,7 +206,7 @@ public class MultipleClassLoader extends ClassLoader
    * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
    */
   public InputStream getResourceAsStream(String name) {
-    InputStream is = ucl.getResourceAsStream(name);
+    InputStream is = this.getURLLoader().getResourceAsStream(name);
     if (is != null)
       return is;
     return super.getResourceAsStream(name);
@@ -193,7 +217,7 @@ public class MultipleClassLoader extends ClassLoader
    */
   public URL getResource(String name)
   {
-    URL url = ucl.getResource(name);
+    URL url = this.getURLLoader().getResource(name);
     if (url != null)
       return url;
     return super.getResource(name);
@@ -204,7 +228,7 @@ public class MultipleClassLoader extends ClassLoader
    */
   public Enumeration<URL> getResources(String name) throws IOException
   {
-    Enumeration<URL> urls = ucl.getResources(name);
+    Enumeration<URL> urls = this.getURLLoader().getResources(name);
     if (urls != null && urls.hasMoreElements())
       return urls;
     return super.getResources(name);
@@ -247,11 +271,10 @@ public class MultipleClassLoader extends ClassLoader
   {
 
     // zuerst im Cache schauen.
-    Class c = (Class) cache.get(className);
+    Class c = cache.get(className);
     if (c != null)
       return c;
 
-    LinkageError error = null;
     try {
       // Dann versuchen wir es mit 'nem URLClassLoader, der alle URLs kennt.
       // Wir nehmen deswegen nur einen URLClassloader, damit sichergestellt
@@ -260,42 +283,28 @@ public class MultipleClassLoader extends ClassLoader
       // Da wir dem UCL als Parent-Classloader nicht uns selbst sondern
       // den System-Classloader uebergeben haben, brauchen wir nur
       // den UCL fragen und nicht extra nochmal den System-Classloader
-      return findVia(ucl,className);
+      return findVia(this.getURLLoader(),className);
     }
-    catch (LinkageError r)
-    {
-      error = r;
-    }
-    catch (ClassNotFoundException e)
+    catch (Throwable t)
     {
       // kann passieren - wir suchen im naechsten Classloader
     }
 
     // ok, wir fragen die anderen ClassLoader
-    ClassLoader l = null;
-    for (int i=0;i<loaders.size();++i)
+    for (ClassLoader l:this.loaders)
     {
       try
       {
-        l = (ClassLoader) loaders.get(i);
         return findVia(l,className);
       }
-      catch (LinkageError r)
-      {
-        error = r;
-      }
-      catch (ClassNotFoundException e)
+      catch (Throwable t)
       {
         // kann passieren - wir suchen im naechsten Classloader
       }
     }
-    if (error != null)
-      throw error;
     
-    // Die oben weggeworfenee ClassNotFoundException muessen
-    // wir nicht aufheben, da in der ohnehin nicht mehr
-    // Informationen stehen als in unserer.
-    throw new ClassNotFoundException(this.getName() + ": class not found: " + className);
+    // Letzter Fallback - wir versuchen es über unseren Parent.
+    return findVia(this.myParent != null ? this.myParent : this.getParent(),className);
   }
 
   /**
@@ -329,21 +338,19 @@ public class MultipleClassLoader extends ClassLoader
   {
     return finder;
   }
-
+  
   /**
    * Wir ueberschreiben den URLClassLoader um an die Funktion "addURL" ranzukommen.
    */
   private class URLLoader extends URLClassLoader
   {
-
     /**
      * 
      */
     public URLLoader()
     {
-      // Niemals den MultipleClassLoader selbst uebergeben, das wuerde eine
-      // Rekursion ausloesen
-      super(new URL[]{},MultipleClassLoader.this.getParent());
+      // Niemals den MultipleClassLoader selbst uebergeben, das wuerde eine Rekursion ausloesen.
+      super(new URL[]{},MultipleClassLoader.this.myParent != null ? MultipleClassLoader.this.myParent : MultipleClassLoader.this.getParent());
     }
 
     /**
@@ -353,7 +360,15 @@ public class MultipleClassLoader extends ClassLoader
     {
       super.addURL(url);
     }
-
+    
+    /**
+     * @see java.lang.ClassLoader#getName()
+     */
+    @Override
+    public String getName()
+    {
+      return MultipleClassLoader.this.getName();
+    }
   }
 
   /**
@@ -364,11 +379,3 @@ public class MultipleClassLoader extends ClassLoader
     return this.getName();
   }
 }
-
-
-/*********************************************************************
- * $Log: MultipleClassLoader.java,v $
- * Revision 1.35  2011/07/18 15:43:35  willuhn
- * @N Name fuer den Classloader vergebbar
- *
- *********************************************************************/
